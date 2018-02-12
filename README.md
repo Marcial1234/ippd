@@ -29,8 +29,8 @@ The `master` branch should be kept CLEAN, and with a working code. Make branches
 
 ## Panoramic Conversion (Alex)
 ### Instalation
-+ Install *Hugin* by either installing [Hugin-win64.msi](real-mean/Hugin-win64.msi) on windows, or [download it](http://hugin.sourceforge.net/download/) if you're not on Window x64
-+ Add the files inside `real-mean\stiching` to your path
++ Install *Hugin* by either installing [Hugin-win64.msi](stiching/Hugin-win64.msi) on windows, or [download it](http://hugin.sourceforge.net/download/) if you're not on Window x64
++ If on Windows: Add the files inside `stiching` to your path
 
 ### Use
 - Once the above it's done, run `gear360pano [either a wildcard or path to unstriched files]`
