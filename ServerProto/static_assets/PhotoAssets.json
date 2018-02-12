@@ -1,0 +1,245 @@
+{
+  "nav_icon": "UpArrowNav.png",
+  "firstPhotoId":"000001",
+  "firstPhotoRotation": 0,
+  "photos": {
+    "000001": {
+      "rotationOffset": 0,
+      "uri": "Home_Page.jpg",
+      "tooltips": [
+        {
+          "rotationY": -20,
+          "text": "CISCO",
+          "linkedPhotoId": "000002"
+        },
+        {
+          "text": "Basement",
+          "rotationY": -10,
+          "linkedPhotoId": "000008"
+        },
+        {
+          "rotationY": 0,
+          "text": "IPPD Room",
+          "linkedPhotoId": "000005"
+        },
+        {
+          "text": "FiOS",
+          "rotationY": 10,
+          "linkedPhotoId": "000004"
+        },
+        {
+          "text": "Genband",
+          "rotationY": 20,
+          "linkedPhotoId": "000003"
+        }
+      ]
+    },
+    "000002": {
+      "rotationOffset": 40,
+      "uri": "CISCO.jpg",
+      "tooltips": [
+        {
+          "text": "The Basement",
+          "rotationY": -9.929,
+          "linkedPhotoId": "000008"
+        },
+        {
+          "text": "Genband",
+          "rotationY": -106.844,
+          "linkedPhotoId": "000003"
+        },
+        {
+          "text": "FiOS",
+          "rotationY": 60,
+          "linkedPhotoId": "000004"
+        },
+        {
+          "type": "image",
+          "rotationY": 115,
+          "width": 1.388,
+          "height": 1.388,
+          "source": "eco_label_brown.png",
+          "attribution": "Photo from Clipart",
+          "attributionUri": "https://openclipart.org/detail/238163/eco-label-brown"
+        }
+      ]
+    },
+    "000003": {
+      "rotationOffset": -50,
+      "uri": "Genband.jpg",
+      "tooltips": [
+        {
+          "text": "Cisco",
+          "rotationY": 100,
+          "linkedPhotoId": "000002"
+        },
+        {
+          "type": "image",
+          "rotationY": 0,
+          "width": 1.388,
+          "height": 1.388,
+          "source": "SampleServerPhoto.jpg",
+          "attribution": "Photo by Harish"
+        }
+
+      ]
+    },
+    "000004": {
+      "rotationOffset": 40,
+      "uri": "FIOS.JPG",
+      "tooltips": [
+        {
+          "text": "Cisco",
+          "rotationY": -110,
+          "linkedPhotoId": "000002"
+        },
+        {
+          "type": "textblock",
+          "title": "A Shelf",
+          "text": "Full of Things",
+          "attribution": "Photo Credit to: Harish",
+          "rotationY": 0,
+          "width": 1.5,
+          "height": 1.5
+        }
+      ]
+    },
+    "000005": {
+      "rotationOffset": -130,
+      "uri": "360_0025[1]_pano.jpg",
+      "tooltips": [
+        {
+          "text": "Home Page",
+          "rotationY": -130,
+          "linkedPhotoId": "000001"
+        },
+        {
+          "text": "Next",
+          "rotationY": 110,
+          "linkedPhotoId": "000006"
+        },
+        {
+          "type": "textblock",
+          "title": "Lockers",
+          "text": "Full of Things",
+          "attribution": "Photo Credit to: Scott",
+          "rotationY": 170,
+          "translateX": 100,
+          "width": 1.3,
+          "height": 1.5
+        },
+        {
+          "type": "textblock",
+          "title": "Chris",
+          "text": "Full of knowledge",
+          "attribution": "Photo Credit to: Scott",
+          "rotationY": 75,
+          "translateX": 100,
+          "width": 1.3,
+          "height": 1.5
+        }
+      ]
+    },
+    "000006": {
+      "rotationOffset": 110,
+      "uri": "360_0026[1]_pano.jpg",
+      "tooltips": [
+        {
+          "text": "Next",
+          "rotationY": 110,
+          "linkedPhotoId": "000007"
+        },
+        {
+          "text": "Back",
+          "rotationY": -150,
+          "linkedPhotoId": "000005"
+        },
+        {
+          "type": "textblock",
+          "title": "Lockers",
+          "text": "Full of Things",
+          "attribution": "Photo Credit to: Scott",
+          "rotationY": 170,
+          "translateX": 100,
+          "width": 1.3,
+          "height": 1.5
+        },
+        {
+          "type": "textblock",
+          "title": "Scott",
+          "text": "Photographer",
+          "attribution": "Photo Credit to: Scott",
+          "rotationY": -10,
+          "translateX": 100,
+          "width": 1.3,
+          "height": 1.5
+        }
+      ]
+    },
+    "000007": {
+      "rotationOffset": 40,
+      "uri": "360_0028[1]_pano.jpg",
+      "tooltips": [
+        {
+          "text": "Home Page",
+          "rotationY": 93,
+          "linkedPhotoId": "000001"
+        },
+        {
+          "text": "Back",
+          "rotationY": -120,
+          "linkedPhotoId": "000006"
+        },
+        {
+          "type": "textblock",
+          "title": "Lockers",
+          "text": "Full of Things",
+          "attribution": "Photo Credit to: Scott",
+          "rotationY": 175,
+          "translateX": 100,
+          "width": 1.3,
+          "height": 1.5
+        },
+        {
+          "type": "textblock",
+          "title": "Chris",
+          "text": "Creep",
+          "attribution": "Photo Credit to: Scott",
+          "rotationY": -90,
+          "translateX": 100,
+          "width": 1.3,
+          "height": 1.5
+        }
+      ]
+    },
+    "000008": {
+      "rotationOffset": 120,
+      "uri": "Basement.jpg",
+      "tooltips": [
+        {
+          "text": "Cisco",
+          "rotationY": -64.525,
+          "linkedPhotoId": "000002"
+        },
+        {
+          "type": "textblock",
+          "rotationY": 140,
+          "width": 1.280,
+          "height": 1.280,
+          "title": "Exide",
+          "text": "Exide Technologies is an American manufacturer of lead-acid batteries, including automotive batteries and industrial batteries. Its four global business groups...",
+          "attribution": "From Wikipedia.org"
+        },
+        {
+          "type": "textblock",
+          "title": "A Start",
+          "text": "We begin in the basement DC Power area. The other three areas are on the 2nd floor: Cisco, FiOS, and Genband. Some annotations from the previous project are included to show a range of posibilities.",
+          "attribution": "Photo Credit to: Harish",
+          "rotationY": 0,
+          "width": 1.5,
+          "height": 1.5
+        }
+      ]
+    }
+  }
+}
