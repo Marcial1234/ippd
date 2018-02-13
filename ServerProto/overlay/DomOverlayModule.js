@@ -17,9 +17,15 @@ export default class DomOverlayModule extends Module {
   }
 
   // This method call opens up the overlay for display.
-  openOverlay(text) {
+  openOverlay(text, title) {
     ReactDOM.render(
-      <TextboxOverlay text={text} onClose={this._closeOverlay} submit={this.submit}/>,
+      <TextboxOverlay title={title} text={text} onClose={this._closeOverlay} submit={this.submit}/>,
+      this._overlayContainer
+    );
+  }
+  openBlankOverlay() {
+    ReactDOM.render(
+      <TextboxOverlay onClose={this._closeOverlay} submit={this.submit}/>,
       this._overlayContainer
     );
   }
@@ -38,7 +44,7 @@ export default class DomOverlayModule extends Module {
     //'text' is value we are returning from here.
     submit(text){
       this.rnContext.callFunction('RCTDeviceEventEmitter', 'emit', [
-        'textUpdated', text,
+        'updateText', text,
       ]);
     }
 }

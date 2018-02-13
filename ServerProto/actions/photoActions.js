@@ -29,3 +29,10 @@ export function changeZoom(zoom){
     payload: zoom,
   }
 }
+
+export function updateData(data){
+  return{
+    type: "Change Data",
+    payload: data,
+  }
+}

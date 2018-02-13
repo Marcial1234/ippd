@@ -154,6 +154,7 @@ const mapDispatchToProps = dispatch => ({
   changeLocationId: (locationId) => dispatch(photo.changeLocationId(locationId)),
   changeNextLocationId: (locationId) => dispatch(photo.changeNextLocationId(locationId)),
   changeZoom: (zoom) => dispatch(photo.changeZoom(zoom)),
+  updateData: (data) => dispatch(photo.updateData(data)),
 });
 
 //This sends the variables and functions to be referenced as "this.props"

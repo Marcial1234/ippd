@@ -41,4 +41,26 @@ export default styles = StyleSheet.create({
     backgroundColor: '#2fa504',
     justifyContent: 'center',
   },
+  tooltipList:{
+    padding: 0.02,
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    transform: [{translateZ: -1}],
+    position: 'absolute',
+    flexDirection: 'column',
+    bottom: -.4,
+    right: -.75,
+  },
+  tooltipListItem:{
+    backgroundColor: '#224b8e',
+    fontSize: 0.04,
+    margin: 0.01,
+    padding: 0.005,
+  },
+
+  tooltipListItemSelected:{
+    backgroundColor: '#4286f4',
+    fontSize: 0.04,
+    margin: 0.01,
+    padding: 0.005,
+  }
 });

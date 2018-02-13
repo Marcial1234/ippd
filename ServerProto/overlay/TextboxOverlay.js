@@ -22,7 +22,7 @@ export default class TextboxOverlay extends React.Component{
   handleSubmit(event) {
     //This prevent the page from reloading on submit
     event.preventDefault();
-    //this.props.submit(this.state.value);
+    this.props.submit(this.state.value);
     this.props.onClose();
   }
 
@@ -34,8 +34,8 @@ export default class TextboxOverlay extends React.Component{
           <div>
             <form onSubmit={this.handleSubmit}>
               <label>
-                Text Input:
-                <textarea value={this.state.value} onChange={this.handleChange} style = {{height: 175, width: 250}} />
+                {this.props.title}
+                <textarea value={this.state.value} onChange={this.handleChange} style = {{height: 100, width: 250}} />
               </label>
               <input type="submit" value="Submit" />
             </form>
