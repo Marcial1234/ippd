@@ -10,13 +10,13 @@
 ## Contribution Guidelines
 > WRITE YOUR PROCESS HERE, ALEX
 
-The `master` branch should be kept CLEAN, and with a working code. Make branches and merge with `master` as you FULLY develop/implement new features. 
+The `master` branch should be kept CLEAN, and with a working code. Make branches and merge with `master` as you FULLY develop/implement new features.
 `branch_names_with_underscores_preferred`
 
 **IMPORTANT**: Make issues (or spam code creator/writer) if there's spaghetti code, and we're not on 'hell weeks'.
 
 <!-- commenting this for now -->
-<!-- 
+<!--
 - MEAN (*run the following commands inside* `real-mean`)
     + First Installation
         + Run `npm run first-install`
@@ -28,12 +28,12 @@ The `master` branch should be kept CLEAN, and with a working code. Make branches
  -->
 
 ## Panoramic Conversion (Alex)
-### Instalation
+### Installation
 + Install *Hugin* by either installing [Hugin-win64.msi](real-mean/Hugin-win64.msi) on windows, or [download it](http://hugin.sourceforge.net/download/) if you're not on Window x64
 + Add the files inside `real-mean\stiching` to your path
 
 ### Use
-- Once the above it's done, run `gear360pano [either a wildcard or path to unstriched files]`
+- Once the above it's done, run `gear360pano [either a wildcard or path to unstitched files]`
     - Works on windows x64
     - If not, manually run `gear360pano.cmd [path to unstiched files]` on the bash script's directory.
 'Stitched' panoramic files will be dumped as `[original file name]-pano.[original extension]`
@@ -58,3 +58,8 @@ The `master` branch should be kept CLEAN, and with a working code. Make branches
         + Create: On n amount of clicks, calculate the offsets/rotationY needed to create the tooltips
     + TBA: Store into into a nice DB format somewhat compatible with Verizon's old/Oracle style
 + Add the "map" view that shows to location of where the picture was taken inside of central office.
+
+## Redux tutorials
+[Part 1/7 for Redux/React Tutorial](https://www.youtube.com/watch?v=1w-oQ-i1XB8&t=1shttps://www.youtube.com/watch?v=1w-oQ-i1XB8&t=1s)
+
+[Project showing Redux/ReactVR](https://github.com/fukumasuya/react-vr-redux-example)
