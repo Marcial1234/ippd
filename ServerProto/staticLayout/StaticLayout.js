@@ -18,13 +18,14 @@ export default class StaticLayout extends React.Component {
     this.goHome = this.goHome.bind(this);
     this.toggleTooltips = this.toggleTooltips.bind(this);
     this.selectTooltip = this.selectTooltip.bind(this);
+    this.createNote = this.createNote.bind(this);
 
   }
 
   componentWillMount(){
     //will respond to the call for 'textUpdated', e is the value recieved
-    RCTDeviceEventEmitter.addListener('updateText', text => {
-    this.updateText(text);
+    RCTDeviceEventEmitter.addListener('updateText', obj => {
+    this.updateText(obj);
     });
   }
 
@@ -38,18 +39,42 @@ export default class StaticLayout extends React.Component {
       this.setState({updateNotes : false})
     }
     if(temp && notes && temp[0] !== notes[0]){
+      //console.log("Notes gets temp");
       this.setState({updateNotes : true});
     }
     // console.log("Notes: ", notes);
     // console.log("Temp: ", temp);
   }
 
+  createNote(){
+    let {notes, data, locationId} = this.props.photo;
+    let newNote = {
+      type: "textblock",
+      title: "New Note",
+      text: "It's Full!",
+      attribution: "Yes Ma'am",
+      rotationY: notes.length>0 ? notes[notes.length-1].rotationY - 20 : 160,
+      translateX: 100,
+      width: 1.3,
+      height: 1.5,
+    }
+
+    // newNote.rotationY = (newNote.rotationY -10);
+    // console.log(notes);
+    // console.log("New Note: ", newNote);
+    notes.push(newNote);
+    data.photos[locationId].tooltips.push(newNote);
+    this.props.updateData(data);
+    //console.log(notes);
+  }
 
   editNote(){
     let {notes} = this.props.photo;
+    console.log(notes);
     if(notes.length> 0){
        NativeModules.DomOverlayModule.closeOverlay();
-       NativeModules.DomOverlayModule.openOverlay(notes[this.state.tooltipID].text);
+       NativeModules.DomOverlayModule.openOverlay(notes[this.state.tooltipID].text,
+                                                  notes[this.state.tooltipID].title);
     }
     else{
       console.log("No Tooltips");
@@ -57,12 +82,15 @@ export default class StaticLayout extends React.Component {
   }
 
   test(){
-    console.log(this.props.photo.data.photos);
+    console.log("Notes: ", this.props.photo.notes);
+    console.log("Data: ", this.props.photo.data);
+    console.log("LocationID: ", this.props.photo.locationId);
   }
 
-  updateText(text){
+  updateText(obj){
     let notes = this.props.photo.notes
-    notes[this.state.tooltipID].text = text;
+    notes[this.state.tooltipID].text = obj.text;
+    notes[this.state.tooltipID].title = obj.title;
     this.props.updateNotes(notes);
   }
 
@@ -74,7 +102,7 @@ export default class StaticLayout extends React.Component {
     let {notes} = this.props.photo;
     this.setState({tooltipID: index})
     NativeModules.DomOverlayModule.closeOverlay();
-    NativeModules.DomOverlayModule.openOverlay(notes[index].text);
+    NativeModules.DomOverlayModule.openOverlay(notes[index].text, notes[index].title);
   }
 
   goHome(){
@@ -105,9 +133,7 @@ export default class StaticLayout extends React.Component {
         <VrButton style={styles.menuButton} onClick={this.editNote}>
           <Text style={styles.menuText}>Edit Note</Text>
         </VrButton>
-       <VrButton style={styles.menuButton} onClick={this.test}>
-          <Text style={styles.menuText}>Log It</Text>
-        </VrButton>
+
         <VrButton style={styles.menuButton} onClick={this.changeVal}>
           <Text style={styles.menuText}>Change Val</Text>
         </VrButton>
@@ -115,6 +141,12 @@ export default class StaticLayout extends React.Component {
         <VrButton style={styles.menuButton} onClick={this.toggleTooltips}>
           <Text style={styles.menuText}>Toggle Tooltips</Text>
         </VrButton>
+        <VrButton style={styles.menuButton} onClick={this.createNote}>
+          <Text style={styles.menuText}>Create Note</Text>
+        </VrButton>
+        <VrButton style={styles.menuButton} onClick={this.test}>
+           <Text style={styles.menuText}>Log It</Text>
+         </VrButton>
       </View>
       {(this.state.displayTooltips && notes.length > 0) && <View style={styles.tooltipList}>
           {notes.map((tooltip, index) => {

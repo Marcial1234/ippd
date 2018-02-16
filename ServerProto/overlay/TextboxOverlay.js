@@ -7,22 +7,31 @@ export default class TextboxOverlay extends React.Component{
   constructor(props) {
     super(props);
     this.state = {
-      value: this.props.text,
+      text: this.props.text,
+      title: this.props.title,
     };
 
-    this.handleChange = this.handleChange.bind(this);
+    this.handleTextChange = this.handleTextChange.bind(this);
+    this.handleTitleChange = this.handleTitleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
-  handleChange(event) {
-    this.setState({value: event.target.value});
+  handleTextChange(event) {
+    this.setState({text: event.target.value});
+  }
+  handleTitleChange(event) {
+    this.setState({title: event.target.value});
   }
 
 
   handleSubmit(event) {
     //This prevent the page from reloading on submit
     event.preventDefault();
-    this.props.submit(this.state.value);
+    let obj ={
+      text: this.state.text,
+      title: this.state.title,
+    }
+    this.props.submit(obj);
     //this.props.onClose();
   }
 
@@ -32,10 +41,15 @@ export default class TextboxOverlay extends React.Component{
         <div className="content">
           <div className="close" onClick={this.props.onClose} />
           <div>
+            <form>
+              <label>
+                Title:
+                <input type="text" value={this.state.title} onChange={this.handleTitleChange} />
+              </label>
+            </form>
             <form onSubmit={this.handleSubmit}>
               <label>
-                {this.props.title}
-                <textarea value={this.state.value} onChange={this.handleChange} style = {{height: 100, width: 250}} />
+                <textarea value={this.state.text} onChange={this.handleTextChange} style = {{height: 100, width: 250}} />
               </label>
               <input type="submit" value="Submit" />
             </form>

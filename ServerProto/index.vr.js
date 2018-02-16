@@ -124,7 +124,6 @@ class VRLayout extends React.Component{
                   {tooltips && <DisplayTooltips data={data} tooltips={tooltips} ppm={PPM}
                     changeNextLocationId={changeNextLocationId} isLoading={isLoading}
                     degreesToPixels={degreesToPixels} notes={notes}/>}
-
                 </View>
               </View>
             </CylindricalPanel>

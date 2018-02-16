@@ -42,9 +42,9 @@ export default class DomOverlayModule extends Module {
     //This will always stay as is
     //'textUpdated' is the name of the listener created in StaticLayout
     //'text' is value we are returning from here.
-    submit(text){
+    submit(obj){
       this.rnContext.callFunction('RCTDeviceEventEmitter', 'emit', [
-        'updateText', text,
+        'updateText', obj,
       ]);
     }
 }
