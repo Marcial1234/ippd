@@ -13,6 +13,7 @@ export default class StaticLayout extends React.Component {
       updateNotes: true,
     }
     this.editNote = this.editNote.bind(this);
+    this.moveNote = this.moveNote.bind(this);
     this.test = this.test.bind(this);
     this.updateText = this.updateText.bind(this);
     this.goHome = this.goHome.bind(this);
@@ -54,7 +55,7 @@ export default class StaticLayout extends React.Component {
       text: "It's Full!",
       attribution: "Yes Ma'am",
       rotationY: notes.length>0 ? notes[notes.length-1].rotationY - 20 : 160,
-      translateX: 100,
+      translateX: 0,
       width: 1.3,
       height: 1.5,
     }
@@ -66,6 +67,30 @@ export default class StaticLayout extends React.Component {
     data.photos[locationId].tooltips.push(newNote);
     this.props.updateData(data);
     //console.log(notes);
+  }
+
+  moveNote(direction){
+    let notes = this.props.photo.notes;
+    //need to figure out what to do at 180 degrees
+    if(notes[this.state.tooltipID].rotationY <= -180 || notes[this.state.tooltipID].rotationY >= 180){
+      notes[this.state.tooltipID].rotationY *=-1;
+    }
+    switch(direction){
+      case "right":
+      notes[this.state.tooltipID].rotationY -=5;
+      break;
+      case "left":
+      notes[this.state.tooltipID].rotationY +=5;
+      break;
+      case "up":
+      notes[this.state.tooltipID].translateX -=5;
+      break;
+      case "down":
+      notes[this.state.tooltipID].translateX +=5;
+      break;
+    }
+    console.log(notes[this.state.tooltipID].rotationY);
+    this.props.updateNotes(notes);
   }
 
   editNote(){
@@ -133,7 +158,9 @@ export default class StaticLayout extends React.Component {
         <VrButton style={styles.menuButton} onClick={this.editNote}>
           <Text style={styles.menuText}>Edit Note</Text>
         </VrButton>
-
+      <VrButton style={styles.menuButton} onClick={this.test}>
+           <Text style={styles.menuText}>Log It</Text>
+         </VrButton>
         <VrButton style={styles.menuButton} onClick={this.changeVal}>
           <Text style={styles.menuText}>Change Val</Text>
         </VrButton>
@@ -144,9 +171,19 @@ export default class StaticLayout extends React.Component {
         <VrButton style={styles.menuButton} onClick={this.createNote}>
           <Text style={styles.menuText}>Create Note</Text>
         </VrButton>
-        <VrButton style={styles.menuButton} onClick={this.test}>
-           <Text style={styles.menuText}>Log It</Text>
-         </VrButton>
+        <VrButton style={styles.menuButton} onClick={() => this.moveNote("left")}>
+          <Text style={styles.menuText}>Left</Text>
+        </VrButton>
+        <VrButton style={styles.menuButton} onClick={() => this.moveNote("right")}>
+          <Text style={styles.menuText}>Right</Text>
+        </VrButton>
+        <VrButton style={styles.menuButton} onClick={() => this.moveNote("up")}>
+          <Text style={styles.menuText}>Up</Text>
+        </VrButton>
+        <VrButton style={styles.menuButton} onClick={() => this.moveNote("down")}>
+          <Text style={styles.menuText}>Down</Text>
+        </VrButton>
+        
       </View>
       {(this.state.displayTooltips && notes.length > 0) && <View style={styles.tooltipList}>
           {notes.map((tooltip, index) => {

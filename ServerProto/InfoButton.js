@@ -72,7 +72,7 @@ class InfoButton extends React.Component {
           transform: [
             {rotateY: this.props.rotateY},
             {translateX: this.props.translateX},
-            {translateZ: this.props.translateZ},
+            {translateY: this.props.translateY},
           ],
         }}
         ignoreLongClick={true}
