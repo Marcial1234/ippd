@@ -63,7 +63,7 @@ class VRLayout extends React.Component{
 
     render(){
       //map short names to state values that will be used.
-      let {zoomZ, locationId, nextLocationId, data} = this.props.photo;
+      let {zoomZ, locationId, nextLocationId, data, notes} = this.props.photo;
       //map short names to functions that will be used.
       let {updatePhoto, changeLocationId, changeNextLocationId, changeZoom} = this.props;
       if(!data){
@@ -77,6 +77,7 @@ class VRLayout extends React.Component{
       // just made these 'vars', cuz idk if const are worth it
       const tooltips = (photoData && photoData.tooltips) || null;
       const rotation = ((photoData && photoData.rotationOffset) || 0);
+
         return (
           <View
             style={{transform: [{rotateY: -rotation}],}}>
@@ -122,7 +123,7 @@ class VRLayout extends React.Component{
                     />}
                   {tooltips && <DisplayTooltips data={data} tooltips={tooltips} ppm={PPM}
                     changeNextLocationId={changeNextLocationId} isLoading={isLoading}
-                    degreesToPixels={degreesToPixels}/>}
+                    degreesToPixels={degreesToPixels} notes={notes}/>}
 
                 </View>
               </View>
@@ -155,6 +156,7 @@ const mapDispatchToProps = dispatch => ({
   changeNextLocationId: (locationId) => dispatch(photo.changeNextLocationId(locationId)),
   changeZoom: (zoom) => dispatch(photo.changeZoom(zoom)),
   updateData: (data) => dispatch(photo.updateData(data)),
+  updateNotes: (notes) => dispatch(photo.updateNotes(notes)),
 });
 
 //This sends the variables and functions to be referenced as "this.props"

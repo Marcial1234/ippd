@@ -23,7 +23,7 @@ export default class TextboxOverlay extends React.Component{
     //This prevent the page from reloading on submit
     event.preventDefault();
     this.props.submit(this.state.value);
-    this.props.onClose();
+    //this.props.onClose();
   }
 
   render(){

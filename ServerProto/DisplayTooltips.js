@@ -12,46 +12,54 @@ export default class DisplayTooltips extends React.Component {
   }
 
   render(){
-    let {data, tooltips, ppm, changeNextLocationId, isLoading, degreesToPixels} = this.props;
-    //console.log(data);
+    let {data, tooltips, ppm, changeNextLocationId, isLoading, degreesToPixels, notes} = this.props;
     return(
       <View>
-        {tooltips.map((tooltip, index) => {
-          // Iterate through items related to this location, creating either:
-          // - Nav buttons: change Pano source and tooltips associated it with them
-          // - Info buttons: show tooltip on hover
-          // P.S: idk what's the use of the key props ~
+        <View>
+          {tooltips.map((tooltip, index) => {
+            // Iterate through items related to this location, creating either:
+            // - Nav buttons: change Pano source and tooltips associated it with them
+            // - Info buttons: show tooltip on hover
+            // P.S: idk what's the use of the key props ~
 
-          if (tooltip.type) {
-            return (
-              <InfoButton
-                key={index}
-                source={asset('info_icon.png')}
-                tooltip={tooltip}
-                pixelsPerMeter={ppm}
-                translateX={degreesToPixels(tooltip.rotationY)}
-                translateY={degreesToPixels(tooltip.translateX)}
-              />
-            );
-          }
-
-          return (
-            <NavButton
-              key={tooltip.linkedPhotoId}
-              isLoading={isLoading}
-              onInput={() => {
-                changeNextLocationId(tooltip.linkedPhotoId)
-                // Update nextLocationId, not locationId, so tooltips match
-                // the currently visible pano; pano will update locationId
-                // after loading the new image.
-              }}
-              source={asset(data.nav_icon)}
-              textLabel={tooltip.text}
-              pixelsPerMeter={ppm}
-              translateX={degreesToPixels(tooltip.rotationY)}
-            />
-          );
-        })}
+            if (!tooltip.type) {
+              return (
+                <NavButton
+                  key={tooltip.linkedPhotoId}
+                  isLoading={isLoading}
+                  onInput={() => {
+                    changeNextLocationId(tooltip.linkedPhotoId)
+                    // Update nextLocationId, not locationId, so tooltips match
+                    // the currently visible pano; pano will update locationId
+                    // after loading the new image.
+                  }}
+                  source={asset(data.nav_icon)}
+                  textLabel={tooltip.text}
+                  pixelsPerMeter={ppm}
+                  translateX={degreesToPixels(tooltip.rotationY)}
+                />
+              );
+            }
+          })}
+        </View>
+        <View>
+          {notes && notes.map((tooltip, index) => {
+            // Iterate through items related to this location, creating either:
+            // - Nav buttons: change Pano source and tooltips associated it with them
+            // - Info buttons: show tooltip on hover
+            // P.S: idk what's the use of the key props ~
+              return (
+                <InfoButton
+                  key={index}
+                  source={asset('info_icon.png')}
+                  tooltip={tooltip}
+                  pixelsPerMeter={ppm}
+                  translateX={degreesToPixels(tooltip.rotationY)}
+                  translateY={degreesToPixels(tooltip.translateX)}
+                />
+              );
+            })}
+        </View>
       </View>
     )
   }

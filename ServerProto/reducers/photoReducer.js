@@ -4,6 +4,7 @@ const defaultState = {
   rotation: null,
   locationId: null,
   nextLocationId: null,
+  notes: null,
 };
 
 export default function user(state=defaultState, action){
@@ -14,7 +15,8 @@ export default function user(state=defaultState, action){
                          data : action.payload.data,
                          rotation : action.payload.rotation,
                          locationId : action.payload.locationId,
-                         nextLocationId : action.payload.nextLocationId}
+                         nextLocationId : action.payload.nextLocationId,
+                         notes: action.payload.notes}
       }
       case "Change Location":{
         return{...state, locationId : action.payload}
@@ -27,6 +29,9 @@ export default function user(state=defaultState, action){
       }
       case "Change Data":{
         return{...state, data : action.payload}
+      }
+      case "Change Notes":{
+        return{...state, notes : action.payload}
       }
       default :{
         return{...state}

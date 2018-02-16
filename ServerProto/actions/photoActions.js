@@ -5,7 +5,8 @@ export function updatePhoto(nextPhoto){
                 data: nextPhoto.data,
                 rotation: nextPhoto.rotation,
                 locationId: nextPhoto.locationId,
-                nextLocationId: nextPhoto.nextLocationId
+                nextLocationId: nextPhoto.nextLocationId,
+                notes: nextPhoto.notes,
               },
   }
 }
@@ -34,5 +35,13 @@ export function updateData(data){
   return{
     type: "Change Data",
     payload: data,
+  }
+}
+
+export function updateNotes(notes){
+  // console.log("Notes: ", notes);
+  return{
+    type: "Change Notes",
+    payload: notes,
   }
 }
