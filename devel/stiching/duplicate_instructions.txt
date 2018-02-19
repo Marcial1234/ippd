@@ -1,0 +1,10 @@
+### Instalation
++ Install *Hugin* by either installing [Hugin-win64.msi](real-mean/Hugin-win64.msi) on windows, or [download it](http://hugin.sourceforge.net/download/) if you're not on Window x64
++ Add the files inside `real-mean\stiching` to your path
+
+### Use
+- Once the above it's done, run `gear360pano [either a wildcard or path to unstriched files]`
+    - Works on windows x64
+    - If not, manually run `gear360pano.cmd [path to unstiched files]` on the bash script's directory.
+
+'Stitched' panoramic files will be dumped as `[original file name]-pano.[original extension]`
