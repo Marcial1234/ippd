@@ -1,4 +1,4 @@
-# image_upload
+# Image Upload Server
 
 - index.js - node.js / express.js server
 - /views - html views directory
@@ -6,7 +6,7 @@
 - /models - in progress
 - public/upload - image upload directory
 
-### Run in dev mode
+### Run in dev mode (server automatically restarts when a dependency is changed)
 ```
 sudo npm install
 sudo npm update
