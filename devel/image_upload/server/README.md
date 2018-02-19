@@ -6,14 +6,16 @@
 - /models - in progress
 - public/upload - image upload directory
 
-## Run in dev mode (server automatically restarts when a dependency is changed)
+# Run in dev mode 
+### Server will automatically restart when a dependency is changed
+
 ```
 sudo npm install
 sudo npm update
 npm run dev
 ```
 
-## TODO
+# TODO
 1. Image validation / security
 2. Image processing w/ provided script
 3. Connect to MongoDB w/ Mongoose
