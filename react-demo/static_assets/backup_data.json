@@ -6,20 +6,38 @@
     "112211": {
       "rotationOffset": 0,
       "uri": "JapanPano.jpg",
-      "adjacent_rooms": [
+      "tooltips": [
+        {
+          "rotationY": -20,
+          "text": "CISCO",
+          "linkedPhotoId": "112234"
+        },
+        {
+          "text": "Basement",
+          "rotationY": -10,
+          "linkedPhotoId": "112233"
+        },
         {
           "rotationY": 0,
           "text": "IPPD Room",
           "linkedPhotoId": "113344"
+        },
+        {
+          "text": "FiOS",
+          "rotationY": 10,
+          "linkedPhotoId": "112236"
+        },
+        {
+          "text": "Genband",
+          "rotationY": 20,
+          "linkedPhotoId": "112235"
         }
-      ],
-      "tooltips": [
       ]
     },
     "112234": {
       "rotationOffset": 40,
       "uri": "CISCO--v112234.jpg",
-      "adjacent_rooms": [
+      "tooltips": [
         {
           "text": "The Basement",
           "rotationY": -9.929,
@@ -34,9 +52,7 @@
           "text": "FiOS",
           "rotationY": 60,
           "linkedPhotoId": "112236"
-        }
-      ],
-      "tooltips": [
+        },
         {
           "type": "image",
           "rotationY": 115,
@@ -51,14 +67,12 @@
     "112235": {
       "rotationOffset": -50,
       "uri": "Genband--v112235.jpg",
-      "adjacent_rooms": [
+      "tooltips": [
         {
           "text": "Cisco",
           "rotationY": 100,
           "linkedPhotoId": "112234"
-        }
-      ],    
-      "tooltips": [
+        },
         {
           "type": "image",
           "rotationY": 0,
@@ -73,14 +87,12 @@
     "112236": {
       "rotationOffset": 40,
       "uri": "FIOS--v112236.JPG",
-      "adjacent_rooms": [
+      "tooltips": [
         {
           "text": "Cisco",
           "rotationY": -110,
           "linkedPhotoId": "112234"
-        }
-      ],    
-      "tooltips": [
+        },
         {
           "type": "textblock",
           "title": "A Shelf",
@@ -95,7 +107,7 @@
     "113344": {
       "rotationOffset": -130,
       "uri": "360_0025[1]_pano.jpg",
-      "adjacent_rooms": [
+      "tooltips": [
         {
           "text": "Home Page",
           "rotationY": -130,
@@ -105,9 +117,7 @@
           "text": "Next",
           "rotationY": 110,
           "linkedPhotoId": "113355"
-        }
-      ],
-      "tooltips": [
+        },
         {
           "type": "textblock",
           "title": "Lockers",
@@ -133,7 +143,7 @@
     "113355": {
       "rotationOffset": 110,
       "uri": "360_0026[1]_pano.jpg",
-      "adjacent_rooms": [
+      "tooltips": [
         {
           "text": "Next",
           "rotationY": 110,
@@ -143,9 +153,7 @@
           "text": "Back",
           "rotationY": -150,
           "linkedPhotoId": "113344"
-        }
-      ],
-      "tooltips": [
+        },
         {
           "type": "textblock",
           "title": "Lockers",
@@ -171,7 +179,7 @@
     "113366": {
       "rotationOffset": 40,
       "uri": "360_0028[1]_pano.jpg",
-      "adjacent_rooms" : [
+      "tooltips": [
         {
           "text": "Home Page",
           "rotationY": 93,
@@ -181,9 +189,7 @@
           "text": "Back",
           "rotationY": -120,
           "linkedPhotoId": "113355"
-        }
-      ],
-      "tooltips": [
+        },
         {
           "type": "textblock",
           "title": "Lockers",
@@ -209,14 +215,12 @@
     "112233": {
       "rotationOffset": 120,
       "uri": "Basement--v112233.jpg",
-      "adjacent_rooms": [
+      "tooltips": [
         {
           "text": "Cisco",
           "rotationY": -64.525,
           "linkedPhotoId": "112234"
-        }
-      ],
-      "tooltips": [
+        },
         {
           "type": "textblock",
           "rotationY": 140,
