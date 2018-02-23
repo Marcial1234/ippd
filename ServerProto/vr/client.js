@@ -38,7 +38,65 @@ function init(bundle, parent, options) {
   //"vr.rootView.context" is the context for the VR portion of the app
   //This is how the overlay(React) can connect with ReactVR
   domOverlayModule._setRNContext(vr.rootView.context);
+
+  // #####
+  // START of zoom code
+  // #####
+  window.playerCamera = vr.player._camera;
+  window.vr = vr;
+  window.ondblclick = onRendererDoubleClick;
+  window.onmousewheel = onRendererMouseWheel;
+  // don't need this??? says 'worker' is undef .. but won't work without it
+  vr.rootView.context.worker.addEventListener('message', onVRMessage);
+
   return vr;
 }
 
 window.ReactVR = { init };
+
+// more zoom f(x)s
+function onVRMessage(e) {
+  var type = e.data.type;
+
+  // watching out for javascript string comparizons...
+  if (type == 'sceneChanged' && window.playerCamera.zoom != 1) {
+    window.playerCamera.zoom = 1;
+    window.playerCamera.updateProjectionMatrix();
+  }
+  else if (type == "sceneLoadStart")
+    document.getElementById('loader').style.display = 'block';
+  else if (type == "sceneLoadEnd")
+    document.getElementById('loader').style.display = 'none';
+}
+
+import * as THREE from 'three';
+function get3DPoint(camera, x, y) {
+  var mousePosition = new THREE.Vector3(x, y, 0.5);
+  mousePosition.unproject(camera);
+
+  var dir = mousePosition.sub(camera.position).normalize();
+  dir.y = dir.y + 0.05;
+  return dir;
+}
+
+function onRendererDoubleClick() {
+  var x = 2 * (event.x / window.innerWidth) - 1;
+  var y = 1 - 2 * (event.y / window.innerHeight);
+  var coordinates = get3DPoint(window.playerCamera, x, y);
+  vr.rootView.context.worker.postMessage({ type: "newCoordinates", coordinates: coordinates });
+}
+
+function onRendererMouseWheel() {
+  // Fliped the '<' for non-reverse scroll, dont like reverse scroll
+  if (event.deltaY < 0) {
+    if (window.playerCamera.zoom > 1) {
+      window.playerCamera.zoom -= 0.1;
+      window.playerCamera.updateProjectionMatrix();
+    }
+  } else {
+    if (window.playerCamera.zoom < 3) {
+      window.playerCamera.zoom += 0.1;
+      window.playerCamera.updateProjectionMatrix();
+    }
+  }
+}
