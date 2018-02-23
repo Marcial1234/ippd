@@ -82,7 +82,8 @@ export default class StaticLayout extends React.Component {
     else{
       this.toggleTooltips();
     }
-    //console.log(notes);
+    this.selectTooltip(notes.length-1);
+    //console.log(notes[notes.length-1]);
   }
 
   moveNote(direction){
@@ -105,7 +106,8 @@ export default class StaticLayout extends React.Component {
       notes[this.state.tooltipID].translateX +=5;
       break;
     }
-    console.log(notes[this.state.tooltipID].rotationY);
+    console.log("Current Rotation:", notes[this.state.tooltipID].rotationY);
+    console.log("Current Translation:", notes[this.state.tooltipID].translateX);
     this.props.updateNotes(notes);
   }
 

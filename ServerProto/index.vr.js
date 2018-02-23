@@ -41,10 +41,7 @@ class VRLayout extends React.Component{
     //Use "onInput" inside a View. Ex: <View onInput={handleInput} style={styles.rootView}>
     handleInput(e){
       let event = e.nativeEvent.inputEvent;
-      if(event.eventType == "click"){
-          console.log(event);
-      }
-      // if(event.eventType == "mousemove"){
+      // if(event.eventType == "click"){
       //   let notes = this.props.photo.notes;
       //   let index = -1;
       //   for (let i = 0; i < notes.length; i++){
@@ -59,6 +56,11 @@ class VRLayout extends React.Component{
       //       x: -event.viewportX,
       //       y: -event.viewportY,
       //     }
+      //     let obj = {
+      //       rotation: notes[index].rotationY,
+      //       translation: notes[index].translateX
+      //     }
+      //     this.props.focusNote(obj);
       //     console.log(dist.x);
       //     console.log(dist.y);
       //     console.log(notes[index]);
@@ -66,8 +68,9 @@ class VRLayout extends React.Component{
       //     if(notes[index].rotationY <= -180 || notes[index].rotationY >= 180){
       //       notes[index].rotationY *=-1;
       //     }
-      //     notes[index].rotationY +=dist.x;
-      //     notes[index].translateX +=dist.y;
+      //     notes[index].rotationY +=dist.x*60;
+      //     notes[index].translateX +=dist.y*30;
+      //
       //     //
       //     // console.log(notes[this.state.tooltipID].rotationY);
       //     this.props.updateNotes(notes);
@@ -101,6 +104,7 @@ class VRLayout extends React.Component{
       let {zoomZ, locationId, nextLocationId, data, notes} = this.props.photo;
       let rot = this.props.photo.rotation;
       let trans = this.props.photo.translation;
+      console.log("Trans:", trans, "Rot:", rot);
       //map short names to functions that will be used.
       let {updatePhoto, changeLocationId, changeNextLocationId, changeZoom} = this.props;
       if(!data){
@@ -119,6 +123,7 @@ class VRLayout extends React.Component{
           <View onInput={this.handleInput}
             style={{
               transform: [
+              {rotateX: + trans},
               {rotateY: - ((rot == 0) ? rotation : rot)},
             ]
           }}>
