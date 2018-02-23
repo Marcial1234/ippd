@@ -15,8 +15,8 @@ var upload_base_tooltips = require('../JSONtoMongo.js').upload_base_tooltips;
 module.exports.init = function() {
 
   // Connect to database
-  mongoose.connect(process.env.MONGODB_URI, { useMongoClient: true });
-  // console.log(process.env.MONGODB_URI);
+  mongoose.connect(process.env.LOCAL_MONGODB_URI, { useMongoClient: true });
+  // mongoose.connect(process.env.CLOUD_MONGODB_URI, { useMongoClient: true });
 
   // initialize app
   var app = express();

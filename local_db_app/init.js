@@ -9,7 +9,8 @@ function startServer() {
 function waitForEnvironmentVariables(count) {
   // we need this else the ".env" is worthless
   
-  if (process.env.MONGODB_URI)
+  // if (process.env.CLOUD_MONGODB_URI)
+  if (process.env.LOCAL_MONGODB_URI)
     startServer();
   else {
     // console.log("loading...", count);
