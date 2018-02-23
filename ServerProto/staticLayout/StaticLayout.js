@@ -1,5 +1,5 @@
 import React from 'react';
-import {Text, View, VrButton, NativeModules} from 'react-vr';
+import {Text, View, VrButton, NativeModules, Image, asset} from 'react-vr';
 import styles from '../static_assets/styles'
 
 //This is to be able to recieve calls from the DomOverlay
@@ -11,6 +11,7 @@ export default class StaticLayout extends React.Component {
       displayTooltips: false,
       tooltipID: 0,
       updateNotes: true,
+      overlayOpen: false,
     }
     this.editNote = this.editNote.bind(this);
     this.moveNote = this.moveNote.bind(this);
@@ -19,14 +20,21 @@ export default class StaticLayout extends React.Component {
     this.goHome = this.goHome.bind(this);
     this.toggleTooltips = this.toggleTooltips.bind(this);
     this.selectTooltip = this.selectTooltip.bind(this);
+    this.deleteNote = this.deleteNote.bind(this);
     this.createNote = this.createNote.bind(this);
 
   }
 
   componentWillMount(){
-    //will respond to the call for 'textUpdated', e is the value recieved
+    //will respond to the call for 'updateText', obj is the value recieved
     RCTDeviceEventEmitter.addListener('updateText', obj => {
     this.updateText(obj);
+    });
+    RCTDeviceEventEmitter.addListener('overlayClose', () => {
+    this.setState({overlayOpen: false,})
+    });
+    RCTDeviceEventEmitter.addListener('overlayOpen', () => {
+    this.setState({overlayOpen: true,})
     });
   }
 
@@ -37,7 +45,7 @@ export default class StaticLayout extends React.Component {
     const temp = (tooltips && tooltips.filter(t => t.type=='textblock')) || null;
     if(temp && this.state.updateNotes){
       this.props.updateNotes(temp);
-      this.setState({updateNotes : false})
+      this.setState({updateNotes : false});
     }
     if(temp && notes && temp[0] !== notes[0]){
       //console.log("Notes gets temp");
@@ -66,6 +74,13 @@ export default class StaticLayout extends React.Component {
     notes.push(newNote);
     data.photos[locationId].tooltips.push(newNote);
     this.props.updateData(data);
+    if(this.state.displayTooltips){
+      setTimeout(function() {this.toggleTooltips()}.bind(this), 25);
+      setTimeout(function() {this.toggleTooltips()}.bind(this), 25);
+    }
+    else{
+      this.toggleTooltips();
+    }
     //console.log(notes);
   }
 
@@ -93,9 +108,9 @@ export default class StaticLayout extends React.Component {
     this.props.updateNotes(notes);
   }
 
-  editNote(){
+  editNote(index){
     let {notes} = this.props.photo;
-    console.log(notes);
+    this.selectTooltip(index);
     if(notes.length> 0){
        NativeModules.DomOverlayModule.closeOverlay();
        NativeModules.DomOverlayModule.openOverlay(notes[this.state.tooltipID].text,
@@ -106,34 +121,57 @@ export default class StaticLayout extends React.Component {
     }
   }
 
-  test(){
-    console.log("Notes: ", this.props.photo.notes);
-    console.log("Data: ", this.props.photo.data);
-    console.log("LocationID: ", this.props.photo.locationId);
-  }
+
+  deleteNote(index){
+      let {notes, data, locationId} = this.props.photo;
+      if(index == this.state.tooltipID){
+        NativeModules.DomOverlayModule.closeOverlay();
+      }
+      let i = notes[index];
+      let d = data.photos[locationId].tooltips.indexOf(i);
+      notes.splice(index, 1);
+      data.photos[locationId].tooltips.splice(d, 1);
+      this.props.updateData(data);
+      setTimeout(function() {this.toggleTooltips()}.bind(this), 25);
+      setTimeout(function() {this.toggleTooltips()}.bind(this), 25);
+
+    }
 
   updateText(obj){
     let notes = this.props.photo.notes
     notes[this.state.tooltipID].text = obj.text;
     notes[this.state.tooltipID].title = obj.title;
     this.props.updateNotes(notes);
+    setTimeout(function() {this.toggleTooltips()}.bind(this), 25);
+    setTimeout(function() {this.toggleTooltips()}.bind(this), 25);
   }
 
   toggleTooltips(){
-    this.setState({displayTooltips: !this.state.displayTooltips})
+    this.setState({
+        displayTooltips: !this.state.displayTooltips,
+      })
   }
 
   selectTooltip(index){
     let {notes} = this.props.photo;
-    this.setState({tooltipID: index})
-    NativeModules.DomOverlayModule.closeOverlay();
-    NativeModules.DomOverlayModule.openOverlay(notes[index].text, notes[index].title);
+    this.setState({tooltipID: index});
+    if(this.state.overlayOpen){
+       NativeModules.DomOverlayModule.closeOverlay();
+       NativeModules.DomOverlayModule.openOverlay(notes[index].text,
+                                                  notes[index].title);
+    }
   }
 
   goHome(){
     this.setState({displayTooltips: false})
     this.props.changeNextLocationId("000001");
     NativeModules.DomOverlayModule.closeOverlay();
+  }
+
+  test(){
+    console.log("Notes: ", this.props.photo.notes);
+    console.log("Data: ", this.props.photo.data);
+    console.log("LocationID: ", this.props.photo.locationId);
   }
 
   render() {
@@ -183,16 +221,24 @@ export default class StaticLayout extends React.Component {
         <VrButton style={styles.menuButton} onClick={() => this.moveNote("down")}>
           <Text style={styles.menuText}>Down</Text>
         </VrButton>
-        
+
       </View>
       {(this.state.displayTooltips && notes.length > 0) && <View style={styles.tooltipList}>
           {notes.map((tooltip, index) => {
           return(
-            <VrButton key={index} onClick={() => this.selectTooltip(index)}>
-              <Text style={(index==(this.state.tooltipID)) ? styles.tooltipListItemSelected : styles.tooltipListItem}>
-              {tooltip.title}
-              </Text>
-            </VrButton>);
+            <View style={styles.tooltipListRow} key={index}>
+              <VrButton onClick={() => this.selectTooltip(index)}>
+                <Text style={(index==(this.state.tooltipID)) ? styles.tooltipListItemSelected : styles.tooltipListItem}>
+                {tooltip.title}
+                </Text>
+              </VrButton>
+              <VrButton onClick={() => this.editNote(index) }>
+                <Image style={styles.tooltipListImage} source={asset('edit_icon.png')}></Image>
+              </VrButton>
+              <VrButton onClick={() => this.deleteNote(index)}>
+                <Image style={styles.tooltipListImage} source={asset('deleteX.png')}></Image>
+              </VrButton>
+            </View>);
         })}
       </View>}
       </View>

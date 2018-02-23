@@ -56,11 +56,20 @@ export default styles = StyleSheet.create({
     margin: 0.01,
     padding: 0.005,
   },
-
   tooltipListItemSelected:{
     backgroundColor: '#4286f4',
     fontSize: 0.04,
     margin: 0.01,
     padding: 0.005,
-  }
+  },
+  tooltipListRow:{
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+  },
+  tooltipListImage:{
+    width: 0.06,
+    height: 0.06,
+    margin: 0.01,
+    padding: 0.005,
+  },
 });

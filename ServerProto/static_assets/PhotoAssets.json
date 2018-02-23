@@ -100,7 +100,8 @@
           "attribution": "Photo Credit to: Harish",
           "rotationY": 0,
           "width": 1.5,
-          "height": 1.5
+          "height": 1.5,
+          "translateX": 0
         }
       ]
     },
@@ -228,7 +229,8 @@
           "height": 1.280,
           "title": "Exide",
           "text": "Exide Technologies is an American manufacturer of lead-acid batteries, including automotive batteries and industrial batteries. Its four global business groups...",
-          "attribution": "From Wikipedia.org"
+          "attribution": "From Wikipedia.org",
+          "translateX": 0
         },
         {
           "type": "textblock",
@@ -237,7 +239,8 @@
           "attribution": "Photo Credit to: Harish",
           "rotationY": 0,
           "width": 1.5,
-          "height": 1.5
+          "height": 1.5,
+          "translateX": 0
         }
       ]
     }

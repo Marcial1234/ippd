@@ -7,7 +7,6 @@ import TextboxOverlay from './TextboxOverlay';
 export default class DomOverlayModule extends Module {
   constructor(overlayContainer) {
     super('DomOverlayModule');
-
     //rnContext will be used to refer to the React Native context
     //This allows communication with React VR
     this.rnContext = null;
@@ -18,6 +17,9 @@ export default class DomOverlayModule extends Module {
 
   // This method call opens up the overlay for display.
   openOverlay(text, title) {
+    this.rnContext.callFunction('RCTDeviceEventEmitter', 'emit', [
+      'overlayOpen'
+    ]);
     ReactDOM.render(
       <TextboxOverlay title={title} text={text} onClose={this._closeOverlay} submit={this.submit}/>,
       this._overlayContainer
@@ -31,6 +33,9 @@ export default class DomOverlayModule extends Module {
   }
 
   closeOverlay() {
+    this.rnContext.callFunction('RCTDeviceEventEmitter', 'emit', [
+      'overlayClose'
+    ]);
     ReactDOM.unmountComponentAtNode(this._overlayContainer);
   }
 

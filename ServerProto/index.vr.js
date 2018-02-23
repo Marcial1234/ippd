@@ -37,7 +37,9 @@ class VRLayout extends React.Component{
     //Use "onInput" inside a View. Ex: <View onInput={handleInput} style={styles.rootView}>
     handleInput(e){
       let event = e.nativeEvent.inputEvent;
-      console.log(event);
+      if(event.eventType == "click"){
+            console.log(event);
+      }
     }
 
     componentDidMount() {
@@ -79,7 +81,7 @@ class VRLayout extends React.Component{
       const rotation = ((photoData && photoData.rotationOffset) || 0);
 
         return (
-          <View
+          <View onInput={this.handleInput}
             style={{transform: [{rotateY: -rotation}],}}>
             <Pano style={{
                 tintColor: isLoading ? 'grey' : 'white',
