@@ -31,10 +31,13 @@ export function changeZoom(zoom){
   }
 }
 
-export function changeRotation(rot){
+export function focusNote(obj){
   return{
-    type: "Change Rotation",
-    payload: rot,
+    type: "Focus Note",
+    payload: {
+      rotation: obj.rotation,
+      translation: obj.translation
+    },
   }
 }
 

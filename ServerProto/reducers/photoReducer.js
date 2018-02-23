@@ -1,7 +1,8 @@
 const defaultState = {
   zoomZ: 0,
   data: null,
-  rotation: null,
+  rotation: 0,
+  translation: 0,
   locationId: null,
   nextLocationId: null,
   notes: null,
@@ -22,13 +23,13 @@ export default function user(state=defaultState, action){
         return{...state, locationId : action.payload}
       }
       case "Change Next Location":{
-        return{...state, nextLocationId : action.payload}
+        return{...state, nextLocationId : action.payload, rotation: 0, translation: 0}
       }
       case "Change Zoom":{
         return{...state, zoomZ : state.zoomZ + action.payload}
       }
-      case "Change Rotation":{
-        return{...state, rotation : action.payload}
+      case "Focus Note":{
+        return{...state, rotation : action.payload.rotation, translation : action.payload.translation}
       }
       case "Change Data":{
         return{...state, data : action.payload}

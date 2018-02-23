@@ -185,7 +185,11 @@ export default class StaticLayout extends React.Component {
     //this.props.updateData(data);
     // console.log("Notes: ", notes);
     // console.log("Data: ", data);
-    //this.props.changeRotation(notes[index].rotationY);
+    let obj = {
+      rotation: notes[index].rotationY,
+      translation: notes[index].translateX
+    }
+    this.props.focusNote(obj);
   }
 
   refreshTooltips(){

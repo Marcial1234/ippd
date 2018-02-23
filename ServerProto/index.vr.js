@@ -30,13 +30,20 @@ class VRLayout extends React.Component{
     constructor(props){
       super(props);
       this.handleInput = this.handleInput.bind(this);
+      this.handleMove = this.handleMove.bind(this);
+    }
+
+    handleMove(e){
+      console.log(e);
     }
 
     //"handleInput" can listen for mouse clicks or key presses and perform actions accordingly
     //Use "onInput" inside a View. Ex: <View onInput={handleInput} style={styles.rootView}>
     handleInput(e){
       let event = e.nativeEvent.inputEvent;
-      // console.log(event);
+      if(event.eventType == "click"){
+          console.log(event);
+      }
       // if(event.eventType == "mousemove"){
       //   let notes = this.props.photo.notes;
       //   let index = -1;
@@ -92,6 +99,8 @@ class VRLayout extends React.Component{
     render(){
       //map short names to state values that will be used.
       let {zoomZ, locationId, nextLocationId, data, notes} = this.props.photo;
+      let rot = this.props.photo.rotation;
+      let trans = this.props.photo.translation;
       //map short names to functions that will be used.
       let {updatePhoto, changeLocationId, changeNextLocationId, changeZoom} = this.props;
       if(!data){
@@ -108,10 +117,13 @@ class VRLayout extends React.Component{
       //console.log(this.props.photo.rotation);
         return (
           <View onInput={this.handleInput}
-            style={{transform: [{rotateY: -rotation}],}}>
+            style={{
+              transform: [
+              {rotateY: - ((rot == 0) ? rotation : rot)},
+            ]
+          }}>
             <Pano style={{
                 tintColor: isLoading ? 'grey' : 'white',
-                transform: [{translate: [0, 0, zoomZ]},],
               }}
               onLoad={() => {changeLocationId(nextLocationId)}}
               source={asset(data.photos[nextLocationId].uri)}
@@ -182,7 +194,7 @@ const mapDispatchToProps = dispatch => ({
   changeLocationId: (locationId) => dispatch(photo.changeLocationId(locationId)),
   changeNextLocationId: (locationId) => dispatch(photo.changeNextLocationId(locationId)),
   changeZoom: (zoom) => dispatch(photo.changeZoom(zoom)),
-  changeRotation: (rot) => dispatch(photo.changeRotation(rot)),
+  focusNote: (obj) => dispatch(photo.focusNote(obj)),
   updateData: (data) => dispatch(photo.updateData(data)),
   updateNotes: (notes) => dispatch(photo.updateNotes(notes)),
 });
