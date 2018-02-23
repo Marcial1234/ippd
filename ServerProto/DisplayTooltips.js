@@ -44,14 +44,10 @@ export default class DisplayTooltips extends React.Component {
         </View>
         <View>
           {notes && notes.map((tooltip, index) => {
-            // Iterate through items related to this location, creating either:
-            // - Nav buttons: change Pano source and tooltips associated it with them
-            // - Info buttons: show tooltip on hover
-            // P.S: idk what's the use of the key props ~
               return (
                 <InfoButton
                   key={index}
-                  source={asset('info_icon.png')}
+                  source={ tooltip.selected ? asset('info_icon_selected.png') : asset('info_icon.png')}
                   tooltip={tooltip}
                   pixelsPerMeter={ppm}
                   translateX={degreesToPixels(tooltip.rotationY)}

@@ -19,7 +19,6 @@ const MAX_TEXTURE_HEIGHT = 720;
 const MAX_TEXTURE_WIDTH = 4096;
 const PPM = 1 / (2 * Math.PI * 3) * MAX_TEXTURE_WIDTH;
 const degreesToPixels = degrees => -(degrees / 360) * MAX_TEXTURE_WIDTH;
-
 class VRLayout extends React.Component{
 
   static defaultProps = {
@@ -37,9 +36,36 @@ class VRLayout extends React.Component{
     //Use "onInput" inside a View. Ex: <View onInput={handleInput} style={styles.rootView}>
     handleInput(e){
       let event = e.nativeEvent.inputEvent;
-      if(event.eventType == "click"){
-            console.log(event);
-      }
+      // console.log(event);
+      // if(event.eventType == "mousemove"){
+      //   let notes = this.props.photo.notes;
+      //   let index = -1;
+      //   for (let i = 0; i < notes.length; i++){
+      //     if(notes[i].selected == true){
+      //       index = i;
+      //       break;
+      //     }
+      //   }
+      //   if (index != -1){
+      //     console.log(event);
+      //     let dist = {
+      //       x: -event.viewportX,
+      //       y: -event.viewportY,
+      //     }
+      //     console.log(dist.x);
+      //     console.log(dist.y);
+      //     console.log(notes[index]);
+      //     //need to figure out what to do at 180 degrees
+      //     if(notes[index].rotationY <= -180 || notes[index].rotationY >= 180){
+      //       notes[index].rotationY *=-1;
+      //     }
+      //     notes[index].rotationY +=dist.x;
+      //     notes[index].translateX +=dist.y;
+      //     //
+      //     // console.log(notes[this.state.tooltipID].rotationY);
+      //     this.props.updateNotes(notes);
+      //   }
+      // }
     }
 
     componentDidMount() {
@@ -79,7 +105,7 @@ class VRLayout extends React.Component{
       // just made these 'vars', cuz idk if const are worth it
       const tooltips = (photoData && photoData.tooltips) || null;
       const rotation = ((photoData && photoData.rotationOffset) || 0);
-
+      //console.log(this.props.photo.rotation);
         return (
           <View onInput={this.handleInput}
             style={{transform: [{rotateY: -rotation}],}}>
@@ -156,6 +182,7 @@ const mapDispatchToProps = dispatch => ({
   changeLocationId: (locationId) => dispatch(photo.changeLocationId(locationId)),
   changeNextLocationId: (locationId) => dispatch(photo.changeNextLocationId(locationId)),
   changeZoom: (zoom) => dispatch(photo.changeZoom(zoom)),
+  changeRotation: (rot) => dispatch(photo.changeRotation(rot)),
   updateData: (data) => dispatch(photo.updateData(data)),
   updateNotes: (notes) => dispatch(photo.updateNotes(notes)),
 });

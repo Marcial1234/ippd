@@ -27,6 +27,9 @@ export default function user(state=defaultState, action){
       case "Change Zoom":{
         return{...state, zoomZ : state.zoomZ + action.payload}
       }
+      case "Change Rotation":{
+        return{...state, rotation : action.payload}
+      }
       case "Change Data":{
         return{...state, data : action.payload}
       }

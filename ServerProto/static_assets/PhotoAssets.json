@@ -101,7 +101,8 @@
           "rotationY": 0,
           "width": 1.5,
           "height": 1.5,
-          "translateX": 0
+          "translateX": 0,
+          "selected": false
         }
       ]
     },
@@ -127,7 +128,8 @@
           "rotationY": 170,
           "translateX": 0,
           "width": 1.3,
-          "height": 1.5
+          "height": 1.5,
+          "selected": false
         },
         {
           "type": "textblock",
@@ -137,7 +139,8 @@
           "rotationY": 75,
           "translateX": 0,
           "width": 1.3,
-          "height": 1.5
+          "height": 1.5,
+          "selected": false
         }
       ]
     },
@@ -163,7 +166,8 @@
           "rotationY": 170,
           "translateX": 0,
           "width": 1.3,
-          "height": 1.5
+          "height": 1.5,
+          "selected": false
         },
         {
           "type": "textblock",
@@ -173,7 +177,8 @@
           "rotationY": -10,
           "translateX": 0,
           "width": 1.3,
-          "height": 1.5
+          "height": 1.5,
+          "selected": false
         }
       ]
     },
@@ -209,7 +214,8 @@
           "rotationY": -90,
           "translateX": 0,
           "width": 1.3,
-          "height": 1.5
+          "height": 1.5,
+          "selected": false
         }
       ]
     },
@@ -230,7 +236,8 @@
           "title": "Exide",
           "text": "Exide Technologies is an American manufacturer of lead-acid batteries, including automotive batteries and industrial batteries. Its four global business groups...",
           "attribution": "From Wikipedia.org",
-          "translateX": 0
+          "translateX": 0,
+          "selected": false
         },
         {
           "type": "textblock",
@@ -240,7 +247,8 @@
           "rotationY": 0,
           "width": 1.5,
           "height": 1.5,
-          "translateX": 0
+          "translateX": 0,
+          "selected": false
         }
       ]
     }

@@ -22,6 +22,7 @@ export default class StaticLayout extends React.Component {
     this.selectTooltip = this.selectTooltip.bind(this);
     this.deleteNote = this.deleteNote.bind(this);
     this.createNote = this.createNote.bind(this);
+    this.refreshTooltips = this.refreshTooltips.bind(this);
 
   }
 
@@ -66,6 +67,7 @@ export default class StaticLayout extends React.Component {
       translateX: 0,
       width: 1.3,
       height: 1.5,
+      selected: false,
     }
 
     // newNote.rotationY = (newNote.rotationY -10);
@@ -75,8 +77,7 @@ export default class StaticLayout extends React.Component {
     data.photos[locationId].tooltips.push(newNote);
     this.props.updateData(data);
     if(this.state.displayTooltips){
-      setTimeout(function() {this.toggleTooltips()}.bind(this), 25);
-      setTimeout(function() {this.toggleTooltips()}.bind(this), 25);
+      this.refreshTooltips();
     }
     else{
       this.toggleTooltips();
@@ -132,8 +133,7 @@ export default class StaticLayout extends React.Component {
       notes.splice(index, 1);
       data.photos[locationId].tooltips.splice(d, 1);
       this.props.updateData(data);
-      setTimeout(function() {this.toggleTooltips()}.bind(this), 25);
-      setTimeout(function() {this.toggleTooltips()}.bind(this), 25);
+      this.refreshTooltips();
 
     }
 
@@ -142,8 +142,7 @@ export default class StaticLayout extends React.Component {
     notes[this.state.tooltipID].text = obj.text;
     notes[this.state.tooltipID].title = obj.title;
     this.props.updateNotes(notes);
-    setTimeout(function() {this.toggleTooltips()}.bind(this), 25);
-    setTimeout(function() {this.toggleTooltips()}.bind(this), 25);
+    this.refreshTooltips();
   }
 
   toggleTooltips(){
@@ -153,13 +152,45 @@ export default class StaticLayout extends React.Component {
   }
 
   selectTooltip(index){
-    let {notes} = this.props.photo;
+    let {notes, data, locationId} = this.props.photo;
     this.setState({tooltipID: index});
     if(this.state.overlayOpen){
        NativeModules.DomOverlayModule.closeOverlay();
        NativeModules.DomOverlayModule.openOverlay(notes[index].text,
                                                   notes[index].title);
     }
+    for(let i = 0; i < notes.length; i++){
+      if(i == index){
+        notes[i].selected = true;
+      }
+      else{
+        notes[i].selected = false;
+      }
+    }
+    //
+    // let i = notes[index];
+    // let d = data.photos[locationId].tooltips.indexOf(i);
+    //
+    // for(let i = 0; i < data.photos[locationId].tooltips.length; i++){
+    //   if(data.photos[locationId].tooltips[i].type == "textblock"){
+    //     if(d == i){
+    //       data.photos[locationId].tooltips[i].selected = true;
+    //     }
+    //     else{
+    //       data.photos[locationId].tooltips[i].selected = false;
+    //     }
+    //   }
+    // }
+    this.props.updateNotes(notes);
+    //this.props.updateData(data);
+    // console.log("Notes: ", notes);
+    // console.log("Data: ", data);
+    //this.props.changeRotation(notes[index].rotationY);
+  }
+
+  refreshTooltips(){
+    setTimeout(function() {this.toggleTooltips()}.bind(this), 25);
+    setTimeout(function() {this.toggleTooltips()}.bind(this), 25);
   }
 
   goHome(){
@@ -177,7 +208,7 @@ export default class StaticLayout extends React.Component {
   render() {
     let {notes} = this.props.photo;
     return (
-      <View>
+      <View >
         {/* The line below Displays the View only if "this.props.textInputActive" is true
           Using the && is a short way of doing it instead of
            this.props.textInputActive ? <View> : null */}

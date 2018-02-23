@@ -31,6 +31,14 @@ export function changeZoom(zoom){
   }
 }
 
+export function changeRotation(rot){
+  return{
+    type: "Change Rotation",
+    payload: rot,
+  }
+}
+
+
 export function updateData(data){
   return{
     type: "Change Data",
