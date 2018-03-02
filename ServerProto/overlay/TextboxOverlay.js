@@ -39,20 +39,21 @@ export default class TextboxOverlay extends React.Component{
       <div className="container">
         <div className="content">
           <div className="close" onClick={this.props.onClose} />
-          <div>
             <form onSubmit={this.handleSubmit}>
-              <label>
-                Title:
-                <input type="text" value={this.state.title} onChange={this.handleTitleChange} />
-              </label>
+              <ul className="input-form">
+                <li className="form-item">
+                  <label> Title: </label>
+                  <input className="form-textbox" type="text" value={this.state.title} onChange={this.handleTitleChange} />
+                </li>
+                <li className="form-item">
+                  <label> Info:  </label>
+                  <textarea className="form-textarea" value={this.state.text} onChange={this.handleTextChange} />
+                </li>
+                <li >
+                  <input className="form-submit" type="submit" value="Submit" />
+                </li>
+              </ul>
             </form>
-            <form onSubmit={this.handleSubmit}>
-              <label>
-                <textarea value={this.state.text} onChange={this.handleTextChange} style = {{height: 100, width: 250}} />
-              </label>
-              <input type="submit" value="Submit" />
-            </form>
-          </div>
         </div>
       </div>
     )
