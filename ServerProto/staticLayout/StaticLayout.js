@@ -147,7 +147,7 @@ export default class StaticLayout extends React.Component {
        //    this.props.location.currentFloor, this.props.location.currentRoom
        //  );
        NativeModules.DomOverlayModule.openOverlay(
-          notes[this.state.tooltipID].text, notes[this.state.tooltipID].title,
+          notes[index].text, notes[index].title,
         )
     }
     else{
@@ -195,7 +195,7 @@ export default class StaticLayout extends React.Component {
        //    this.props.location.currentFloor, this.props.location.currentRoom
        //  );
        NativeModules.DomOverlayModule.openOverlay(
-          notes[this.state.tooltipID].text, notes[this.state.tooltipID].title,
+          notes[index].text, notes[index].title,
         )
     }
     for(let i = 0; i < notes.length; i++){
@@ -245,8 +245,6 @@ export default class StaticLayout extends React.Component {
   buildingSelection(){
     NativeModules.DomOverlayModule.openOverlay(
        notes[this.state.tooltipID].text, notes[this.state.tooltipID].title,
-       this.props.location.buildings, this.props.location.currentBuilding,
-       this.props.location.currentFloor, this.props.location.currentRoom
      );
   }
 

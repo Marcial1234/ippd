@@ -21,6 +21,7 @@ export default class DomOverlayModule extends Module {
     this.rnContext.callFunction('RCTDeviceEventEmitter', 'emit', [
       'overlayOpen'
     ]);
+    console.log("Text:", text, "Title:", title);
     ReactDOM.render(
       <TextboxOverlay title={title} text={text} onClose={this._closeOverlay} submit={this.submit}/>,
       this._overlayContainer
