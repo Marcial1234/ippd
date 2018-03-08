@@ -7,6 +7,7 @@ import CylindricalPanel from 'CylindricalPanel';
 import store from "./vr/store";
 import * as mode from "./actions/modeActions";
 import * as photo from "./actions/photoActions";
+import * as location from "./actions/locationActions";
 import styles from './static_assets/styles'
 import StaticLayout from './staticLayout/StaticLayout';
 import TextboxVr from './staticLayout/TextboxVr';
@@ -88,15 +89,23 @@ class VRLayout extends React.Component{
         .done();
     }
 
-    init(tourConfig) {
+    init(roomConfig) {
+      let {currentBuilding, currentFloor, currentRoom} = this.props.location;
+      console.log(roomConfig.buildings[currentBuilding]);
+      let roomData = roomConfig.buildings[currentBuilding].floors[currentFloor];
       this.props.updatePhoto({
         zoomZ: 0,
-        data: tourConfig,
+        data: roomData,
         locationId: null,
-        nextLocationId: tourConfig.firstPhotoId,
-        rotation: tourConfig.firstPhotoRotation +
-        (tourConfig.photos[tourConfig.firstPhotoId].rotationOffset || 0)
+        nextLocationId: roomData.firstPhotoId,
+        rotation: roomData.firstPhotoRotation +
+        (roomData.photos[roomData.firstPhotoId].rotationOffset || 0)
       });
+      this.props.initBuildings({
+        buildings: roomConfig.buildings,
+        floors: roomConfig.buildings[currentBuilding].floors,
+        rooms: roomConfig.buildings[currentBuilding].floors[currentFloor].photos,
+      })
     }
 
     render(){
@@ -150,14 +159,6 @@ class VRLayout extends React.Component{
                 }}>
                 {/* Need container view, else using absolute position on buttons removes them from cylinder */}
 
-                {/* code that dynamically adds buttons to the page */}
-                {/*
-                    const temp = {...tooltips[tooltips.length-1]};
-                    temp.rotationY = (temp.rotationY - 10);
-                    temp.linkedPhotoId += 200;
-                    tooltips.push(temp)
-                    // console.log(tooltips);
-                */}
               {/* Main Content View */}
                 <View>
                   {/* Show a spinner while first pano is loading */}
@@ -186,6 +187,7 @@ const mapStateToProps = state => ({
   input: state.mode.input,
   //photo props
   photo: state.photo,
+  location: state.location,
 });
 
 //in "mapDispatchToProps", map names to use functions returned from action
@@ -202,6 +204,12 @@ const mapDispatchToProps = dispatch => ({
   focusNote: (obj) => dispatch(photo.focusNote(obj)),
   updateData: (data) => dispatch(photo.updateData(data)),
   updateNotes: (notes) => dispatch(photo.updateNotes(notes)),
+
+  initBuildings: (obj) => dispatch(location.initBuildings(obj)),
+  selectAll: (obj) => dispatch(location.selectAll(obj)),
+  selectBuilding: (building) => dispatch(location.selectBuilding(building)),
+  selectFloor: (floor) => dispatch(location.selectFloor(floor)),
+  selectRoom: (room) => dispatch(location.selectRoom(room)),
 });
 
 //This sends the variables and functions to be referenced as "this.props"

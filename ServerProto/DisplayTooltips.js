@@ -33,7 +33,7 @@ export default class DisplayTooltips extends React.Component {
                     // the currently visible pano; pano will update locationId
                     // after loading the new image.
                   }}
-                  source={asset(data.nav_icon)}
+                  source={asset('UpArrowNav.png')}
                   textLabel={tooltip.text}
                   pixelsPerMeter={ppm}
                   translateX={degreesToPixels(tooltip.rotationY)}

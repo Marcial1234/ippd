@@ -8,7 +8,7 @@ const defaultState = {
   notes: null,
 };
 
-export default function user(state=defaultState, action){
+export default function photo(state=defaultState, action){
     //let {zoomZ, data, rotation, locationId, nextLocationId,} = action.payload;
     switch(action.type){
       case "Update":{

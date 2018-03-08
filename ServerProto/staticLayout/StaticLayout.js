@@ -12,6 +12,7 @@ export default class StaticLayout extends React.Component {
       tooltipID: 0,
       updateNotes: true,
       overlayOpen: false,
+      adjustRate: 6,
     }
     this.editNote = this.editNote.bind(this);
     this.moveNote = this.moveNote.bind(this);
@@ -23,6 +24,9 @@ export default class StaticLayout extends React.Component {
     this.deleteNote = this.deleteNote.bind(this);
     this.createNote = this.createNote.bind(this);
     this.refreshTooltips = this.refreshTooltips.bind(this);
+    this.adjustRate = this.adjustRate.bind(this);
+    this.changeRate = this.changeRate.bind(this);
+    this.buildingSelection = this.buildingSelection.bind(this);
 
   }
 
@@ -36,6 +40,18 @@ export default class StaticLayout extends React.Component {
     });
     RCTDeviceEventEmitter.addListener('overlayOpen', () => {
     this.setState({overlayOpen: true,})
+    });
+    RCTDeviceEventEmitter.addListener('selectBuilding', obj => {
+    this.props.selectBuilding(obj);
+    });
+    RCTDeviceEventEmitter.addListener('selectFloor', obj => {
+    this.props.selectFloor(obj);
+    });
+    RCTDeviceEventEmitter.addListener('selectRoom', obj => {
+    this.props.selectRoom(obj);
+    });
+    RCTDeviceEventEmitter.addListener('selectAll', obj => {
+    this.props.selectAll(obj);
     });
   }
 
@@ -63,7 +79,7 @@ export default class StaticLayout extends React.Component {
       title: "New Note",
       text: "It's Full!",
       attribution: "Yes Ma'am",
-      rotationY: notes.length>0 ? notes[notes.length-1].rotationY - 20 : 160,
+      rotationY: notes.length>0 ? notes[this.state.tooltipID].rotationY - 20 : 160,
       translateX: 0,
       width: 1.3,
       height: 1.5,
@@ -88,22 +104,31 @@ export default class StaticLayout extends React.Component {
 
   moveNote(direction){
     let notes = this.props.photo.notes;
+    let adj = this.state.adjustRate;
     //need to figure out what to do at 180 degrees
-    if(notes[this.state.tooltipID].rotationY <= -180 || notes[this.state.tooltipID].rotationY >= 180){
-      notes[this.state.tooltipID].rotationY *=-1;
-    }
+
     switch(direction){
       case "right":
-      notes[this.state.tooltipID].rotationY -=5;
+      if(notes[this.state.tooltipID].rotationY - adj > -180){
+        notes[this.state.tooltipID].rotationY -=adj;
+      }
+      else{
+        notes[this.state.tooltipID].rotationY *=-1;
+      }
       break;
       case "left":
-      notes[this.state.tooltipID].rotationY +=5;
+      if(notes[this.state.tooltipID].rotationY + adj < 180){
+        notes[this.state.tooltipID].rotationY +=adj;
+      }
+      else{
+        notes[this.state.tooltipID].rotationY *=-1;
+      }
       break;
       case "up":
-      notes[this.state.tooltipID].translateX -=5;
+      notes[this.state.tooltipID].translateX -=adj;
       break;
       case "down":
-      notes[this.state.tooltipID].translateX +=5;
+      notes[this.state.tooltipID].translateX +=adj;
       break;
     }
     console.log("Current Rotation:", notes[this.state.tooltipID].rotationY);
@@ -116,8 +141,14 @@ export default class StaticLayout extends React.Component {
     this.selectTooltip(index);
     if(notes.length> 0){
        NativeModules.DomOverlayModule.closeOverlay();
-       NativeModules.DomOverlayModule.openOverlay(notes[this.state.tooltipID].text,
-                                                  notes[this.state.tooltipID].title);
+       // NativeModules.DomOverlayModule.openOverlay(
+       //    notes[this.state.tooltipID].text, notes[this.state.tooltipID].title,
+       //    this.props.location.buildings, this.props.location.currentBuilding,
+       //    this.props.location.currentFloor, this.props.location.currentRoom
+       //  );
+       NativeModules.DomOverlayModule.openOverlay(
+          notes[this.state.tooltipID].text, notes[this.state.tooltipID].title,
+        )
     }
     else{
       console.log("No Tooltips");
@@ -158,8 +189,14 @@ export default class StaticLayout extends React.Component {
     this.setState({tooltipID: index});
     if(this.state.overlayOpen){
        NativeModules.DomOverlayModule.closeOverlay();
-       NativeModules.DomOverlayModule.openOverlay(notes[index].text,
-                                                  notes[index].title);
+       // NativeModules.DomOverlayModule.openOverlay(
+       //    notes[this.state.tooltipID].text, notes[this.state.tooltipID].title,
+       //    this.props.location.buildings, this.props.location.currentBuilding,
+       //    this.props.location.currentFloor, this.props.location.currentRoom
+       //  );
+       NativeModules.DomOverlayModule.openOverlay(
+          notes[this.state.tooltipID].text, notes[this.state.tooltipID].title,
+        )
     }
     for(let i = 0; i < notes.length; i++){
       if(i == index){
@@ -169,20 +206,6 @@ export default class StaticLayout extends React.Component {
         notes[i].selected = false;
       }
     }
-    //
-    // let i = notes[index];
-    // let d = data.photos[locationId].tooltips.indexOf(i);
-    //
-    // for(let i = 0; i < data.photos[locationId].tooltips.length; i++){
-    //   if(data.photos[locationId].tooltips[i].type == "textblock"){
-    //     if(d == i){
-    //       data.photos[locationId].tooltips[i].selected = true;
-    //     }
-    //     else{
-    //       data.photos[locationId].tooltips[i].selected = false;
-    //     }
-    //   }
-    // }
     this.props.updateNotes(notes);
     //this.props.updateData(data);
     // console.log("Notes: ", notes);
@@ -192,6 +215,39 @@ export default class StaticLayout extends React.Component {
       translation: notes[index].translateX
     }
     this.props.focusNote(obj);
+  }
+
+  adjustRate(direction){
+    switch (direction){
+      case "up":
+        if(this.state.adjustRate < 20){
+          this.setState({adjustRate : this.state.adjustRate + 2 })
+        }
+        else{
+            console.log("Adjust Rate Maxed");
+        }
+        break;
+      case "down":
+        if(this.state.adjustRate > 2){
+          this.setState({adjustRate : this.state.adjustRate - 2 })
+        }
+        else{
+            console.log("Adjust Rate Minimized");
+        }
+      break;
+
+    }
+  }
+  changeRate(magnitude){
+    this.setState({adjustRate : magnitude })
+  }
+
+  buildingSelection(){
+    NativeModules.DomOverlayModule.openOverlay(
+       notes[this.state.tooltipID].text, notes[this.state.tooltipID].title,
+       this.props.location.buildings, this.props.location.currentBuilding,
+       this.props.location.currentFloor, this.props.location.currentRoom
+     );
   }
 
   refreshTooltips(){
@@ -213,6 +269,10 @@ export default class StaticLayout extends React.Component {
 
   render() {
     let {notes} = this.props.photo;
+    var lvls = [];
+    for (let i = 2; i <= 20; i+=2){
+      lvls.push(i);
+    }
     return (
       <View >
         {/* The line below Displays the View only if "this.props.textInputActive" is true
@@ -243,22 +303,16 @@ export default class StaticLayout extends React.Component {
         <VrButton style={styles.menuButton} onClick={this.createNote}>
           <Text style={styles.menuText}>Create Note</Text>
         </VrButton>
-        <VrButton style={styles.menuButton} onClick={() => this.moveNote("left")}>
-          <Text style={styles.menuText}>Left</Text>
+
+{/*
+        <VrButton style={styles.menuButton} onClick={this.buildingSelection}>
+          <Text style={styles.menuText}>Building Selection: {this.props.location.currentBuilding}</Text>
         </VrButton>
-        <VrButton style={styles.menuButton} onClick={() => this.moveNote("right")}>
-          <Text style={styles.menuText}>Right</Text>
-        </VrButton>
-        <VrButton style={styles.menuButton} onClick={() => this.moveNote("up")}>
-          <Text style={styles.menuText}>Up</Text>
-        </VrButton>
-        <VrButton style={styles.menuButton} onClick={() => this.moveNote("down")}>
-          <Text style={styles.menuText}>Down</Text>
-        </VrButton>
+*/}
+
         <VrButton style={styles.menuButton} onClick={this.toggleTooltips}>
           <Text style={styles.menuText}>Toggle Tooltips</Text>
         </VrButton>
-
       </View>
       {(this.state.displayTooltips && notes.length > 0) && <View style={styles.tooltipList}>
           {notes.map((tooltip, index) => {
@@ -277,6 +331,39 @@ export default class StaticLayout extends React.Component {
               </VrButton>
             </View>);
         })}
+      </View>}
+      {(this.state.displayTooltips && notes.length > 0) && <View style={styles.pBButton}>
+      <VrButton style={styles.pBLeft} onClick={() => this.moveNote("left")}>
+        <Text style={styles.menuText}>Left</Text>
+      </VrButton>
+      <VrButton style={styles.pBRight} onClick={() => this.moveNote("right")}>
+        <Text style={styles.menuText}>Right</Text>
+      </VrButton>
+      <VrButton style={styles.pBUp} onClick={() => this.moveNote("up")}>
+        <Text style={styles.menuText}>Up</Text>
+      </VrButton>
+      <VrButton style={styles.pBDown} onClick={() => this.moveNote("down")}>
+        <Text style={styles.menuText}>Down</Text>
+      </VrButton>
+      <VrButton style={styles.pBPlus} onClick={() => this.adjustRate("up")}>
+        <Text style={styles.menuText}>+</Text>
+      </VrButton>
+      <VrButton style={styles.pBRate}>
+        <Text style={styles.menuText}>{this.state.adjustRate}</Text>
+      </VrButton>
+      <VrButton style={styles.pBMinus} onClick={() => this.adjustRate("down")}>
+        <Text style={styles.menuText}>-</Text>
+      </VrButton>
+      <View style={styles.pBRateBar}>
+        {lvls.map((mag, index) => {
+          return(
+            <VrButton style={(this.state.adjustRate == mag) ? styles.pBRateBarButtonSelected : styles.pBRateBarButton}
+                key ={index} onClick={() => this.changeRate(mag)}>
+                  <Text style={styles.barText}>{mag}</Text>
+            </VrButton>
+          );
+        })}
+      </View>
       </View>}
       </View>
     );

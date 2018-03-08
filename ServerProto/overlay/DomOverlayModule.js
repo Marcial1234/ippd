@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import {Module} from 'react-vr-web';
 
 import TextboxOverlay from './TextboxOverlay';
+import SelectorOverlay from './SelectorOverlay';
 
 export default class DomOverlayModule extends Module {
   constructor(overlayContainer) {
@@ -25,12 +26,16 @@ export default class DomOverlayModule extends Module {
       this._overlayContainer
     );
   }
-  openBlankOverlay() {
-    ReactDOM.render(
-      <TextboxOverlay onClose={this._closeOverlay} submit={this.submit}/>,
-      this._overlayContainer
-    );
-  }
+  // openOverlay(text, title, buildings, b, f, r) {
+  //   this.rnContext.callFunction('RCTDeviceEventEmitter', 'emit', [
+  //     'overlayOpen'
+  //   ]);
+  //   ReactDOM.render(
+  //     <TextboxOverlay title={title} text={text} onClose={this._closeOverlay} submit={this.submit}
+  //       buildings={buildings} b={b} f={f} r={r} submitSelection={this.submitSelection}/>,
+  //     this._overlayContainer
+  //   );
+  // }
 
   closeOverlay() {
     this.rnContext.callFunction('RCTDeviceEventEmitter', 'emit', [
@@ -50,6 +55,11 @@ export default class DomOverlayModule extends Module {
     submit(obj){
       this.rnContext.callFunction('RCTDeviceEventEmitter', 'emit', [
         'updateText', obj,
+      ]);
+    }
+    submitSelection(obj){
+      this.rnContext.callFunction('RCTDeviceEventEmitter', 'emit', [
+        'selectAll', obj,
       ]);
     }
 }
