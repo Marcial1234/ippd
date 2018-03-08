@@ -15,10 +15,29 @@ app.get('/', function(req, res) {
 app.post('/upload', function(req, res) {
   res.writeHead(200, {'Content-Type': 'text/html'});
 
+/*
+  var files = [], fields = [];
+  form.on('field', function(field, value) {
+    fields.push([field, value]);
+  });
+  form.on('file', function(field, file) {
+    console.log(file.name);
+    files.push([field, file]);
+  });
+  form.on('end', function() {
+    console.log('done');
+    res.redirect('/');
+  });
+*/
+
   var form = new formidable.IncomingForm();
   form.parse(req, function(err, fields, files) {
     var oldpath = files.image.path;
     var newpath = __dirname + '/public/upload/' + files.image.name;
+    //var fileObj = {};
+    //fileObj.name = files.image.name;
+    //fileObj.path = '/public/upload/';
+    
     fs.rename(oldpath, newpath, function(err) {
       if(err)
         throw err;
@@ -34,10 +53,11 @@ app.post('/upload', function(req, res) {
 }); 
 
 app.use(function (req, res, next) {
-  console.log('Time:', Date.now())
-  next()
+  console.log('Time:', Date.now());
+  next();
 })
 
 app.listen(3000, function() {
    console.log('Listening on port 3000!');
 });
+
