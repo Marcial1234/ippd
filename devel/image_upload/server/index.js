@@ -2,11 +2,17 @@ var express = require('express');
 var app = express();
 var router = express.Router();
 
+//var bodyParser = require('body-parser');
 var exec = require('child_process').exec;
 var formidable = require('formidable');
 var fs = require('fs');
 var path = require('path');
 
+//app.use(bodyParser.urlencoded({
+//  limit: '5mb',
+//  extended: true
+//}));
+//app.use(bodyParser.json());
 //app.get(express.static(__dirname + '/public'));
 
 app.get('/', function(req, res) {
@@ -32,8 +38,10 @@ app.post('/upload', function(req, res) {
 */
 
   var form = new formidable.IncomingForm();
+  form.encoding = 'utf-8';
   form.keepExtensions = false;
   form.maxFieldsSize =  1073741824;  // 1GB max
+  form.maxFieldsSize =  1;  // 1GB max
   form.maxFields = 100;  //100 images max
 
   //Progress
@@ -60,8 +68,7 @@ app.post('/upload', function(req, res) {
         throw err;
       else
       {
-/*
-        var stitcher = exec(__dirname + '/public/gear360pano/gear360pano.sh -n' + 
+        var stitch = exec(__dirname + '/public/gear360pano/gear360pano.sh -n ' + 
                             '-o ' + __dirname + '/public/upload ' + 
                             __dirname + '/public/gear360pano/to_pano*',
             (error, stdout, stderr) => {
@@ -71,7 +78,6 @@ app.post('/upload', function(req, res) {
                   console.log(`exec error: ${error}`);
             }
         );
-*/
 
         console.log('New image uploaded as:\n' + newpath);
         res.write('<h1>Uploaded</h1>'); 
