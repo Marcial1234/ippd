@@ -83,8 +83,8 @@
   z-index: 1000;
   top: 0px;
   left: 50%;
-  width: 250px;
-  height: 100px;
+  width: 550px;
+  height: 40px;
   color: #fff;
   background-color: rgba(55,55,55,0.9);
   /* overflow: auto; */
@@ -97,5 +97,13 @@
   /* box-sizing: border-box; */
   margin: 0;
   padding: 0;
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+  border-spacing: 10px;
+}
+.selCol {
+  display: table-cell;
   text-align: center;
+  font-size: 14;
 }

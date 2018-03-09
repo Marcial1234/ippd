@@ -27,31 +27,45 @@ export default class StaticLayout extends React.Component {
     this.adjustRate = this.adjustRate.bind(this);
     this.changeRate = this.changeRate.bind(this);
     this.buildingSelection = this.buildingSelection.bind(this);
+    this.openOverlay = this.openOverlay.bind(this);
 
   }
 
   componentWillMount(){
     //will respond to the call for 'updateText', obj is the value recieved
     RCTDeviceEventEmitter.addListener('updateText', obj => {
-    this.updateText(obj);
+      this.updateText(obj);
     });
     RCTDeviceEventEmitter.addListener('overlayClose', () => {
-    this.setState({overlayOpen: false,})
+      this.setState({overlayOpen: false,})
     });
     RCTDeviceEventEmitter.addListener('overlayOpen', () => {
-    this.setState({overlayOpen: true,})
+      this.setState({overlayOpen: true,})
     });
     RCTDeviceEventEmitter.addListener('selectBuilding', obj => {
-    this.props.selectBuilding(obj);
+      this.props.selectBuilding(obj);
     });
     RCTDeviceEventEmitter.addListener('selectFloor', obj => {
-    this.props.selectFloor(obj);
+      this.props.selectFloor(obj);
     });
     RCTDeviceEventEmitter.addListener('selectRoom', obj => {
-    this.props.selectRoom(obj);
+      this.props.selectRoom(obj);
     });
     RCTDeviceEventEmitter.addListener('selectAll', obj => {
-    this.props.selectAll(obj);
+      // this.props.selectAll(obj);
+      // let {currentBuilding, currentFloor} = this.props.location;
+      // let roomData = this.props.location.buildings[currentBuilding].floors[currentFloor];
+      // console.log(this.props.location.buildings[currentBuilding].floors[currentFloor]);
+      // let room = obj.room;
+      // //this.props.changeNextLocationId(roomData.room);
+      // this.props.updatePhoto({
+      //   zoomZ: 0,
+      //   data: roomData,
+      //   locationId: null,
+      //   nextLocationId: roomData.room,
+      //   rotation: roomData.firstPhotoRotation +
+      //   (roomData.photos[roomData.firstPhotoId].rotationOffset || 0)
+      // });
     });
   }
 
@@ -140,15 +154,7 @@ export default class StaticLayout extends React.Component {
     let {notes} = this.props.photo;
     this.selectTooltip(index);
     if(notes.length> 0){
-       NativeModules.DomOverlayModule.closeOverlay();
-       // NativeModules.DomOverlayModule.openOverlay(
-       //    notes[this.state.tooltipID].text, notes[this.state.tooltipID].title,
-       //    this.props.location.buildings, this.props.location.currentBuilding,
-       //    this.props.location.currentFloor, this.props.location.currentRoom
-       //  );
-       NativeModules.DomOverlayModule.openOverlay(
-          notes[index].text, notes[index].title,
-        )
+       this.openOverlay(index, "Text");
     }
     else{
       console.log("No Tooltips");
@@ -188,15 +194,7 @@ export default class StaticLayout extends React.Component {
     let {notes, data, locationId} = this.props.photo;
     this.setState({tooltipID: index});
     if(this.state.overlayOpen){
-       NativeModules.DomOverlayModule.closeOverlay();
-       // NativeModules.DomOverlayModule.openOverlay(
-       //    notes[this.state.tooltipID].text, notes[this.state.tooltipID].title,
-       //    this.props.location.buildings, this.props.location.currentBuilding,
-       //    this.props.location.currentFloor, this.props.location.currentRoom
-       //  );
-       NativeModules.DomOverlayModule.openOverlay(
-          notes[index].text, notes[index].title,
-        )
+       this.openOverlay(index, "Text");
     }
     for(let i = 0; i < notes.length; i++){
       if(i == index){
@@ -243,14 +241,30 @@ export default class StaticLayout extends React.Component {
   }
 
   buildingSelection(){
-    NativeModules.DomOverlayModule.openOverlay(
-       notes[this.state.tooltipID].text, notes[this.state.tooltipID].title,
-     );
+    this.openOverlay(-1, "Select");
   }
 
   refreshTooltips(){
     setTimeout(function() {this.toggleTooltips()}.bind(this), 25);
     setTimeout(function() {this.toggleTooltips()}.bind(this), 25);
+  }
+
+  openOverlay(index, type){
+    let {notes, locationId} = this.props.photo;
+    let {currentFloor, currentBuilding, buildings} = this.props.location;
+
+    NativeModules.DomOverlayModule.closeOverlay();
+    if(type == "Text"){
+      NativeModules.DomOverlayModule.openOverlay(
+         type, notes[index].text, notes[index].title, locationId, currentFloor, currentBuilding, buildings
+       )
+    }
+    if(type == "Select"){
+      NativeModules.DomOverlayModule.openOverlay(
+         type, "", "", locationId, currentFloor, currentBuilding, buildings
+       )
+    }
+
   }
 
   goHome(){
@@ -301,12 +315,9 @@ export default class StaticLayout extends React.Component {
         <VrButton style={styles.menuButton} onClick={this.createNote}>
           <Text style={styles.menuText}>Create Note</Text>
         </VrButton>
-
-{/*
         <VrButton style={styles.menuButton} onClick={this.buildingSelection}>
           <Text style={styles.menuText}>Building Selection: {this.props.location.currentBuilding}</Text>
         </VrButton>
-*/}
 
         <VrButton style={styles.menuButton} onClick={this.toggleTooltips}>
           <Text style={styles.menuText}>Toggle Tooltips</Text>

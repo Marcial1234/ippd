@@ -90,8 +90,7 @@ class VRLayout extends React.Component{
     }
 
     init(roomConfig) {
-      let {currentBuilding, currentFloor, currentRoom} = this.props.location;
-      console.log(roomConfig.buildings[currentBuilding]);
+      let {currentBuilding, currentFloor} = this.props.location;
       let roomData = roomConfig.buildings[currentBuilding].floors[currentFloor];
       this.props.updatePhoto({
         zoomZ: 0,
@@ -106,6 +105,7 @@ class VRLayout extends React.Component{
         floors: roomConfig.buildings[currentBuilding].floors,
         rooms: roomConfig.buildings[currentBuilding].floors[currentFloor].photos,
       })
+      //console.log(roomConfig.buildings);
     }
 
     render(){
@@ -113,7 +113,7 @@ class VRLayout extends React.Component{
       let {zoomZ, locationId, nextLocationId, data, notes} = this.props.photo;
       let rot = this.props.photo.rotation;
       let trans = this.props.photo.translation;
-      console.log("Trans:", trans, "Rot:", rot);
+      //console.log("Trans:", trans, "Rot:", rot);
       //map short names to functions that will be used.
       let {updatePhoto, changeLocationId, changeNextLocationId, changeZoom} = this.props;
       if(!data){
@@ -209,7 +209,6 @@ const mapDispatchToProps = dispatch => ({
   selectAll: (obj) => dispatch(location.selectAll(obj)),
   selectBuilding: (building) => dispatch(location.selectBuilding(building)),
   selectFloor: (floor) => dispatch(location.selectFloor(floor)),
-  selectRoom: (room) => dispatch(location.selectRoom(room)),
 });
 
 //This sends the variables and functions to be referenced as "this.props"
