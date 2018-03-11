@@ -1,0 +1,41 @@
+<!-- Page Content -->
+
+<div class="container">
+
+    <div class="row">
+
+        <div class="col-lg-12">
+            <h1 class="page-header">Create a location
+                <small>Building/Floor/Room</small>
+            </h1>
+        </div>
+
+    </div>
+    <!-- /.row -->
+
+    <div class="row">
+
+        <div class="col-lg-12">
+            <!--Need to store this-->
+            <!--Form for building/floor/room-->
+            <div ng-app="tutorialWebApp" ng-controller="formCtrl">
+                <form novalidate>
+                    Building:<br>
+                    <input type="text" ng-model="building"><br>
+
+                    Floor:<br>
+                    <input type="text" ng-model="floor"><br>
+
+                    Room:<br>
+                    <input type="text" ng-model="room">
+                    <br><br>
+                    <button ng-click="submit()">SUBMIT NOT IMPLEMENTED</button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+    <!-- /.row -->
+
+</div>
+<!-- /.container -->
