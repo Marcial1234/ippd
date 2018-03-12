@@ -256,13 +256,13 @@ export default class StaticLayout extends React.Component {
     NativeModules.DomOverlayModule.closeOverlay();
     if(type == "Text"){
       NativeModules.DomOverlayModule.openOverlay(
-         type, notes[index].text, notes[index].title, locationId, currentFloor, currentBuilding, buildings
+         notes[index].text, notes[index].title
        )
     }
     if(type == "Select"){
-      NativeModules.DomOverlayModule.openOverlay(
-         type, "", "", locationId, currentFloor, currentBuilding, buildings
-       )
+      // NativeModules.DomOverlayModule.openOverlay(
+      //    type, "", "", locationId, currentFloor, currentBuilding, buildings
+      //  )
     }
 
   }
@@ -301,13 +301,13 @@ export default class StaticLayout extends React.Component {
         <VrButton style={styles.menuButton} onClick={this.goHome}>
           <Text style={styles.menuText}>Home</Text>
         </VrButton>
+        <VrButton style={styles.menuButton} onClick={this.test}>
+             <Text style={styles.menuText}>Log It</Text>
+       </VrButton>
 {/*
         <VrButton style={styles.menuButton} onClick={this.editNote}>
           <Text style={styles.menuText}>Edit Note</Text>
         </VrButton>
-      <VrButton style={styles.menuButton} onClick={this.test}>
-           <Text style={styles.menuText}>Log It</Text>
-         </VrButton>
         <VrButton style={styles.menuButton} onClick={this.changeVal}>
           <Text style={styles.menuText}>Change Val</Text>
         </VrButton>
