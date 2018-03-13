@@ -53,7 +53,7 @@ export default class StaticLayout extends React.Component {
     });
     RCTDeviceEventEmitter.addListener('selectAll', obj => {
       let {currentBuilding, currentFloor} = this.props.location;
-      let {locationId} = this.props.photo;
+      let {locationId, data} = this.props.photo;
       if(obj.building == currentBuilding && obj.floor == currentFloor && obj.room == locationId){
         console.log("Already here.");
       }
@@ -68,8 +68,11 @@ export default class StaticLayout extends React.Component {
           rotation: roomData.firstPhotoRotation +
           (roomData.photos[roomData.firstPhotoId].rotationOffset || 0)
         });
-        setTimeout(function() {this.props.changeNextLocationId("000001")}.bind(this), 25);
-        setTimeout(function() {this.props.changeNextLocationId("000002")}.bind(this), 25);
+        let locs = Object.keys(roomData.photos);
+        //console.log(locs[0]);
+        // console.log();
+        setTimeout(function() {this.props.changeNextLocationId(locs[0])}.bind(this), 25);
+        setTimeout(function() {this.props.changeNextLocationId(locs[1])}.bind(this), 25);
         setTimeout(function() {this.props.changeNextLocationId(obj.room)}.bind(this), 25);
       }
       //setTimeout(function() {this.buildingSelection()}.bind(this), 25);
@@ -83,25 +86,29 @@ export default class StaticLayout extends React.Component {
     const tooltips = (photoData && photoData.tooltips) || null;
     const temp = (tooltips && tooltips.filter(t => t.type=='textblock')) || null;
     if(temp && this.state.updateNotes){
+    //  data.photos[locationId].push(temp);
+      console.log(data.photos[locationId]);
       this.props.updateNotes(temp);
       this.setState({updateNotes : false});
     }
     if((temp && notes && temp[0] !== notes[0]) || (!notes && temp)){
-      //console.log("Notes gets temp");
       this.setState({updateNotes : true});
     }
-    // console.log("Notes: ", notes);
-    // console.log("Temp: ", temp);
   }
 
   createNote(){
     let {notes, data, locationId} = this.props.photo;
+    let ID = this.state.tooltipID;
+    if(ID >= notes.length){
+      this.setState({tooltipID: 0});
+      ID = 0;
+    }
     let newNote = {
       type: "textblock",
       title: "New Note",
       text: "It's Full!",
       attribution: "Yes Ma'am",
-      rotationY: notes.length>0 ? notes[this.state.tooltipID].rotationY - 20 : 160,
+      rotationY: notes.length>0 ? notes[ID].rotationY - 20 : 160,
       translateX: 0,
       width: 1.3,
       height: 1.5,
@@ -112,6 +119,7 @@ export default class StaticLayout extends React.Component {
     // console.log(notes);
     // console.log("New Note: ", newNote);
     notes.push(newNote);
+    this.props.updateNotes(notes);
     data.photos[locationId].tooltips.push(newNote);
     this.props.updateData(data);
     if(this.state.displayTooltips){
@@ -291,6 +299,8 @@ export default class StaticLayout extends React.Component {
   }
 
   test(){
+    console.log("Building:", this.props.location.currentBuilding);
+    console.log("Floor:", this.props.location.currentFloor);
     console.log("Photo:", this.props.photo);
     console.log("Notes: ", this.props.photo.notes);
     console.log("Data: ", this.props.photo.data);
