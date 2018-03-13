@@ -17,28 +17,23 @@ export default class DomOverlayModule extends Module {
     this.submitSelection = this.submitSelection.bind(this);
   }
 
-  // This method call opens up the overlay for display.
-  // openOverlay(type, text, title, room, floor, building, bldgs) {
-  //   this.rnContext.callFunction('RCTDeviceEventEmitter', 'emit', [
-  //     'overlayOpen'
-  //   ]);
-  //   ReactDOM.render(
-  //     <TextboxOverlay type={type} text={text} title={title} room={room}
-  //       floor={floor} building={building} bldgs={bldgs}
-  //        onClose={this._closeOverlay} submit={this.submit} submitSelection={this.submitSelection}/>,
-  //     this._overlayContainer
-  //   );
-  // }
-
-  openOverlay(text, title) {
+  //This method call opens up the overlay for display.
+  openOverlay(type, text, title, room, floor, building, bldgs) {
     this.rnContext.callFunction('RCTDeviceEventEmitter', 'emit', [
       'overlayOpen'
     ]);
     ReactDOM.render(
-      <TextboxOverlay text={text} title={title} submit={this.submit}/>,
+      <TextboxOverlay type={type} text={text} title={title} room={room}
+        floor={floor} building={building} bldgs={bldgs}
+         onClose={this._closeOverlay} submit={this.submit} submitSelection={this.submitSelection}/>,
       this._overlayContainer
     );
+    // ReactDOM.render(
+    //     <TextboxOverlay text={text} title={title} submit={this.submit}/>,
+    //     this._overlayContainer
+    //   );
   }
+
 
   closeOverlay() {
     this.rnContext.callFunction('RCTDeviceEventEmitter', 'emit', [

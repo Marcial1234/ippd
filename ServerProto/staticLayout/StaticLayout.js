@@ -52,20 +52,28 @@ export default class StaticLayout extends React.Component {
       this.props.selectRoom(obj);
     });
     RCTDeviceEventEmitter.addListener('selectAll', obj => {
-      // this.props.selectAll(obj);
-      // let {currentBuilding, currentFloor} = this.props.location;
-      // let roomData = this.props.location.buildings[currentBuilding].floors[currentFloor];
-      // console.log(this.props.location.buildings[currentBuilding].floors[currentFloor]);
-      // let room = obj.room;
-      // //this.props.changeNextLocationId(roomData.room);
-      // this.props.updatePhoto({
-      //   zoomZ: 0,
-      //   data: roomData,
-      //   locationId: null,
-      //   nextLocationId: roomData.room,
-      //   rotation: roomData.firstPhotoRotation +
-      //   (roomData.photos[roomData.firstPhotoId].rotationOffset || 0)
-      // });
+      let {currentBuilding, currentFloor} = this.props.location;
+      let {locationId} = this.props.photo;
+      if(obj.building == currentBuilding && obj.floor == currentFloor && obj.room == locationId){
+        console.log("Already here.");
+      }
+      else{
+        this.props.selectAll(obj);
+        let roomData = this.props.location.buildings[currentBuilding].floors[currentFloor];
+        this.props.updatePhoto({
+          zoomZ: 0,
+          data: roomData,
+          locationId: null,
+          nextLocationId: obj.room,
+          rotation: roomData.firstPhotoRotation +
+          (roomData.photos[roomData.firstPhotoId].rotationOffset || 0)
+        });
+        setTimeout(function() {this.props.changeNextLocationId("000001")}.bind(this), 25);
+        setTimeout(function() {this.props.changeNextLocationId("000002")}.bind(this), 25);
+        setTimeout(function() {this.props.changeNextLocationId(obj.room)}.bind(this), 25);
+      }
+      //setTimeout(function() {this.buildingSelection()}.bind(this), 25);
+
     });
   }
 
@@ -78,7 +86,7 @@ export default class StaticLayout extends React.Component {
       this.props.updateNotes(temp);
       this.setState({updateNotes : false});
     }
-    if(temp && notes && temp[0] !== notes[0]){
+    if((temp && notes && temp[0] !== notes[0]) || (!notes && temp)){
       //console.log("Notes gets temp");
       this.setState({updateNotes : true});
     }
@@ -145,8 +153,8 @@ export default class StaticLayout extends React.Component {
       notes[this.state.tooltipID].translateX +=adj;
       break;
     }
-    console.log("Current Rotation:", notes[this.state.tooltipID].rotationY);
-    console.log("Current Translation:", notes[this.state.tooltipID].translateX);
+    // console.log("Current Rotation:", notes[this.state.tooltipID].rotationY);
+    // console.log("Current Translation:", notes[this.state.tooltipID].translateX);
     this.props.updateNotes(notes);
   }
 
@@ -252,17 +260,26 @@ export default class StaticLayout extends React.Component {
   openOverlay(index, type){
     let {notes, locationId} = this.props.photo;
     let {currentFloor, currentBuilding, buildings} = this.props.location;
+    console.log(currentFloor, currentBuilding);
+    // let BU = Object.assign({}, buildings);
+    //let BU = {...buildings};
+  //  let BU = {};
+    // for(var k in buildings){
+    //   BU[k] = buildings[k];
+    // }
+    let BU = JSON.parse(JSON.stringify(buildings));
+    // console.log(BU);
 
     NativeModules.DomOverlayModule.closeOverlay();
     if(type == "Text"){
       NativeModules.DomOverlayModule.openOverlay(
-         notes[index].text, notes[index].title
+         type, notes[index].text, notes[index].title, locationId, currentFloor, currentBuilding, BU
        )
     }
     if(type == "Select"){
-      // NativeModules.DomOverlayModule.openOverlay(
-      //    type, "", "", locationId, currentFloor, currentBuilding, buildings
-      //  )
+      NativeModules.DomOverlayModule.openOverlay(
+         type, "", "", locationId, currentFloor, currentBuilding, BU
+       )
     }
 
   }
@@ -274,6 +291,7 @@ export default class StaticLayout extends React.Component {
   }
 
   test(){
+    console.log("Photo:", this.props.photo);
     console.log("Notes: ", this.props.photo.notes);
     console.log("Data: ", this.props.photo.data);
     console.log("LocationID: ", this.props.photo.locationId);
@@ -285,6 +303,11 @@ export default class StaticLayout extends React.Component {
     for (let i = 2; i <= 20; i+=2){
       lvls.push(i);
     }
+
+    if(!notes){
+      notes = [];
+    }
+
     return (
       <View >
         {/* The line below Displays the View only if "this.props.textInputActive" is true

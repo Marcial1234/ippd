@@ -10,14 +10,14 @@ export default class TextboxOverlay extends React.Component{
       text: this.props.text || "Empty",
       title: this.props.title || "Empty",
       building: props.building || "000999",
-      floor: props.floor || "99",
+      floor: props.floor || "01",
       room: props.room || "000001",
-      // buildings: null,
-      // lBuildings: null,
-      // floors: null,
-      // lFloors: null,
-      // rooms: null,
-      // lRooms: null,
+      buildings: null,
+      lBuildings: null,
+      floors: null,
+      lFloors: null,
+      rooms: null,
+      lRooms: null,
     };
 
     this.handleTextChange = this.handleTextChange.bind(this);
@@ -34,7 +34,7 @@ export default class TextboxOverlay extends React.Component{
   }
 
   componentDidMount(){
-    //this.updateSelections();
+    this.updateSelections();
   }
 
   handleTextChange(event) {
@@ -45,7 +45,7 @@ export default class TextboxOverlay extends React.Component{
   }
   handleBuildingChange(event, type) {
     this.setState({building: event.target.value});
-    console.log(event.target.value);
+    //console.log(event.target.value);
     if(type == "update"){
       setTimeout(function() {this.updateSelections()}.bind(this), 25);
     }
@@ -101,7 +101,7 @@ export default class TextboxOverlay extends React.Component{
       floor: this.state.floor,
       room: this.state.room
     }
-    // this.props.submitSelection(obj);
+    this.props.submitSelection(obj);
   }
 
   handleSubmit(event) {
@@ -128,7 +128,8 @@ export default class TextboxOverlay extends React.Component{
   }
 
   updateSelections(){
-    // console.log("B:", this.state.building, "F:", this.state.floor);
+    // console.log(this.props.bldgs);
+    //  console.log("B:", this.state.building, "F:", this.state.floor);
     this.setState({
       buildings: Object.keys(this.props.bldgs),
       lBuildings: Object.keys(this.props.bldgs),
@@ -144,10 +145,10 @@ export default class TextboxOverlay extends React.Component{
     // console.log("Floors:", this.state.floors);
     // console.log("Rooms:", this.state.rooms);
 
-    //{(this.props.type == "Text") &&
+
     return (
       <div>
-        <div className="container">
+          {(this.props.type == "Text") && <div className="container">
           <div className="content">
             <div className="close" onClick={this.props.onClose} />
               <form onSubmit={this.handleSubmit}>
@@ -167,8 +168,41 @@ export default class TextboxOverlay extends React.Component{
               </form>
           </div>
         </div>
+      }
 
-
+      {(this.props.type == "Select" && this.state.rooms) && <div className="select-container">
+        <div className="select-content">
+              <div className="selCol">Building:
+                 <select onChange={ (e) => {this.handleBuildingChange(e, "update");}}>
+                   {this.state.lBuildings.map((num, index) =>
+                    <option key={index}>
+                      {num}
+                    </option>
+                  )}
+                </select>
+                </div>
+                <div className="selCol">Floor:
+                   <select onChange={ (e) => {this.handleFloorChange(e, "update");}}>
+                     {this.state.lFloors.map((num, index) =>
+                      <option key={index}>
+                        {num}
+                      </option>
+                    )}
+                  </select>
+                </div>
+                <div className="selCol">Room:
+                   <select onChange={ (e) => {this.handleRoomChange(e, "update");}}>
+                     {this.state.lRooms.map((num, index) =>
+                        <option key={index}>
+                          {num}
+                        </option>
+                      )}
+                    </select>
+                </div>
+                <button onClick={this.goToRoom} className="selCol">GO</button>
+          </div>
+        </div>
+      }
       </div>
     )
   }
@@ -176,37 +210,3 @@ export default class TextboxOverlay extends React.Component{
 //
 // <input type="text" ref="query" value={this.state.building}
 //      onChange={ (e) => {this.handleBuildingChange(e, "refresh"); this.updateSearch(e, "B")}} style={{width: 70}}/>
-
-//   {(this.props.type == "Select" && this.state.rooms) && <div className="select-container">
-//     <div className="select-content">
-//         <div className="selCol">Building:
-//            <select onChange={ (e) => {this.handleBuildingChange(e, "update");}}>
-//              {this.state.lBuildings.map((num, index) =>
-//               <option key={index}>
-//                 {num}
-//               </option>
-//             )}
-//           </select>
-//           </div>
-//           <div className="selCol">Floor:
-//              <select onChange={ (e) => {this.handleFloorChange(e, "update");}}>
-//                {this.state.lFloors.map((num, index) =>
-//                 <option key={index}>
-//                   {num}
-//                 </option>
-//               )}
-//             </select>
-//           </div>
-//           <div className="selCol">Room:
-//              <select onChange={ (e) => {this.handleRoomChange(e, "update");}}>
-//                {this.state.lRooms.map((num, index) =>
-//                   <option key={index}>
-//                     {num}
-//                   </option>
-//                 )}
-//               </select>
-//           </div>
-//           <button onClick={this.goToRoom} className="selCol">GO</button>
-//     </div>
-//   </div>
-// }
