@@ -7,30 +7,29 @@ export default class TextboxOverlay extends React.Component{
   constructor(props) {
     super(props);
     this.state = {
+      rooms: null,
+      floors: null,
+      lRooms: null,
+      lFloors: null,
+      lBuildings: null,
+      buildings : null,
+      floor: props.floor || "01",
+      room: props.room || "000001",
       text: this.props.text || "Empty",
       title: this.props.title || "Empty",
       building: props.building || "000999",
-      floor: props.floor || "01",
-      room: props.room || "000001",
-      buildings: null,
-      lBuildings: null,
-      floors: null,
-      lFloors: null,
-      rooms: null,
-      lRooms: null,
     };
 
-    this.handleTextChange = this.handleTextChange.bind(this);
-    this.handleTitleChange = this.handleTitleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
-    this.handleBuildingChange = this.handleBuildingChange.bind(this);
-    this.handleFloorChange = this.handleFloorChange.bind(this);
-    this.handleRoomChange = this.handleRoomChange.bind(this);
-    this.handleSubmitSelection = this.handleSubmitSelection.bind(this);
-    this.updateSearch = this.updateSearch.bind(this);
-    this.updateSelections = this.updateSelections.bind(this);
     this.goToRoom = this.goToRoom.bind(this);
-
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.updateSearch = this.updateSearch.bind(this);
+    this.handleTextChange = this.handleTextChange.bind(this);
+    this.handleRoomChange = this.handleRoomChange.bind(this);
+    this.updateSelections = this.updateSelections.bind(this);
+    this.handleTitleChange = this.handleTitleChange.bind(this);
+    this.handleFloorChange = this.handleFloorChange.bind(this);
+    this.handleBuildingChange = this.handleBuildingChange.bind(this);
+    this.handleSubmitSelection = this.handleSubmitSelection.bind(this);
   }
 
   componentDidMount(){

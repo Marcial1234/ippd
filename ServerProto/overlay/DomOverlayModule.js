@@ -11,9 +11,9 @@ export default class DomOverlayModule extends Module {
     //rnContext will be used to refer to the React Native context
     //This allows communication with React VR
     this.rnContext = null;
-    this._closeOverlay = this.closeOverlay.bind(this);
-    this._overlayContainer = overlayContainer;
     this.submit = this.submit.bind(this);
+    this._overlayContainer = overlayContainer;
+    this._closeOverlay = this.closeOverlay.bind(this);
     this.submitSelection = this.submitSelection.bind(this);
   }
 

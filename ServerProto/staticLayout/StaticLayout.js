@@ -8,27 +8,27 @@ export default class StaticLayout extends React.Component {
   constructor(props){
     super(props);
     this.state ={
-      displayTooltips: false,
       tooltipID: 0,
+      adjustRate: 6,
       updateNotes: true,
       overlayOpen: false,
-      adjustRate: 6,
+      displayTooltips: false,
     }
+
+    this.test = this.test.bind(this);
+    this.goHome = this.goHome.bind(this);
     this.editNote = this.editNote.bind(this);
     this.moveNote = this.moveNote.bind(this);
-    this.test = this.test.bind(this);
     this.updateText = this.updateText.bind(this);
-    this.goHome = this.goHome.bind(this);
-    this.toggleTooltips = this.toggleTooltips.bind(this);
-    this.selectTooltip = this.selectTooltip.bind(this);
     this.deleteNote = this.deleteNote.bind(this);
     this.createNote = this.createNote.bind(this);
-    this.refreshTooltips = this.refreshTooltips.bind(this);
     this.adjustRate = this.adjustRate.bind(this);
     this.changeRate = this.changeRate.bind(this);
-    this.buildingSelection = this.buildingSelection.bind(this);
     this.openOverlay = this.openOverlay.bind(this);
-
+    this.selectTooltip = this.selectTooltip.bind(this);
+    this.toggleTooltips = this.toggleTooltips.bind(this);
+    this.refreshTooltips = this.refreshTooltips.bind(this);
+    this.buildingSelection = this.buildingSelection.bind(this);
   }
 
   componentWillMount(){
@@ -202,8 +202,8 @@ export default class StaticLayout extends React.Component {
 
   toggleTooltips(){
     this.setState({
-        displayTooltips: !this.state.displayTooltips,
-      })
+      displayTooltips: !this.state.displayTooltips,
+    })
   }
 
   selectTooltip(index){
@@ -337,6 +337,7 @@ export default class StaticLayout extends React.Component {
         <VrButton style={styles.menuButton} onClick={this.test}>
              <Text style={styles.menuText}>Log It</Text>
        </VrButton>
+
 {/*
         <VrButton style={styles.menuButton} onClick={this.editNote}>
           <Text style={styles.menuText}>Edit Note</Text>
@@ -345,6 +346,7 @@ export default class StaticLayout extends React.Component {
           <Text style={styles.menuText}>Change Val</Text>
         </VrButton>
 */}
+
         <VrButton style={styles.menuButton} onClick={this.createNote}>
           <Text style={styles.menuText}>Create Note</Text>
         </VrButton>
