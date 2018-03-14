@@ -4,6 +4,7 @@
 'use strict';
 
 import React from 'react';
+import CylindricalPanel from 'CylindricalPanel';
 import {
   AppRegistry,
   asset,
@@ -18,13 +19,12 @@ import {
   Scene,
 } from 'react-vr';
 
-import CylindricalPanel from 'CylindricalPanel';
 
 // Created Components
 // import ZoomButton from './ZoomButton.js';
-import NavButton from './NavButton';
-import InfoButton from './InfoButton';
-import LoadingSpinner from './LoadingSpinner';
+import NavButton from './components/NavButton';
+import InfoButton from './components/InfoButton';
+import LoadingSpinner from './components/LoadingSpinner';
 
 // import MainContent from './MainContent.js';
 {/*
