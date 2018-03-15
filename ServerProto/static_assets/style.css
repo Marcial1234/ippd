@@ -81,42 +81,29 @@
 .select-container {
   box-sizing: border-box;
   position: fixed;
-  z-index: 1000;
+  z-index: 10;
   top: 0px;
-  left: 30%;
-  width: 600px;
+  left: 33%;
+  width: 500px;
   height: 40px;
   color: #fff;
   background-color: rgba(55,55,55,0.9);
-  /* overflow: auto; */
   -webkit-overflow-scrolling: touch;
-  opacity: 1;
-  pointer-events: auto;
   user-select: none;
 }
 .select-content {
-  /* box-sizing: border-box; */
-  margin: 0;
-  padding: 0;
   display: table;
   width: 100%;
-  table-layout: fixed;
   border-spacing: 10px;
 }
 .close2 {
   width: 30px;
-  height: 30px;
-  padding: 0;
-  margin: 0;
   display: table-cell;
-  /* margin-left: auto; */
-  /* margin-top: -15px; */
-  /* margin-right: -15px; */
   background: url('collapse_arrow.png') center center no-repeat;
   background-size: 30px;
   cursor: pointer;
   opacity: 0.6;
-  transition: opacity 0.2s;
+  transition: opacity 0.35s;
 }
 .close2:hover {
   opacity: 1;
