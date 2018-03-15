@@ -11,7 +11,8 @@ export default class StaticLayout extends React.Component {
       tooltipID: 0,
       adjustRate: 6,
       updateNotes: true,
-      overlayOpen: false,
+      overlayOpen1: false,
+      overlayOpen2: false,
       displayTooltips: false,
     }
 
@@ -36,11 +37,17 @@ export default class StaticLayout extends React.Component {
     RCTDeviceEventEmitter.addListener('updateText', obj => {
       this.updateText(obj);
     });
-    RCTDeviceEventEmitter.addListener('overlayClose', () => {
-      this.setState({overlayOpen: false,})
+    RCTDeviceEventEmitter.addListener('overlayClose1', () => {
+      this.setState({overlayOpen1: false,})
     });
-    RCTDeviceEventEmitter.addListener('overlayOpen', () => {
-      this.setState({overlayOpen: true,})
+    RCTDeviceEventEmitter.addListener('overlayClose2', () => {
+      this.setState({overlayOpen2: false,})
+    });
+    RCTDeviceEventEmitter.addListener('overlayOpen1', () => {
+      this.setState({overlayOpen1: true,})
+    });
+    RCTDeviceEventEmitter.addListener('overlayOpen2', () => {
+      this.setState({overlayOpen2: true,})
     });
     RCTDeviceEventEmitter.addListener('selectBuilding', obj => {
       this.props.selectBuilding(obj);
@@ -59,7 +66,7 @@ export default class StaticLayout extends React.Component {
       }
       else{
         this.props.selectAll(obj);
-        let roomData = this.props.location.buildings[currentBuilding].floors[currentFloor];
+        let roomData = this.props.location.buildings[obj.building].floors[obj.floor];
         this.props.updatePhoto({
           zoomZ: 0,
           data: roomData,
@@ -87,7 +94,7 @@ export default class StaticLayout extends React.Component {
     const temp = (tooltips && tooltips.filter(t => t.type=='textblock')) || null;
     if(temp && this.state.updateNotes){
     //  data.photos[locationId].push(temp);
-      console.log(data.photos[locationId]);
+      //console.log(data.photos[locationId]);
       this.props.updateNotes(temp);
       this.setState({updateNotes : false});
     }
@@ -181,7 +188,7 @@ export default class StaticLayout extends React.Component {
   deleteNote(index){
       let {notes, data, locationId} = this.props.photo;
       if(index == this.state.tooltipID){
-        NativeModules.DomOverlayModule.closeOverlay();
+        NativeModules.DomOverlayModule.closeOverlay1();
       }
       let i = notes[index];
       let d = data.photos[locationId].tooltips.indexOf(i);
@@ -209,7 +216,7 @@ export default class StaticLayout extends React.Component {
   selectTooltip(index){
     let {notes, data, locationId} = this.props.photo;
     this.setState({tooltipID: index});
-    if(this.state.overlayOpen){
+    if(this.state.overlayOpen1){
        this.openOverlay(index, "Text");
     }
     for(let i = 0; i < notes.length; i++){
@@ -257,7 +264,13 @@ export default class StaticLayout extends React.Component {
   }
 
   buildingSelection(){
-    this.openOverlay(-1, "Select");
+    if(this.state.overlayOpen2){
+      NativeModules.DomOverlayModule.closeOverlay2();
+    }
+    else{
+      this.openOverlay(-1, "Select");
+    }
+
   }
 
   refreshTooltips(){
@@ -268,26 +281,14 @@ export default class StaticLayout extends React.Component {
   openOverlay(index, type){
     let {notes, locationId} = this.props.photo;
     let {currentFloor, currentBuilding, buildings} = this.props.location;
-    console.log(currentFloor, currentBuilding);
-    // let BU = Object.assign({}, buildings);
-    //let BU = {...buildings};
-  //  let BU = {};
-    // for(var k in buildings){
-    //   BU[k] = buildings[k];
-    // }
     let BU = JSON.parse(JSON.stringify(buildings));
-    // console.log(BU);
-
-    NativeModules.DomOverlayModule.closeOverlay();
     if(type == "Text"){
-      NativeModules.DomOverlayModule.openOverlay(
-         type, notes[index].text, notes[index].title, locationId, currentFloor, currentBuilding, BU
-       )
+      NativeModules.DomOverlayModule.closeOverlay1();
+      NativeModules.DomOverlayModule.openOverlay1(notes[index].text, notes[index].title);
     }
     if(type == "Select"){
-      NativeModules.DomOverlayModule.openOverlay(
-         type, "", "", locationId, currentFloor, currentBuilding, BU
-       )
+      NativeModules.DomOverlayModule.closeOverlay2();
+      NativeModules.DomOverlayModule.openOverlay2(locationId, currentFloor, currentBuilding, BU);
     }
 
   }
@@ -295,7 +296,8 @@ export default class StaticLayout extends React.Component {
   goHome(){
     this.setState({displayTooltips: false})
     this.props.changeNextLocationId("000001");
-    NativeModules.DomOverlayModule.closeOverlay();
+    NativeModules.DomOverlayModule.closeOverlay1();
+    NativeModules.DomOverlayModule.closeOverlay2();
   }
 
   test(){
@@ -334,11 +336,11 @@ export default class StaticLayout extends React.Component {
         <VrButton style={styles.menuButton} onClick={this.goHome}>
           <Text style={styles.menuText}>Home</Text>
         </VrButton>
-        <VrButton style={styles.menuButton} onClick={this.test}>
-             <Text style={styles.menuText}>Log It</Text>
-       </VrButton>
 
 {/*
+        <VrButton style={styles.menuButton} onClick={this.test}>
+               <Text style={styles.menuText}>Log It</Text>
+        </VrButton>
         <VrButton style={styles.menuButton} onClick={this.editNote}>
           <Text style={styles.menuText}>Edit Note</Text>
         </VrButton>
@@ -350,14 +352,16 @@ export default class StaticLayout extends React.Component {
         <VrButton style={styles.menuButton} onClick={this.createNote}>
           <Text style={styles.menuText}>Create Note</Text>
         </VrButton>
-        <VrButton style={styles.menuButton} onClick={this.buildingSelection}>
-          <Text style={styles.menuText}>Building Selection: {this.props.location.currentBuilding}</Text>
-        </VrButton>
 
         <VrButton style={styles.menuButton} onClick={this.toggleTooltips}>
           <Text style={styles.menuText}>Toggle Tooltips</Text>
         </VrButton>
       </View>
+      {!this.state.overlayOpen2 &&
+      <VrButton style={styles.selection} onClick={this.buildingSelection}>
+        <Image style={styles.selectionImage} source={asset('expand_arrow.png')}></Image>
+      </VrButton>
+      }
       {(this.state.displayTooltips && notes.length > 0) && <View style={styles.tooltipList}>
           {notes.map((tooltip, index) => {
           return(

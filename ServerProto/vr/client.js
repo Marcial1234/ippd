@@ -10,10 +10,12 @@ import DomOverlayModule from '../overlay/DomOverlayModule';
 function init(bundle, parent, options) {
 
   //create div from overlay
-  const domOverlayContainer = document.createElement('div');
-  domOverlayContainer.id = 'dom-overlay';
+  const domOverlayContainer1 = document.createElement('div');
+  const domOverlayContainer2 = document.createElement('div');
+  domOverlayContainer1.id = 'dom-overlay1';
+  domOverlayContainer2.id = 'dom-overlay2';
   //create instance of module
-  const domOverlayModule = new DomOverlayModule(domOverlayContainer);
+  const domOverlayModule = new DomOverlayModule(domOverlayContainer1, domOverlayContainer2);
 
   const vr = new VRInstance(bundle, 'VRLayout', parent, {
     // Add custom options here
@@ -23,7 +25,8 @@ function init(bundle, parent, options) {
     nativeModules: [domOverlayModule],
   });
 
-  vr.player._wrapper.appendChild(domOverlayContainer);
+  vr.player._wrapper.appendChild(domOverlayContainer1);
+  vr.player._wrapper.appendChild(domOverlayContainer2);
   vr.render = function() {
     // Any custom behavior you want to perform on each frame goes here
   };

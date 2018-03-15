@@ -6,27 +6,43 @@ import TextboxOverlay from './TextboxOverlay';
 import SelectorOverlay from './SelectorOverlay';
 
 export default class DomOverlayModule extends Module {
-  constructor(overlayContainer) {
+  constructor(overlayContainer1, overlayContainer2) {
     super('DomOverlayModule');
     //rnContext will be used to refer to the React Native context
     //This allows communication with React VR
     this.rnContext = null;
     this.submit = this.submit.bind(this);
-    this._overlayContainer = overlayContainer;
-    this._closeOverlay = this.closeOverlay.bind(this);
+    this._overlayContainer1 = overlayContainer1;
+    this._overlayContainer2 = overlayContainer2;
+    this.closeOverlay1 = this.closeOverlay1.bind(this);
+    this.closeOverlay2 = this.closeOverlay2.bind(this);
+    this.openOverlay1 = this.openOverlay1.bind(this);
+    this.openOverlay2 = this.openOverlay2.bind(this);
     this.submitSelection = this.submitSelection.bind(this);
   }
 
   //This method call opens up the overlay for display.
-  openOverlay(type, text, title, room, floor, building, bldgs) {
+  openOverlay1(text, title) {
     this.rnContext.callFunction('RCTDeviceEventEmitter', 'emit', [
-      'overlayOpen'
+      'overlayOpen1'
     ]);
     ReactDOM.render(
-      <TextboxOverlay type={type} text={text} title={title} room={room}
-        floor={floor} building={building} bldgs={bldgs}
-         onClose={this._closeOverlay} submit={this.submit} submitSelection={this.submitSelection}/>,
-      this._overlayContainer
+      <TextboxOverlay text={text} title={title} onClose={this.closeOverlay1} submit={this.submit}/>,
+      this._overlayContainer1
+    );
+    // ReactDOM.render(
+    //     <TextboxOverlay text={text} title={title} submit={this.submit}/>,
+    //     this._overlayContainer
+    //   );
+  }
+  openOverlay2(room, floor, building, bldgs) {
+    this.rnContext.callFunction('RCTDeviceEventEmitter', 'emit', [
+      'overlayOpen2'
+    ]);
+    ReactDOM.render(
+      <SelectorOverlay room={room}floor={floor} building={building} bldgs={bldgs}
+         onClose={this.closeOverlay2} submit={this.submitSelection}/>,
+       this._overlayContainer2
     );
     // ReactDOM.render(
     //     <TextboxOverlay text={text} title={title} submit={this.submit}/>,
@@ -35,11 +51,18 @@ export default class DomOverlayModule extends Module {
   }
 
 
-  closeOverlay() {
+  closeOverlay1() {
     this.rnContext.callFunction('RCTDeviceEventEmitter', 'emit', [
-      'overlayClose'
+      'overlayClose1'
     ]);
-    ReactDOM.unmountComponentAtNode(this._overlayContainer);
+    ReactDOM.unmountComponentAtNode(this._overlayContainer1);
+  }
+
+  closeOverlay2() {
+    this.rnContext.callFunction('RCTDeviceEventEmitter', 'emit', [
+      'overlayClose2'
+    ]);
+    ReactDOM.unmountComponentAtNode(this._overlayContainer2);
   }
 
   _setRNContext(rnctx) {
