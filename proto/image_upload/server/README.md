@@ -15,8 +15,11 @@ sudo npm update
 npm run dev
 ```
 
+# Current features
+1. Multiple image upload to server
+2. Automatic panorama stitching with gear360pano and hugin
+3. Automatic upload to Cloudinary image service
+
 # TODO
 1. Image validation / security
-2. Image processing w/ provided script
-3. Connect to MongoDB w/ Mongoose
-4. Create json / MongoDB file entries to dynamically locate image files
+2. DB ?
