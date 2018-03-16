@@ -1,0 +1,25 @@
+{
+  "name": "serverful",
+  "version": "0.0.1",
+  "description": "Simple image upload application",
+  "main": "index.js",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "cloudinary": "^1.10.0",
+    "connect-mongo": "~1.3.2",
+    "express": "^4.16.0",
+    "express-fileupload": "^0.4.0",
+    "mongodb": "^3.0.4",
+    "mongoose": "^4.11.14",
+    "multer": "~1.3.0"
+  },
+  "devDependencies": {
+    "nodemon": "^1.17.1"
+  },
+  "scripts": {
+    "dev": "nodemon server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Alex Eiffert",
+  "license": "ISC"
+}
