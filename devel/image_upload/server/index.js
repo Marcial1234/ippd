@@ -14,6 +14,9 @@ cloudinary.config({
 });
 var upload_stream
 
+/**
+ * Upload to /public/upload with express-fileupload middleware
+ */
 function uploadToServer(image, res) {
   let id = Date.now();  // Time in milliseconds
   let path = __dirname + "/public/upload/" + id + ".jpg";
@@ -34,6 +37,9 @@ function uploadToServer(image, res) {
   };
 } 
 
+/**
+ * Process image with gear360pano and, on exit, send to cloudinary
+ */
 function processAndUploadImage(image) {
   var stitch = exec(__dirname + '/public/gear360pano/gear360pano.sh -n ' + 
                     '-r -o ' + __dirname + '/public/upload ' + image.path,
@@ -53,6 +59,9 @@ function processAndUploadImage(image) {
   });
 }
 
+/**
+ * Send image to cloudinary
+ */
 function pushToCloud(image) {
   cloudinary.v2.uploader.upload(image.panoPath, 
     {
