@@ -1,21 +1,5 @@
-/**
- * The examples provided by Oculus are for non-commercial testing and
- * evaluation purposes only.
- *
- * Oculus reserves all rights not expressly granted.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
- * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL
- * OCULUS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
- * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
- * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- * Example ReactVR app that allows a simple tour using linked 360 photos.
- */
-'use strict';
-
 import React from 'react';
+import CylindricalPanel from 'CylindricalPanel';
 import {
   AppRegistry,
   asset,
@@ -27,46 +11,43 @@ import {
   StyleSheet,
   View,
   VrButton,
-  Scene
+  Scene,
 } from 'react-vr';
 
-import NavButton from './NavButton';
-import InfoButton from './InfoButton';
-// import ZoomButton from './ZoomButton.js';
-import LoadingSpinner from './LoadingSpinner';
-import CylindricalPanel from 'CylindricalPanel';
+// Created Components
+import NavButton from './components/NavButton';
+import InfoButton from './components/InfoButton';
+import LoadingSpinner from './components/LoadingSpinner';
 
-// Web VR is only able to support a maxiumum texture resolution of 4096 px
-const MAX_TEXTURE_WIDTH = 4096;
+// Static Tour f(x)s and variables used later ~
 const MAX_TEXTURE_HEIGHT = 720;
-// Cylinder is a 2D surface a fixed distance from the camera.
-// It uses pixes instead of meters for positioning components.
-// pixels = degrees/360 * density, negative to rotate in expected direction.
-const degreesToPixels = degrees => -(degrees / 360) * MAX_TEXTURE_WIDTH;
-// PPM = 1/(2*PI*Radius) * density. Radius of cylinder is 3 meters.
+const MAX_TEXTURE_WIDTH = 4096;
 const PPM = 1 / (2 * Math.PI * 3) * MAX_TEXTURE_WIDTH;
+const degreesToPixels = degrees => -(degrees / 360) * MAX_TEXTURE_WIDTH;
 
-/**
- * ReactVR component that allows a simple tour using linked 360 photos.
- * Tour includes nav buttons, activated by gaze-and-fill or direct selection,
- * that move between tour locations and info buttons that display tooltips with
- * text and/or images. Tooltip data and photo URLs are read from a JSON file.
- */
 class TourSample extends React.Component {
   static defaultProps = {
+    // This is the source for all Panoramic Data, for now
+    // Eventually need to have a DB and point that data/JSON to this ~
+    // data in this object can be later accessed by 'this.prop.[key_name]'
+
     tourSource: 'tourOfTheChester.json',
   };
 
   constructor(props) {
     super(props);
+
+    // Base State Variables
     this.state = {
       rotZ: 0,
       data: null,
+      rotation: null,
       locationId: null,
       nextLocationId: null,
-      rotation: null,
     };
 
+    // React's CSS-like styles
+    // This is not used anywhere thou
     this.styles = StyleSheet.create({
       menu: {
         flex: 1,
@@ -78,7 +59,12 @@ class TourSample extends React.Component {
     });
   }
 
+  // Marcial:
+  //  Need to look relearn what this is again...
+  //  I think it's some kind of middleware after loading/construction
   componentDidMount() {
+    // Gets the json file, and later initiallizes the component
+
     fetch(asset(this.props.tourSource).uri)
       .then(response => response.json())
       .then(responseData => {
@@ -87,8 +73,9 @@ class TourSample extends React.Component {
       .done();
   }
 
+  // Initialize the tour based on data file.
   init(tourConfig) {
-    // Initialize the tour based on data file.
+    // RE-DEFINE STATE VARIABLES FROM THE CONSTRUCTOR HERE
     this.setState({
       rotZ: 0,
       data: tourConfig,
@@ -100,65 +87,53 @@ class TourSample extends React.Component {
   }
 
   render() {
+    console.log(this.props);
+    console.log(this.state);
+
     if (!this.state.data) {
       return null;
     }
 
     const locationId = this.state.locationId;
-    const photoData = (locationId && this.state.data.photos[locationId]) || null;
+    const photoData = (this.state.locationId && this.state.data.photos[locationId]) || null;
     const isLoading = this.state.nextLocationId !== this.state.locationId;
 
+    // just made these 'vars', cuz idk if const are worth it
     var tooltips = (photoData && photoData.tooltips) || null;
     var rotation = ((photoData && photoData.rotationOffset) || 0);
-
-    // const soundEffects = this.state.data.soundEffects;
-    // const ambient = this.state.data.soundEffects.ambient;
 
     return (
       <View
         style={{
-          // THIS ATTEMPTS TO resets each picture's initial rotation
-          // no idea how to extract ACTUAL xyz coors
+          // this ATTEMPTS to resets each picture's initial rotation
+          // no idea how to extract ACTUAL xyz coors/rotations
           transform: [
-            // {translate: [0, 0, this.state.rotZ]},
-            {rotateY : -rotation}, 
-            // {scale : this.state.rotZ + 1 },
+            {rotateY : -rotation},
           ],
         }}
       >
 
-        {/*
-          {ambient &&
-            <Sound
-              // Background audio that plays throughout the tour.
-              source={asset(ambient.uri)}
-              autoPlay={true}
-              loop={ambient.loop}
-              volume={ambient.volume}
-            />}
-        */}
-
         <Pano
-          // Place pano in world, and by using position absolute it does not
-          // contribute to the layout of other views.
+          // This does not contribute to the layout of other views
+          // (it uses absolute position by default),
           style={{
+            tintColor: isLoading ? 'grey' : 'white',
+
             // this WORKS!!!
             transform: [
               {translate: [0, 0, this.state.rotZ]},
             ],
-            tintColor: isLoading ? 'grey' : 'white',
           }}
+
           onLoad={() => {
             const data = this.state.data;
-
-            // console.log(locationId, -rotation, data);
-            // console.log(this);
 
             this.setState({
               // Now that ths new photo is loaded, update the locationId.
               locationId: this.state.nextLocationId,
             });
           }}
+
           source={asset(this.state.data.photos[this.state.nextLocationId].uri)}
         />
 
@@ -175,7 +150,7 @@ class TourSample extends React.Component {
 
           <View
             style={{
-              // View covering the cyldiner. Center so contents appear in middle of cylinder.
+              // Centered so contents appear in middle of cylinder
               alignItems: 'center',
               justifyContent: 'center',
               width: MAX_TEXTURE_WIDTH,
@@ -183,52 +158,52 @@ class TourSample extends React.Component {
             }}>
             {/* Need container view, else using absolute position on buttons removes them from cylinder */}
 
-
-            {/*Zoom Button*/}
+            {/* code that dynamically adds buttons to the page */}
             {/*
-              style={{
-                position: 'absolute',
-                transform: [
-                  {translate: [30, 30, 5]},
-                ],
-              }}
-            */}
-
-            {/* this button changes the z axis (bring the items forward) */}
-            <NavButton
-
-              // onClickSound={asset(soundEffects.navButton.onClick.uri)}
-              // onEnterSound={asset(soundEffects.navButton.onEnter.uri)}
-              onInput={() => {
-
                 const temp = {...tooltips[tooltips.length-1]};
                 temp.rotationY = (temp.rotationY - 10);
                 temp.linkedPhotoId += 200;
                 tooltips.push(temp)
+                // console.log(tooltips);
+            */}
 
-                console.log(tooltips);
-
+            {/* this button bring the picture forward (increases base z axis) */}
+            <NavButton
+              onInput={() => {
                 this.setState({
                   rotZ: this.state.rotZ + 10,
                 });
               }}
+
               source={asset(this.state.data.nav_icon)}
               textLabel={"Zoom"}
+              // This prop seems to be required, check the NavButton file for more
               pixelsPerMeter={PPM}
             />
 
+          {/* Main Content View */}
             <View>
+              {/* Show a spinner while first pano is loading */}
+              {this.state.locationId == null &&
+                <LoadingSpinner
+                  style={{layoutOrigin: [0.5, 0.5]}}
+                  pixelsPerMeter={PPM}
+
+                  // Undo the rotation so spinner is centered
+                  translateX={degreesToPixels(rotation) * -1}
+                />}
+
               {tooltips &&
                 tooltips.map((tooltip, index) => {
-                  // Iterate through items related to this location, creating either
-                  // info buttons, which show tooltip on hover, or nav buttons, which
-                  // change the current location in the tour.
+                  // Iterate through items related to this location, creating either:
+                  // - Nav buttons: change Pano source and tooltips associated it with them
+                  // - Info buttons: show tooltip on hover
+                  // P.S: idk what's the use of the key props ~
 
                   if (tooltip.type) {
                     return (
                       <InfoButton
                         // key={index}
-                        // onEnterSound={asset(soundEffects.navButton.onEnter.uri)}
                         source={asset('info_icon.png')}
                         tooltip={tooltip}
                         pixelsPerMeter={PPM}
@@ -237,19 +212,18 @@ class TourSample extends React.Component {
                       />
                     );
                   }
+
                   return (
                     <NavButton
                       // key={tooltip.linkedPhotoId}
                       isLoading={isLoading}
-                      // onClickSound={asset(soundEffects.navButton.onClick.uri)}
-                      // onEnterSound={asset(soundEffects.navButton.onEnter.uri)}
                       onInput={() => {
-                        // Update nextLocationId, not locationId, so tooltips match
-                        // the currently visible pano; pano will update locationId
-                        // after loading the new image.
                         this.setState({
                           nextLocationId: tooltip.linkedPhotoId,
                         });
+                        // Update nextLocationId, not locationId, so tooltips match
+                        // the currently visible pano; pano will update locationId
+                        // after loading the new image.
                       }}
                       source={asset(this.state.data.nav_icon)}
                       textLabel={tooltip.text}
@@ -258,16 +232,8 @@ class TourSample extends React.Component {
                     />
                   );
                 })}
-
-              {locationId == null &&
-                // Show a spinner while first pano is loading.
-                <LoadingSpinner
-                  style={{layoutOrigin: [0.5, 0.5]}}
-                  pixelsPerMeter={PPM}
-                  // Undo the rotation so spinner is centered
-                  translateX={degreesToPixels(rotation) * -1}
-                />}
             </View>
+
           </View>
         </CylindricalPanel>
       </View>
