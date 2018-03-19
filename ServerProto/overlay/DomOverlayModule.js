@@ -6,7 +6,7 @@ import TextboxOverlay from './TextboxOverlay';
 import SelectorOverlay from './SelectorOverlay';
 
 export default class DomOverlayModule extends Module {
-  constructor(overlayContainer1, overlayContainer2) {
+  constructor(overlayContainer1, overlayContainer2, testIt) {
     super('DomOverlayModule');
     //rnContext will be used to refer to the React Native context
     //This allows communication with React VR
@@ -19,15 +19,20 @@ export default class DomOverlayModule extends Module {
     this.openOverlay1 = this.openOverlay1.bind(this);
     this.openOverlay2 = this.openOverlay2.bind(this);
     this.submitSelection = this.submitSelection.bind(this);
+    this.submitGNotes = this.submitGNotes.bind(this);
+    this.cameraRot = this.cameraRot.bind(this);
+    this.testIt = testIt;
+    // this.testIt = this.testIt.bind(this);
   }
 
   //This method call opens up the overlay for display.
-  openOverlay1(text, title) {
+  openOverlay1(text, title, type, gNotes) {
     this.rnContext.callFunction('RCTDeviceEventEmitter', 'emit', [
       'overlayOpen1'
     ]);
     ReactDOM.render(
-      <TextboxOverlay text={text} title={title} onClose={this.closeOverlay1} submit={this.submit}/>,
+      <TextboxOverlay text={text} title={title} type={type} gNotes={gNotes} testIt={this.testIt}
+        onClose={this.closeOverlay1} submit={this.submit} submitGNotes={this.submitGNotes}/>,
       this._overlayContainer1
     );
     // ReactDOM.render(
@@ -40,7 +45,7 @@ export default class DomOverlayModule extends Module {
       'overlayOpen2'
     ]);
     ReactDOM.render(
-      <SelectorOverlay room={room}floor={floor} building={building} bldgs={bldgs}
+      <SelectorOverlay room={room}floor={floor} building={building} bldgs={bldgs} testIt={this.testIt}
          onClose={this.closeOverlay2} submit={this.submitSelection}/>,
        this._overlayContainer2
     );
@@ -78,9 +83,21 @@ export default class DomOverlayModule extends Module {
         'updateText', obj,
       ]);
     }
+    submitGNotes(obj){
+      this.rnContext.callFunction('RCTDeviceEventEmitter', 'emit', [
+        'updateGNotes', obj,
+      ]);
+    }
     submitSelection(obj){
       this.rnContext.callFunction('RCTDeviceEventEmitter', 'emit', [
         'selectAll', obj,
+      ]);
+    }
+
+    cameraRot(){
+      let obj = this.testIt();
+      this.rnContext.callFunction('RCTDeviceEventEmitter', 'emit', [
+        'cameraRot', obj,
       ]);
     }
 }

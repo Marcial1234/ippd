@@ -7,6 +7,8 @@ import {VRInstance} from 'react-vr-web';
 import './process'; //necessary from DOMOverlay instructions
 import DomOverlayModule from '../overlay/DomOverlayModule';
 
+// const RCTDeviceEventEmitter = require('RCTDeviceEventEmitter');
+
 function init(bundle, parent, options) {
 
   //create div from overlay
@@ -15,8 +17,10 @@ function init(bundle, parent, options) {
   domOverlayContainer1.id = 'dom-overlay1';
   domOverlayContainer2.id = 'dom-overlay2';
   //create instance of module
-  const domOverlayModule = new DomOverlayModule(domOverlayContainer1, domOverlayContainer2);
-
+  const domOverlayModule = new DomOverlayModule(domOverlayContainer1, domOverlayContainer2, testIt);
+  // let element = this.props.doc.body.children[2].children[0].children[2].children[0];
+  // element.style.transform = "";
+  // setTimeout(function() {this.toggleNotes()}.bind(this), 10000);
   const vr = new VRInstance(bundle, 'VRLayout', parent, {
     // Add custom options here
     hideFullscreen: true, //hides the button
@@ -24,6 +28,12 @@ function init(bundle, parent, options) {
     //register dom overlay
     nativeModules: [domOverlayModule],
   });
+
+  function testIt(){
+    //document.body.children[2].children[0].children[2].click();
+    // console.log(vr);
+    return vr.player.camera.rotation;
+  }
 
   vr.player._wrapper.appendChild(domOverlayContainer1);
   vr.player._wrapper.appendChild(domOverlayContainer2);
@@ -51,7 +61,9 @@ function init(bundle, parent, options) {
   window.onmousewheel = onRendererMouseWheel;
   // don't need this??? says 'worker' is undef .. but won't work without it
   vr.rootView.context.worker.addEventListener('message', onVRMessage);
-
+  // RCTDeviceEventEmitter.addListener('testIt', () => {
+  //   console.log("VR:", vr.player.overlay.compass);
+  // });
   return vr;
 }
 

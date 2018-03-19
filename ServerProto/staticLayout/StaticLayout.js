@@ -14,6 +14,7 @@ export default class StaticLayout extends React.Component {
       overlayOpen1: false,
       overlayOpen2: false,
       displayTooltips: false,
+      cameraRot: null,
     }
 
     this.test = this.test.bind(this);
@@ -21,21 +22,26 @@ export default class StaticLayout extends React.Component {
     this.editNote = this.editNote.bind(this);
     this.moveNote = this.moveNote.bind(this);
     this.updateText = this.updateText.bind(this);
+    this.updateGNotes = this.updateGNotes.bind(this);
     this.deleteNote = this.deleteNote.bind(this);
     this.createNote = this.createNote.bind(this);
     this.adjustRate = this.adjustRate.bind(this);
     this.changeRate = this.changeRate.bind(this);
     this.openOverlay = this.openOverlay.bind(this);
     this.selectTooltip = this.selectTooltip.bind(this);
-    this.toggleTooltips = this.toggleTooltips.bind(this);
+    this.toggleNotes = this.toggleNotes.bind(this);
     this.refreshTooltips = this.refreshTooltips.bind(this);
     this.buildingSelection = this.buildingSelection.bind(this);
+    this.selectAll = this.selectAll.bind(this);
   }
 
   componentWillMount(){
     //will respond to the call for 'updateText', obj is the value recieved
     RCTDeviceEventEmitter.addListener('updateText', obj => {
       this.updateText(obj);
+    });
+    RCTDeviceEventEmitter.addListener('updateGNotes', obj => {
+      this.updateGNotes(obj);
     });
     RCTDeviceEventEmitter.addListener('overlayClose1', () => {
       this.setState({overlayOpen1: false,})
@@ -59,52 +65,37 @@ export default class StaticLayout extends React.Component {
       this.props.selectRoom(obj);
     });
     RCTDeviceEventEmitter.addListener('selectAll', obj => {
-      let {currentBuilding, currentFloor} = this.props.location;
-      let {locationId, data} = this.props.photo;
-      if(obj.building == currentBuilding && obj.floor == currentFloor && obj.room == locationId){
-        console.log("Already here.");
-      }
-      else{
-        this.props.selectAll(obj);
-        let roomData = this.props.location.buildings[obj.building].floors[obj.floor];
-        this.props.updatePhoto({
-          zoomZ: 0,
-          data: roomData,
-          locationId: null,
-          nextLocationId: obj.room,
-          rotation: roomData.firstPhotoRotation +
-          (roomData.photos[roomData.firstPhotoId].rotationOffset || 0)
-        });
-        let locs = Object.keys(roomData.photos);
-        //console.log(locs[0]);
-        // console.log();
-        setTimeout(function() {this.props.changeNextLocationId(locs[0])}.bind(this), 25);
-        setTimeout(function() {this.props.changeNextLocationId(locs[1])}.bind(this), 25);
-        setTimeout(function() {this.props.changeNextLocationId(obj.room)}.bind(this), 25);
-      }
-      //setTimeout(function() {this.buildingSelection()}.bind(this), 25);
-
+      this.selectAll(obj);
     });
+    RCTDeviceEventEmitter.addListener('cameraRot', obj => {
+      this.setState({cameraRot: obj});
+    });
+
   }
 
-  componentDidUpdate() {
-    let {data, locationId, notes} = this.props.photo;
-    const photoData = (locationId && data.photos[locationId]) || null;
-    const tooltips = (photoData && photoData.tooltips) || null;
-    const temp = (tooltips && tooltips.filter(t => t.type=='textblock')) || null;
-    if(temp && this.state.updateNotes){
-    //  data.photos[locationId].push(temp);
-      //console.log(data.photos[locationId]);
-      this.props.updateNotes(temp);
-      this.setState({updateNotes : false});
+  componentDidMount(){
+    setTimeout(function() {this.openOverlay(-1, "Select")}.bind(this), 500);
+  }
+
+  componentDidUpdate(prevProps){
+    if(prevProps.photo.locationId !== this.props.photo.locationId){
+          NativeModules.DomOverlayModule.closeOverlay2();
+          this.openOverlay(-1, "Select");
+          if(this.state.overlayOpen1){
+            NativeModules.DomOverlayModule.closeOverlay1();
+            this.openOverlay(-1, "General");
+          }
+          if(this.state.displayTooltips){
+            this.refreshTooltips();
+          }
+
     }
-    if((temp && notes && temp[0] !== notes[0]) || (!notes && temp)){
-      this.setState({updateNotes : true});
-    }
+
   }
 
   createNote(){
-    let {notes, data, locationId} = this.props.photo;
+    let {data, locationId} = this.props.photo;
+    let notes = data.photos[locationId].notes;
     let ID = this.state.tooltipID;
     if(ID >= notes.length){
       this.setState({tooltipID: 0});
@@ -122,59 +113,60 @@ export default class StaticLayout extends React.Component {
       selected: false,
     }
 
-    // newNote.rotationY = (newNote.rotationY -10);
-    // console.log(notes);
-    // console.log("New Note: ", newNote);
-    notes.push(newNote);
-    this.props.updateNotes(notes);
-    data.photos[locationId].tooltips.push(newNote);
+    data.photos[locationId].notes.push(newNote);
     this.props.updateData(data);
     if(this.state.displayTooltips){
       this.refreshTooltips();
     }
     else{
-      this.toggleTooltips();
+      this.toggleNotes();
     }
-    this.selectTooltip(notes.length-1);
-    //console.log(notes[notes.length-1]);
+    this.selectTooltip(notes.length -1);
   }
 
   moveNote(direction){
-    let notes = this.props.photo.notes;
+    let {data, locationId} = this.props.photo;
+    let notes = data.photos[locationId].notes;
     let adj = this.state.adjustRate;
+    let ID = this.state.tooltipID;
+    if(ID >= notes.length){
+      this.setState({tooltipID: 0});
+      ID = 0;
+    }
     //need to figure out what to do at 180 degrees
 
     switch(direction){
       case "right":
-      if(notes[this.state.tooltipID].rotationY - adj > -180){
-        notes[this.state.tooltipID].rotationY -=adj;
+      if(notes[ID].rotationY - adj > -180){
+        notes[ID].rotationY -=adj;
       }
       else{
-        notes[this.state.tooltipID].rotationY *=-1;
+        notes[ID].rotationY *=-1;
       }
       break;
       case "left":
-      if(notes[this.state.tooltipID].rotationY + adj < 180){
-        notes[this.state.tooltipID].rotationY +=adj;
+      if(notes[ID].rotationY + adj < 180){
+        notes[ID].rotationY +=adj;
       }
       else{
-        notes[this.state.tooltipID].rotationY *=-1;
+        notes[ID].rotationY *=-1;
       }
       break;
       case "up":
-      notes[this.state.tooltipID].translateX -=adj;
+      notes[ID].translateX -=adj;
       break;
       case "down":
-      notes[this.state.tooltipID].translateX +=adj;
+      notes[ID].translateX +=adj;
       break;
     }
-    // console.log("Current Rotation:", notes[this.state.tooltipID].rotationY);
-    // console.log("Current Translation:", notes[this.state.tooltipID].translateX);
-    this.props.updateNotes(notes);
+    data.photos[locationId].notes = notes;
+    this.props.updateData(data);
+    // this.props.updateNotes(notes);
   }
 
   editNote(index){
-    let {notes} = this.props.photo;
+    let {data, locationId} = this.props.photo;
+    let notes = data.photos[locationId].notes;
     this.selectTooltip(index);
     if(notes.length> 0){
        this.openOverlay(index, "Text");
@@ -186,35 +178,43 @@ export default class StaticLayout extends React.Component {
 
 
   deleteNote(index){
-      let {notes, data, locationId} = this.props.photo;
+    let {data, locationId} = this.props.photo;
+    let notes = data.photos[locationId].notes;
       if(index == this.state.tooltipID){
         NativeModules.DomOverlayModule.closeOverlay1();
+        this.openOverlay(-1, "General");
       }
-      let i = notes[index];
-      let d = data.photos[locationId].tooltips.indexOf(i);
-      notes.splice(index, 1);
-      data.photos[locationId].tooltips.splice(d, 1);
+      data.photos[locationId].notes.splice(index, 1);
       this.props.updateData(data);
       this.refreshTooltips();
 
     }
 
   updateText(obj){
-    let notes = this.props.photo.notes
+    let {data, locationId} = this.props.photo;
+    let notes = data.photos[locationId].notes;
     notes[this.state.tooltipID].text = obj.text;
     notes[this.state.tooltipID].title = obj.title;
-    this.props.updateNotes(notes);
+    data.photos[locationId].notes = notes;
+    this.props.updateData(data);
     this.refreshTooltips();
   }
 
-  toggleTooltips(){
+  updateGNotes(obj){
+    let {data, locationId} = this.props.photo;
+    data.photos[locationId].gNotes = obj;
+    this.props.updateData(data);
+  }
+
+  toggleNotes(){
     this.setState({
       displayTooltips: !this.state.displayTooltips,
     })
   }
 
   selectTooltip(index){
-    let {notes, data, locationId} = this.props.photo;
+    let {data, locationId} = this.props.photo;
+    let notes = data.photos[locationId].notes;
     this.setState({tooltipID: index});
     if(this.state.overlayOpen1){
        this.openOverlay(index, "Text");
@@ -227,15 +227,20 @@ export default class StaticLayout extends React.Component {
         notes[i].selected = false;
       }
     }
-    this.props.updateNotes(notes);
-    //this.props.updateData(data);
-    // console.log("Notes: ", notes);
-    // console.log("Data: ", data);
-    let obj = {
-      rotation: notes[index].rotationY,
-      translation: notes[index].translateX
-    }
-    this.props.focusNote(obj);
+    data.photos[locationId].notes = notes;
+    this.props.updateData(data);
+    NativeModules.DomOverlayModule.cameraRot();
+
+    setTimeout(function() {
+      let rot = (this.state.cameraRot._y*57)%360;
+      let trans = (this.state.cameraRot._x*57)%360;
+      let obj = {
+        rotation: notes[index].rotationY - rot,
+        translation: 0, //notes[index].translateX
+      };
+      this.props.focusNote(obj);
+    }.bind(this), 25);
+
   }
 
   adjustRate(direction){
@@ -274,43 +279,97 @@ export default class StaticLayout extends React.Component {
   }
 
   refreshTooltips(){
-    setTimeout(function() {this.toggleTooltips()}.bind(this), 25);
-    setTimeout(function() {this.toggleTooltips()}.bind(this), 25);
+    setTimeout(function() {this.toggleNotes()}.bind(this), 25);
+    setTimeout(function() {this.toggleNotes()}.bind(this), 25);
   }
 
   openOverlay(index, type){
-    let {notes, locationId} = this.props.photo;
+    let {data, locationId} = this.props.photo;
+    const photoData = (locationId && data.photos[locationId]) || null;
+    let notes = (photoData && photoData.notes) || null;
+    let gNotes = (photoData && photoData.gNotes) || null;
     let {currentFloor, currentBuilding, buildings} = this.props.location;
     let BU = JSON.parse(JSON.stringify(buildings));
     if(type == "Text"){
       NativeModules.DomOverlayModule.closeOverlay1();
-      NativeModules.DomOverlayModule.openOverlay1(notes[index].text, notes[index].title);
+      NativeModules.DomOverlayModule.openOverlay1(notes[index].text, notes[index].title, "Both", gNotes);
+    }
+    if (type == "General"){
+      NativeModules.DomOverlayModule.closeOverlay1();
+      NativeModules.DomOverlayModule.openOverlay1("", "", "General", gNotes);
     }
     if(type == "Select"){
       NativeModules.DomOverlayModule.closeOverlay2();
       NativeModules.DomOverlayModule.openOverlay2(locationId, currentFloor, currentBuilding, BU);
     }
+  }
 
+  selectAll(obj){
+    let {currentBuilding, currentFloor} = this.props.location;
+    let {locationId, data} = this.props.photo;
+    if(obj.building == currentBuilding && obj.floor == currentFloor && obj.room == locationId){
+      console.log("Already here.");
+    }
+    else{
+      this.props.selectAll(obj);
+      let roomData = this.props.location.buildings[obj.building].floors[obj.floor];
+      // let bLocs = Object.keys(this.props.location.buildings);
+      // building = bLocs[0];
+      // let fLocs = Object.keys(this.props.location.buildings[bLocs[0]].floors);
+      // floor = fLocs[0];
+      // roomData = this.props.location.buildings[bLocs[0]].floors[fLocs[0]];
+      let rdp = Object.keys(roomData.photos);
+      if(!rdp.includes(obj.room)){
+        obj.room = rdp[0];
+      }
+      this.props.updatePhoto({
+        zoomZ: 0,
+        data: roomData,
+        locationId: null,
+        nextLocationId: obj.room,
+        rotation: roomData.firstPhotoRotation +
+        (roomData.photos[roomData.firstPhotoId].rotationOffset || 0)
+      });
+      let locs = Object.keys(roomData.photos);
+      // console.log();
+      setTimeout(function() {this.props.changeNextLocationId(locs[0])}.bind(this), 25);
+      setTimeout(function() {this.props.changeNextLocationId(locs[1])}.bind(this), 25);
+      setTimeout(function() {this.props.changeNextLocationId(obj.room)}.bind(this), 25);
+    }
   }
 
   goHome(){
+    let {data} = this.props.photo;
+    let bLocs = Object.keys(this.props.location.buildings);
+    building = bLocs[0];
+    let fLocs = Object.keys(this.props.location.buildings[bLocs[0]].floors);
+    floor = fLocs[0];
+    let rLocs = Object.keys(this.props.location.buildings[bLocs[0]].floors[fLocs[0]].photos);
+    room = rLocs[0];
+    this.selectAll({building, floor, room});
+    //this.props.changeNextLocationId(locs[0]);
     this.setState({displayTooltips: false})
-    this.props.changeNextLocationId("000001");
     NativeModules.DomOverlayModule.closeOverlay1();
-    NativeModules.DomOverlayModule.closeOverlay2();
+    NativeModules.DomOverlayModule.cameraRot();
+    setTimeout(function() {
+      let rot = (this.state.cameraRot._y*57)%360;
+      let obj = {
+        rotation: -rot,
+        translation: 0,
+      };
+      this.props.focusNote(obj);
+    }.bind(this), 25);
+    // NativeModules.DomOverlayModule.closeOverlay2();
   }
 
   test(){
-    console.log("Building:", this.props.location.currentBuilding);
-    console.log("Floor:", this.props.location.currentFloor);
-    console.log("Photo:", this.props.photo);
-    console.log("Notes: ", this.props.photo.notes);
-    console.log("Data: ", this.props.photo.data);
-    console.log("LocationID: ", this.props.photo.locationId);
+
   }
 
   render() {
-    let {notes} = this.props.photo;
+    let {data, locationId} = this.props.photo;
+    const photoData = (locationId && data.photos[locationId]) || null;
+    let notes = (photoData && photoData.notes) || null;
     var lvls = [];
     for (let i = 2; i <= 20; i+=2){
       lvls.push(i);
@@ -336,7 +395,9 @@ export default class StaticLayout extends React.Component {
         <VrButton style={styles.menuButton} onClick={this.goHome}>
           <Text style={styles.menuText}>Home</Text>
         </VrButton>
-
+        <VrButton style={styles.menuButton} onClick={ () => this.openOverlay(-1, "General")}>
+               <Text style={styles.menuText}>Room Notes</Text>
+        </VrButton>
 {/*
         <VrButton style={styles.menuButton} onClick={this.test}>
                <Text style={styles.menuText}>Log It</Text>
@@ -353,8 +414,8 @@ export default class StaticLayout extends React.Component {
           <Text style={styles.menuText}>Create Note</Text>
         </VrButton>
 
-        <VrButton style={styles.menuButton} onClick={this.toggleTooltips}>
-          <Text style={styles.menuText}>Toggle Tooltips</Text>
+        <VrButton style={styles.menuButton} onClick={this.toggleNotes}>
+          <Text style={styles.menuText}>Toggle Notes</Text>
         </VrButton>
       </View>
       {!this.state.overlayOpen2 &&
@@ -362,6 +423,14 @@ export default class StaticLayout extends React.Component {
         <Image style={styles.selectionImage} source={asset('expand_arrow.png')}></Image>
       </VrButton>
       }
+      {(this.state.displayTooltips && notes.length == 0) && <View style={styles.tooltipList}>
+      <VrButton>
+        <Text style={styles.tooltipListItem}>
+        No Notes For This Room
+        </Text>
+      </VrButton>
+      </View>
+    }
       {(this.state.displayTooltips && notes.length > 0) && <View style={styles.tooltipList}>
           {notes.map((tooltip, index) => {
           return(

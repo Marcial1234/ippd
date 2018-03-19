@@ -46,41 +46,6 @@ class VRLayout extends React.Component{
   // Use "onInput" inside a View. Ex: <View onInput={handleInput} style={styles.rootView}>
   handleInput(e){
     let event = e.nativeEvent.inputEvent;
-    // if(event.eventType == "click"){
-    //   let notes = this.props.photo.notes;
-    //   let index = -1;
-    //   for (let i = 0; i < notes.length; i++){
-    //     if(notes[i].selected == true){
-    //       index = i;
-    //       break;
-    //     }
-    //   }
-    //   if (index != -1){
-    //     console.log(event);
-    //     let dist = {
-    //       x: -event.viewportX,
-    //       y: -event.viewportY,
-    //     }
-    //     let obj = {
-    //       rotation: notes[index].rotationY,
-    //       translation: notes[index].translateX
-    //     }
-    //     this.props.focusNote(obj);
-    //     console.log(dist.x);
-    //     console.log(dist.y);
-    //     console.log(notes[index]);
-    //     //need to figure out what to do at 180 degrees
-    //     if(notes[index].rotationY <= -180 || notes[index].rotationY >= 180){
-    //       notes[index].rotationY *=-1;
-    //     }
-    //     notes[index].rotationY +=dist.x*60;
-    //     notes[index].translateX +=dist.y*30;
-    //
-    //     //
-    //     // console.log(notes[this.state.tooltipID].rotationY);
-    //     this.props.updateNotes(notes);
-    //   }
-    // }
   }
 
   componentDidMount() {
@@ -93,19 +58,28 @@ class VRLayout extends React.Component{
       .done();
   }
 
-  init(roomConfig) {
-    let {currentBuilding, currentFloor} = this.props.location;
-    let roomData = roomConfig.buildings[currentBuilding].floors[currentFloor];
+  componentWillUpdate(nextProps, nextState){
+    if(nextProps.location.buildings && this.props.location.buildings !== nextProps.location.buildings){
+      let {currentBuilding, currentFloor} = nextProps.location;
+      let roomData = nextProps.location.buildings[currentBuilding].floors[currentFloor];
 
-    this.props.updatePhoto({
-      zoomZ: 0,
-      data: roomData,
-      locationId: null,
-      nextLocationId: roomData.firstPhotoId,
-      rotation: roomData.firstPhotoRotation +
-      (roomData.photos[roomData.firstPhotoId].rotationOffset || 0),
-    });
-    
+      this.props.updatePhoto({
+        zoomZ: 0,
+        data: roomData,
+        locationId: null,
+        nextLocationId: roomData.firstPhotoId,
+        rotation: roomData.firstPhotoRotation +
+        (roomData.photos[roomData.firstPhotoId].rotationOffset || 0),
+      });
+    }
+  }
+
+  init(roomConfig) {
+    let {currentFloor} = this.props.location;
+    let locs = Object.keys(roomConfig.buildings);
+    let currentBuilding = locs[0];
+
+
     this.props.initBuildings({
       buildings: roomConfig.buildings,
       floors: roomConfig.buildings[currentBuilding].floors,
@@ -116,7 +90,7 @@ class VRLayout extends React.Component{
 
   render(){
     // map short names to state values that will be used.
-    let {zoomZ, locationId, nextLocationId, data, notes} = this.props.photo;
+    let {zoomZ, locationId, nextLocationId, data} = this.props.photo;
     let rot = this.props.photo.rotation;
     let trans = this.props.photo.translation;
 
@@ -133,6 +107,7 @@ class VRLayout extends React.Component{
     //console.log("Props in render: ", this.props);
 
     const tooltips = (photoData && photoData.tooltips) || null;
+    const notes = (photoData && photoData.notes) || null;
     const rotation = ((photoData && photoData.rotationOffset) || 0);
     //console.log(this.props.photo.rotation);
       return (
@@ -144,7 +119,7 @@ class VRLayout extends React.Component{
             ]
           }}
           >
-          <Pano 
+          <Pano
             style={{
               tintColor: isLoading ? 'grey' : 'white',
             }}
@@ -154,7 +129,7 @@ class VRLayout extends React.Component{
 
           <CylindricalPanel
             layer={{
-              width: MAX_TEXTURE_WIDTH, 
+              width: MAX_TEXTURE_WIDTH,
               height: MAX_TEXTURE_HEIGHT,
               density: MAX_TEXTURE_WIDTH,
             }}
@@ -173,14 +148,14 @@ class VRLayout extends React.Component{
             {/* Main Content View */}
               <View>
                 {/* Show a spinner while first pano is loading */}
-                {locationId == null && <LoadingSpinner 
+                {locationId == null && <LoadingSpinner
                     pixelsPerMeter={PPM}
                     style={{layoutOrigin: [0.5, 0.5]}}
 
                     // Undo the rotation so spinner is centered
                     translateX={degreesToPixels(rotation) * -1}
                   />}
-                {tooltips && <DisplayTooltips 
+                {tooltips && <DisplayTooltips
                     data={data} tooltips={tooltips} ppm={PPM}
                     changeNextLocationId={changeNextLocationId} isLoading={isLoading}
                     degreesToPixels={degreesToPixels} notes={notes}
@@ -217,6 +192,7 @@ const mapDispatchToProps = dispatch => ({
   changeZoom: (zoom) => dispatch(photo.changeZoom(zoom)),
   updateData: (data) => dispatch(photo.updateData(data)),
   updateNotes: (notes) => dispatch(photo.updateNotes(notes)),
+  updateGNotes: (notes) => dispatch(photo.updateGNotes(notes)),
   updatePhoto: (nextPhoto) => dispatch(photo.updatePhoto(nextPhoto)),
   changeLocationId: (locationId) => dispatch(photo.changeLocationId(locationId)),
   changeNextLocationId: (locationId) => dispatch(photo.changeNextLocationId(locationId)),

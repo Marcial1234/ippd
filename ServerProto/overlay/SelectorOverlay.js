@@ -1,5 +1,6 @@
 import React from 'react';
-
+// import Select from 'react-select';
+// import 'react-select/dist/react-select.css';
 
 //This is standard react.
 export default class SelectorOverlay extends React.Component{
@@ -17,6 +18,7 @@ export default class SelectorOverlay extends React.Component{
       building: props.building || "000001",
       floor: props.floor || "01",
       room: props.room || "000001",
+      updated: false,
     };
 
     this.goToRoom = this.goToRoom.bind(this);
@@ -92,6 +94,9 @@ export default class SelectorOverlay extends React.Component{
       room: this.state.room
     }
     this.props.submit(obj);
+    // 
+    // this.setState({updated: true});
+    // setTimeout(function() {this.setState({updated: false});}.bind(this), 1000);
   }
 
   updateSelections(){
@@ -141,6 +146,7 @@ export default class SelectorOverlay extends React.Component{
                     </select>
                 </div>
                 <button onClick={this.goToRoom} className="selCol">GO</button>
+                {this.state.updated && <img className="check" src="../static_assets/check.png"/>}
           </div>
         </div>
     )

@@ -6,6 +6,7 @@ const defaultState = {
   locationId: null,
   nextLocationId: null,
   notes: null,
+  gNotes: "",
 };
 
 export default function photo(state=defaultState, action){
@@ -36,6 +37,9 @@ export default function photo(state=defaultState, action){
       }
       case "Change Notes":{
         return{...state, notes : action.payload}
+      }
+      case "Change gNotes":{
+        return{...state, gNotes : action.payload}
       }
       default :{
         return{...state}

@@ -2,7 +2,7 @@ const defaultState = {
   buildings: null,
   floors: null,
   rooms: null,
-  currentBuilding: "000001",
+  currentBuilding: "IPPD",
   currentFloor: "01",
 };
 

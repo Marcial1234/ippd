@@ -56,3 +56,11 @@ export function updateNotes(notes){
     payload: notes,
   }
 }
+
+export function updateGNotes(notes){
+  // console.log("Notes: ", notes);
+  return{
+    type: "Change gNotes",
+    payload: notes,
+  }
+}
