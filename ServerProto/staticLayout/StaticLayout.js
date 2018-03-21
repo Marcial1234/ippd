@@ -101,6 +101,11 @@ export default class StaticLayout extends React.Component {
       this.setState({tooltipID: 0});
       ID = 0;
     }
+    NativeModules.CameraModule.getRotation();
+    setTimeout(function() {
+      let rot = (this.state.cameraRot._y*57)%360;
+      console.log(rot);
+    }.bind(this), 25);
     let newNote = {
       type: "textblock",
       title: "New Note",
@@ -176,13 +181,15 @@ export default class StaticLayout extends React.Component {
     }
   }
 
-
   deleteNote(index){
     let {data, locationId} = this.props.photo;
     let notes = data.photos[locationId].notes;
-      if(index == this.state.tooltipID){
+      if(index == this.state.tooltipID && this.overlayOpen1){
         NativeModules.DomOverlayModule.closeOverlay1();
         this.openOverlay(-1, "General");
+      }
+      else if(index == this.state.tooltipID){
+        NativeModules.DomOverlayModule.closeOverlay1();
       }
       data.photos[locationId].notes.splice(index, 1);
       this.props.updateData(data);
@@ -229,7 +236,7 @@ export default class StaticLayout extends React.Component {
     }
     data.photos[locationId].notes = notes;
     this.props.updateData(data);
-    NativeModules.DomOverlayModule.cameraRot();
+    NativeModules.CameraModule.getRotation();
 
     setTimeout(function() {
       let rot = (this.state.cameraRot._y*57)%360;
@@ -264,6 +271,7 @@ export default class StaticLayout extends React.Component {
 
     }
   }
+
   changeRate(magnitude){
     this.setState({adjustRate : magnitude })
   }
@@ -350,7 +358,7 @@ export default class StaticLayout extends React.Component {
     //this.props.changeNextLocationId(locs[0]);
     this.setState({displayTooltips: false})
     NativeModules.DomOverlayModule.closeOverlay1();
-    NativeModules.DomOverlayModule.cameraRot();
+    NativeModules.CameraModule.getRotation();
     setTimeout(function() {
       let rot = (this.state.cameraRot._y*57)%360;
       let obj = {
@@ -363,7 +371,6 @@ export default class StaticLayout extends React.Component {
   }
 
   test(){
-
   }
 
   render() {

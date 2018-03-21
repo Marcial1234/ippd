@@ -3,11 +3,26 @@
 // If you want to modify your application, start in "index.vr.js"
 
 // Auto-generated content.
-import {VRInstance} from 'react-vr-web';
+import {VRInstance, Module} from 'react-vr-web';
 import './process'; //necessary from DOMOverlay instructions
 import DomOverlayModule from '../overlay/DomOverlayModule';
 
-// const RCTDeviceEventEmitter = require('RCTDeviceEventEmitter');
+class CameraModule extends Module {
+  constructor() {
+    super('CameraModule');
+    this.rnContext = null;
+  }
+
+  getRotation() {
+    let obj = window.playerCamera.rotation;
+    this.rnContext.callFunction('RCTDeviceEventEmitter', 'emit', [
+      'cameraRot', obj,
+    ]);
+  }
+  _setRNContext(rnctx) {
+      this.rnContext = rnctx;
+    }
+}
 
 function init(bundle, parent, options) {
 
@@ -17,7 +32,8 @@ function init(bundle, parent, options) {
   domOverlayContainer1.id = 'dom-overlay1';
   domOverlayContainer2.id = 'dom-overlay2';
   //create instance of module
-  const domOverlayModule = new DomOverlayModule(domOverlayContainer1, domOverlayContainer2, testIt);
+  const domOverlayModule = new DomOverlayModule(domOverlayContainer1, domOverlayContainer2);
+  const cameraModule = new CameraModule();
   // let element = this.props.doc.body.children[2].children[0].children[2].children[0];
   // element.style.transform = "";
   // setTimeout(function() {this.toggleNotes()}.bind(this), 10000);
@@ -26,8 +42,10 @@ function init(bundle, parent, options) {
     hideFullscreen: true, //hides the button
     ...options,
     //register dom overlay
-    nativeModules: [domOverlayModule],
+    nativeModules: [domOverlayModule, cameraModule],
   });
+
+  cameraModule._setRNContext(vr.rootView.context);
 
   function testIt(){
     //document.body.children[2].children[0].children[2].click();

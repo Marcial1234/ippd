@@ -6,7 +6,7 @@ import TextboxOverlay from './TextboxOverlay';
 import SelectorOverlay from './SelectorOverlay';
 
 export default class DomOverlayModule extends Module {
-  constructor(overlayContainer1, overlayContainer2, testIt) {
+  constructor(overlayContainer1, overlayContainer2) {
     super('DomOverlayModule');
     //rnContext will be used to refer to the React Native context
     //This allows communication with React VR
@@ -20,9 +20,6 @@ export default class DomOverlayModule extends Module {
     this.openOverlay2 = this.openOverlay2.bind(this);
     this.submitSelection = this.submitSelection.bind(this);
     this.submitGNotes = this.submitGNotes.bind(this);
-    this.cameraRot = this.cameraRot.bind(this);
-    this.testIt = testIt;
-    // this.testIt = this.testIt.bind(this);
   }
 
   //This method call opens up the overlay for display.
@@ -31,7 +28,7 @@ export default class DomOverlayModule extends Module {
       'overlayOpen1'
     ]);
     ReactDOM.render(
-      <TextboxOverlay text={text} title={title} type={type} gNotes={gNotes} testIt={this.testIt}
+      <TextboxOverlay text={text} title={title} type={type} gNotes={gNotes}
         onClose={this.closeOverlay1} submit={this.submit} submitGNotes={this.submitGNotes}/>,
       this._overlayContainer1
     );
@@ -45,7 +42,7 @@ export default class DomOverlayModule extends Module {
       'overlayOpen2'
     ]);
     ReactDOM.render(
-      <SelectorOverlay room={room}floor={floor} building={building} bldgs={bldgs} testIt={this.testIt}
+      <SelectorOverlay room={room}floor={floor} building={building} bldgs={bldgs}
          onClose={this.closeOverlay2} submit={this.submitSelection}/>,
        this._overlayContainer2
     );
@@ -91,13 +88,6 @@ export default class DomOverlayModule extends Module {
     submitSelection(obj){
       this.rnContext.callFunction('RCTDeviceEventEmitter', 'emit', [
         'selectAll', obj,
-      ]);
-    }
-
-    cameraRot(){
-      let obj = this.testIt();
-      this.rnContext.callFunction('RCTDeviceEventEmitter', 'emit', [
-        'cameraRot', obj,
       ]);
     }
 }
