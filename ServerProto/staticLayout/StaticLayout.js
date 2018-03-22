@@ -8,13 +8,15 @@ export default class StaticLayout extends React.Component {
   constructor(props){
     super(props);
     this.state ={
-      tooltipID: 0,
+      noteID: 0,
+      navID: 0,
       adjustRate: 6,
-      updateNotes: true,
       overlayOpen1: false,
       overlayOpen2: false,
-      displayTooltips: false,
+      displayNotes: false,
+      displayNavs: false,
       cameraRot: null,
+      noteOrNav: "note",
     }
 
     this.test = this.test.bind(this);
@@ -30,6 +32,7 @@ export default class StaticLayout extends React.Component {
     this.openOverlay = this.openOverlay.bind(this);
     this.selectTooltip = this.selectTooltip.bind(this);
     this.toggleNotes = this.toggleNotes.bind(this);
+    this.toggleNavs = this.toggleNavs.bind(this);
     this.refreshTooltips = this.refreshTooltips.bind(this);
     this.buildingSelection = this.buildingSelection.bind(this);
     this.selectAll = this.selectAll.bind(this);
@@ -85,7 +88,7 @@ export default class StaticLayout extends React.Component {
             NativeModules.DomOverlayModule.closeOverlay1();
             this.openOverlay(-1, "General");
           }
-          if(this.state.displayTooltips){
+          if(this.state.displayNotes){
             this.refreshTooltips();
           }
 
@@ -96,16 +99,16 @@ export default class StaticLayout extends React.Component {
   createNote(){
     let {data, locationId} = this.props.photo;
     let notes = data.photos[locationId].notes;
-    let ID = this.state.tooltipID;
+    let ID = this.state.noteID;
     if(ID >= notes.length){
-      this.setState({tooltipID: 0});
+      this.setState({noteID: 0});
       ID = 0;
     }
     NativeModules.CameraModule.getRotation();
     setTimeout(function() {
       let rot = (this.state.cameraRot._y*57)%360;
-      console.log(rot);
     }.bind(this), 25);
+
     let newNote = {
       type: "textblock",
       title: "New Note",
@@ -120,75 +123,110 @@ export default class StaticLayout extends React.Component {
 
     data.photos[locationId].notes.push(newNote);
     this.props.updateData(data);
-    if(this.state.displayTooltips){
+    if(this.state.displayNotes){
       this.refreshTooltips();
     }
     else{
       this.toggleNotes();
     }
-    this.selectTooltip(notes.length -1);
+    this.selectTooltip(notes.length -1, "note");
   }
 
   moveNote(direction){
     let {data, locationId} = this.props.photo;
     let notes = data.photos[locationId].notes;
+    let navs = data.photos[locationId].navs;
+    let NoteID = this.state.noteID;
+    let NavID = this.state.navID;
     let adj = this.state.adjustRate;
-    let ID = this.state.tooltipID;
-    if(ID >= notes.length){
-      this.setState({tooltipID: 0});
-      ID = 0;
+    if(NoteID >= notes.length){
+      this.setState({noteID: 0});
+      NoteID = 0;
+    }
+    if(NavID >= navs.length){
+      this.setState({noteID: 0});
+      NavID = 0;
     }
     //need to figure out what to do at 180 degrees
-
-    switch(direction){
-      case "right":
-      if(notes[ID].rotationY - adj > -180){
-        notes[ID].rotationY -=adj;
+    if(this.state.noteOrNav == "note"){
+      switch(direction){
+        case "right":
+        if(notes[NoteID].rotationY - adj > -180){
+          notes[NoteID].rotationY -=adj;
+        }
+        else{
+          notes[NoteID].rotationY *=-1;
+        }
+        break;
+        case "left":
+        if(notes[NoteID].rotationY + adj < 180){
+          notes[NoteID].rotationY +=adj;
+        }
+        else{
+          notes[NoteID].rotationY *=-1;
+        }
+        break;
+        case "up":
+        notes[NoteID].translateX -=adj;
+        break;
+        case "down":
+        notes[NoteID].translateX +=adj;
+        break;
       }
-      else{
-        notes[ID].rotationY *=-1;
-      }
-      break;
-      case "left":
-      if(notes[ID].rotationY + adj < 180){
-        notes[ID].rotationY +=adj;
-      }
-      else{
-        notes[ID].rotationY *=-1;
-      }
-      break;
-      case "up":
-      notes[ID].translateX -=adj;
-      break;
-      case "down":
-      notes[ID].translateX +=adj;
-      break;
+      data.photos[locationId].notes = notes;
     }
-    data.photos[locationId].notes = notes;
+
+    if(this.state.noteOrNav == "nav"){
+      switch(direction){
+        case "right":
+        if(navs[NavID].rotationY - adj > -180){
+          navs[NavID].rotationY -=adj;
+        }
+        else{
+          navs[NavID].rotationY *=-1;
+        }
+        break;
+        case "left":
+        if(navs[NavID].rotationY + adj < 180){
+          navs[NavID].rotationY +=adj;
+        }
+        else{
+          navs[NavID].rotationY *=-1;
+        }
+        break;
+        case "up":
+        navs[NavID].translateX -=adj;
+        break;
+        case "down":
+        navs[NavID].translateX +=adj;
+        break;
+      }
+      data.photos[locationId].navs = navs;
+    }
+
     this.props.updateData(data);
-    // this.props.updateNotes(notes);
   }
 
   editNote(index){
     let {data, locationId} = this.props.photo;
     let notes = data.photos[locationId].notes;
-    this.selectTooltip(index);
+    this.selectTooltip(index, "note");
     if(notes.length> 0){
        this.openOverlay(index, "Text");
     }
     else{
-      console.log("No Tooltips");
+      console.log("No notes");
     }
   }
 
   deleteNote(index){
     let {data, locationId} = this.props.photo;
     let notes = data.photos[locationId].notes;
-      if(index == this.state.tooltipID && this.overlayOpen1){
+      if(index == this.state.noteID && this.overlayOpen1){
         NativeModules.DomOverlayModule.closeOverlay1();
         this.openOverlay(-1, "General");
       }
-      else if(index == this.state.tooltipID){
+      else if(index == this.state.noteID){
         NativeModules.DomOverlayModule.closeOverlay1();
       }
       data.photos[locationId].notes.splice(index, 1);
@@ -200,8 +238,8 @@ export default class StaticLayout extends React.Component {
   updateText(obj){
     let {data, locationId} = this.props.photo;
     let notes = data.photos[locationId].notes;
-    notes[this.state.tooltipID].text = obj.text;
-    notes[this.state.tooltipID].title = obj.title;
+    notes[this.state.noteID].text = obj.text;
+    notes[this.state.noteID].title = obj.title;
     data.photos[locationId].notes = notes;
     this.props.updateData(data);
     this.refreshTooltips();
@@ -215,38 +253,73 @@ export default class StaticLayout extends React.Component {
 
   toggleNotes(){
     this.setState({
-      displayTooltips: !this.state.displayTooltips,
+      displayNotes: !this.state.displayNotes,
     })
   }
 
-  selectTooltip(index){
+  toggleNavs(){
+    this.setState({
+      displayNavs: !this.state.displayNavs,
+    })
+  }
+
+  selectTooltip(index, type){
     let {data, locationId} = this.props.photo;
     let notes = data.photos[locationId].notes;
-    this.setState({tooltipID: index});
-    if(this.state.overlayOpen1){
-       this.openOverlay(index, "Text");
-    }
-    for(let i = 0; i < notes.length; i++){
-      if(i == index){
-        notes[i].selected = true;
-      }
-      else{
-        notes[i].selected = false;
-      }
-    }
-    data.photos[locationId].notes = notes;
-    this.props.updateData(data);
-    NativeModules.CameraModule.getRotation();
+    let navs = data.photos[locationId].navs;
 
-    setTimeout(function() {
-      let rot = (this.state.cameraRot._y*57)%360;
-      let trans = (this.state.cameraRot._x*57)%360;
-      let obj = {
-        rotation: notes[index].rotationY - rot,
-        translation: 0, //notes[index].translateX
-      };
-      this.props.focusNote(obj);
-    }.bind(this), 25);
+    if(type == "note"){
+      this.setState({noteID: index, noteOrNav: "note"});
+      if(this.state.overlayOpen1){
+         this.openOverlay(index, "Text");
+      }
+      for(let i = 0; i < notes.length; i++){
+        if(i == index){
+          notes[i].selected = true;
+        }
+        else{
+          notes[i].selected = false;
+        }
+      }
+      data.photos[locationId].notes = notes;
+      this.props.updateData(data);
+      NativeModules.CameraModule.getRotation();
+
+      setTimeout(function() {
+        let rot = (this.state.cameraRot._y*57)%360;
+        let obj = {
+          rotation: notes[index].rotationY - rot,
+          translation: 0, //notes[index].translateX
+        };
+        this.props.focusNote(obj);
+      }.bind(this), 25);
+    }
+
+    if(type == "nav"){
+      this.setState({navID: index, noteOrNav: "nav"});
+
+      for(let i = 0; i < navs.length; i++){
+        if(i == index){
+          navs[i].selected = true;
+        }
+        else{
+          navs[i].selected = false;
+        }
+      }
+      data.photos[locationId].navs = navs;
+      this.props.updateData(data);
+      NativeModules.CameraModule.getRotation();
+
+      setTimeout(function() {
+        let rot = (this.state.cameraRot._y*57)%360;
+        let obj = {
+          rotation: navs[index].rotationY - rot,
+          translation: 0, //notes[index].translateX
+        };
+        this.props.focusNote(obj);
+      }.bind(this), 25);
+    }
+
 
   }
 
@@ -321,11 +394,6 @@ export default class StaticLayout extends React.Component {
     else{
       this.props.selectAll(obj);
       let roomData = this.props.location.buildings[obj.building].floors[obj.floor];
-      // let bLocs = Object.keys(this.props.location.buildings);
-      // building = bLocs[0];
-      // let fLocs = Object.keys(this.props.location.buildings[bLocs[0]].floors);
-      // floor = fLocs[0];
-      // roomData = this.props.location.buildings[bLocs[0]].floors[fLocs[0]];
       let rdp = Object.keys(roomData.photos);
       if(!rdp.includes(obj.room)){
         obj.room = rdp[0];
@@ -356,7 +424,7 @@ export default class StaticLayout extends React.Component {
     room = rLocs[0];
     this.selectAll({building, floor, room});
     //this.props.changeNextLocationId(locs[0]);
-    this.setState({displayTooltips: false})
+    this.setState({displayNotes: false})
     NativeModules.DomOverlayModule.closeOverlay1();
     NativeModules.CameraModule.getRotation();
     setTimeout(function() {
@@ -377,6 +445,7 @@ export default class StaticLayout extends React.Component {
     let {data, locationId} = this.props.photo;
     const photoData = (locationId && data.photos[locationId]) || null;
     let notes = (photoData && photoData.notes) || null;
+    let navs = (photoData && photoData.navs) || null;
     var lvls = [];
     for (let i = 2; i <= 20; i+=2){
       lvls.push(i);
@@ -384,6 +453,9 @@ export default class StaticLayout extends React.Component {
 
     if(!notes){
       notes = [];
+    }
+    if(!navs){
+      navs = [];
     }
 
     return (
@@ -416,7 +488,9 @@ export default class StaticLayout extends React.Component {
           <Text style={styles.menuText}>Change Val</Text>
         </VrButton>
 */}
-
+        <VrButton style={styles.menuButton} onClick={this.toggleNavs}>
+          <Text style={styles.menuText}>Toggle Navs</Text>
+        </VrButton>
         <VrButton style={styles.menuButton} onClick={this.createNote}>
           <Text style={styles.menuText}>Create Note</Text>
         </VrButton>
@@ -430,7 +504,7 @@ export default class StaticLayout extends React.Component {
         <Image style={styles.selectionImage} source={asset('expand_arrow.png')}></Image>
       </VrButton>
       }
-      {(this.state.displayTooltips && notes.length == 0) && <View style={styles.tooltipList}>
+      {(this.state.displayNotes && notes.length == 0) && <View style={styles.noteList}>
       <VrButton>
         <Text style={styles.tooltipListItem}>
         No Notes For This Room
@@ -438,13 +512,26 @@ export default class StaticLayout extends React.Component {
       </VrButton>
       </View>
     }
-      {(this.state.displayTooltips && notes.length > 0) && <View style={styles.tooltipList}>
-          {notes.map((tooltip, index) => {
+      {(this.state.displayNavs && navs.length > 0) && <View style={styles.navList}>
+          {navs.map((nav, index) => {
           return(
             <View style={styles.tooltipListRow} key={index}>
-              <VrButton onClick={() => this.selectTooltip(index)}>
-                <Text style={(index==(this.state.tooltipID)) ? styles.tooltipListItemSelected : styles.tooltipListItem}>
-                {tooltip.title}
+              <VrButton onClick={() => this.selectTooltip(index, "nav")}>
+                <Text style={(index==(this.state.navID) && (this.state.noteOrNav == "nav")) ? styles.tooltipListItemSelected : styles.tooltipListItem}>
+                {nav.text}
+                </Text>
+              </VrButton>
+            </View>);
+        })}
+      </View>}
+
+      {(this.state.displayNotes && notes.length > 0) && <View style={styles.noteList}>
+          {notes.map((note, index) => {
+          return(
+            <View style={styles.tooltipListRow} key={index}>
+              <VrButton onClick={() => this.selectTooltip(index, "note")}>
+                <Text style={(index==(this.state.noteID) && (this.state.noteOrNav == "note")) ? styles.tooltipListItemSelected : styles.tooltipListItem}>
+                {note.title}
                 </Text>
               </VrButton>
               <VrButton onClick={() => this.editNote(index) }>
@@ -456,19 +543,22 @@ export default class StaticLayout extends React.Component {
             </View>);
         })}
       </View>}
-      {(this.state.displayTooltips && notes.length > 0) && <View style={styles.pBButton}>
-      <VrButton style={styles.pBLeft} onClick={() => this.moveNote("left")}>
+
+      {((this.state.displayNotes || this.state.displayNavs) && (notes.length > 0 || navs.length > 0)) && <View style={styles.pBButton}>
+      <VrButton style={this.state.noteOrNav == "nav" ? styles.pBLeftNav : styles.pBLeft} onClick={() => this.moveNote("left")}>
         <Text style={styles.menuText}>Left</Text>
       </VrButton>
-      <VrButton style={styles.pBRight} onClick={() => this.moveNote("right")}>
+      <VrButton style={this.state.noteOrNav == "nav" ? styles.pBRightNav : styles.pBRight} onClick={() => this.moveNote("right")}>
         <Text style={styles.menuText}>Right</Text>
       </VrButton>
-      <VrButton style={styles.pBUp} onClick={() => this.moveNote("up")}>
+      {this.state.noteOrNav == "note" && <VrButton style={styles.pBUp} onClick={() => this.moveNote("up")}>
         <Text style={styles.menuText}>Up</Text>
       </VrButton>
-      <VrButton style={styles.pBDown} onClick={() => this.moveNote("down")}>
+      }
+      {this.state.noteOrNav == "note" && <VrButton style={styles.pBDown} onClick={() => this.moveNote("down")}>
         <Text style={styles.menuText}>Down</Text>
       </VrButton>
+      }
       <VrButton style={styles.pBPlus} onClick={() => this.adjustRate("up")}>
         <Text style={styles.menuText}>+</Text>
       </VrButton>

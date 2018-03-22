@@ -94,7 +94,7 @@ export default class SelectorOverlay extends React.Component{
       room: this.state.room
     }
     this.props.submit(obj);
-    // 
+    //
     // this.setState({updated: true});
     // setTimeout(function() {this.setState({updated: false});}.bind(this), 1000);
   }

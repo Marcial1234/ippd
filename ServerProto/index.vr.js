@@ -106,7 +106,7 @@ class VRLayout extends React.Component{
     const isLoading = nextLocationId !== locationId;
     //console.log("Props in render: ", this.props);
 
-    const tooltips = (photoData && photoData.tooltips) || null;
+    const navs = (photoData && photoData.navs) || null;
     const notes = (photoData && photoData.notes) || null;
     const rotation = ((photoData && photoData.rotationOffset) || 0);
     //console.log(this.props.photo.rotation);
@@ -155,8 +155,8 @@ class VRLayout extends React.Component{
                     // Undo the rotation so spinner is centered
                     translateX={degreesToPixels(rotation) * -1}
                   />}
-                {tooltips && <DisplayTooltips
-                    data={data} tooltips={tooltips} ppm={PPM}
+                  {navs && <DisplayTooltips
+                    data={data} tooltips={navs} ppm={PPM}
                     changeNextLocationId={changeNextLocationId} isLoading={isLoading}
                     degreesToPixels={degreesToPixels} notes={notes}
                   />}

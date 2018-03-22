@@ -8,7 +8,7 @@
               "000001": {
                 "rotationOffset": 0,
                 "uri": "Home_Page.jpg",
-                "tooltips": [
+                "navs": [
                   {
                     "rotationY": 0,
                     "text": "IPPD Room",
@@ -21,7 +21,7 @@
               "000005": {
                 "rotationOffset": -130,
                 "uri": "360_0025[1]_pano.jpg",
-                "tooltips": [
+                "navs": [
                   {
                     "text": "Home Page",
                     "rotationY": -130,
@@ -62,7 +62,7 @@
               "000006": {
                 "rotationOffset": 110,
                 "uri": "360_0026[1]_pano.jpg",
-                "tooltips": [
+                "navs": [
                   {
                     "text": "Next",
                     "rotationY": 110,
@@ -104,7 +104,7 @@
               "000007": {
                 "rotationOffset": 40,
                 "uri": "360_0028[1]_pano.jpg",
-                "tooltips": [
+                "navs": [
                   {
                     "text": "Home Page",
                     "rotationY": 93,
@@ -154,7 +154,7 @@
               "000001": {
                 "rotationOffset": 0,
                 "uri": "360_0034_pano.jpg",
-                "tooltips": [
+                "navs": [
                   {
                     "rotationY": -95,
                     "text": "Next",
@@ -172,7 +172,7 @@
               "000002": {
                 "rotationOffset": 0,
                 "uri": "360_0035_pano.jpg",
-                "tooltips": [
+                "navs": [
                   {
                     "rotationY": -100,
                     "text": "Next",
@@ -190,7 +190,7 @@
               "000003": {
                 "rotationOffset": 0,
                 "uri": "360_0036_pano.jpg",
-                "tooltips": [
+                "navs": [
                   {
                     "rotationY": -100,
                     "text": "Next",
@@ -208,7 +208,7 @@
               "000004": {
                 "rotationOffset": 0,
                 "uri": "360_0037_pano.jpg",
-                "tooltips": [
+                "navs": [
                   {
                     "rotationY": -100,
                     "text": "Next",
@@ -226,7 +226,7 @@
               "000005": {
                 "rotationOffset": 0,
                 "uri": "360_0038_pano.jpg",
-                "tooltips": [
+                "navs": [
                   {
                     "rotationY": -100,
                     "text": "Next",
@@ -244,7 +244,7 @@
               "000006": {
                 "rotationOffset": 0,
                 "uri": "360_0039_pano.jpg",
-                "tooltips": [
+                "navs": [
                   {
                     "rotationY": 0,
                     "text": "Next",
@@ -262,7 +262,7 @@
               "000007": {
                 "rotationOffset": 0,
                 "uri": "360_0040_pano.jpg",
-                "tooltips": [
+                "navs": [
                   {
                     "rotationY": 90,
                     "text": "Next",
@@ -280,7 +280,7 @@
               "000008": {
                 "rotationOffset": 0,
                 "uri": "360_0041_pano.jpg",
-                "tooltips": [
+                "navs": [
                   {
                     "rotationY": 90,
                     "text": "Next",
@@ -298,7 +298,7 @@
               "000009": {
                 "rotationOffset": 0,
                 "uri": "360_0042_pano.jpg",
-                "tooltips": [
+                "navs": [
                   {
                     "rotationY": 90,
                     "text": "Next",
@@ -316,7 +316,7 @@
               "000010": {
                 "rotationOffset": 0,
                 "uri": "360_0043_pano.jpg",
-                "tooltips": [
+                "navs": [
                   {
                     "rotationY": 90,
                     "text": "Next",
@@ -334,7 +334,7 @@
               "000011": {
                 "rotationOffset": 0,
                 "uri": "360_0044_pano.jpg",
-                "tooltips": [
+                "navs": [
                   {
                     "rotationY": 90,
                     "text": "Next",
@@ -352,7 +352,7 @@
               "000012": {
                 "rotationOffset": 0,
                 "uri": "360_0045_pano.jpg",
-                "tooltips": [
+                "navs": [
                   {
                     "rotationY": 90,
                     "text": "Next",
@@ -370,7 +370,7 @@
               "000013": {
                 "rotationOffset": 0,
                 "uri": "360_0046_pano.jpg",
-                "tooltips": [
+                "navs": [
                   {
                     "rotationY": -100,
                     "text": "Next",
