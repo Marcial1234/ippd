@@ -27,6 +27,97 @@ The `master` branch should be kept CLEAN, and with a working code. Make branches
         + **NOTE:** there's an independent Git repo in `real-mean` to manage this.
  -->
 
+# Operationalizing TODOs
+
+### Main Task
+- Graph search algorithm for map view and assignment of navigation elements to each 'room'
+- Async f(x) to link mapping views to cloud image locations (Alex)
+- General Server (Marcial)
+- [Bleh one](#bleh)
+
+### Detailed breakdowns
+
+
+#### 'REST API'
+  - GETs: On initial room load and one navigation button clicks
+    - Search by building mongo ID, and default to floor 1, initial room
+  - PUT/POST/DELETE: on what you think. save of new tooltips is a PUT thou
+
+#### DB Architecture
+  - Buildings:
+    + (Marcial note to self) Use verification code from SWE project
+    + array of references to rooms
+    + *ALL REQUIRED*
+    + '#' of Floors?
+    + State => abbv. dropdown, but also map in the backend (on save/new) the FULL state names
+      * Long_State: backend only property, for search convenience
+    + City
+    + 'Name'
+      * Address? => no for now
+
+  - Rooms:
+    + INITIAL ROOM!! - Add this property
+    array/obj of pictures path locations to static resource cloud (- cloudfoundry, S3 bucket)
+    + 'tooltips'
+      * notes
+      + navigation
+        - hard-coding 1/4 circle degrees 
+          + normal ones (0, 90, 180, 270)
+          + diagonals (45, 135, 225, 315)
+        - <a name='bleh'>*TODO*</a>: figure out what's the '0' degree by default... 
+          + => Center of the right sphere on the normal file, whatever that means
+        - how to make these editable if we're moving them around??
+        allow for 'navigation' toggle ~ or just make them into 'tooltips - toggle' compatible/friendly
+
+- React <=> DB
+  + Save button toggles PUTs only!
+  + Implement all the GETs
+    * If you wanna navigate to array specific room, how do I pass in optionals commands?
+      - => '?' query, and then process it in the local react ~
+      ```
+        window.location.href (lolz), split by '?' and all that jazz
+        or
+        this.props.location.pathname <= if routing defined ~
+      ```
+      - from there we can define go-to commands ~
+
+- Frontend
+  + What's the deal with Teresa's 2D stuff??
+  + Search View
+    * // Only needed if the building search bar is too hard/ugly/inconvinient in ReactVR
+
+    ```
+    ====================
+          NAVBAR
+    --------------------
+        | Search bar ng-model='search'
+        | --------------
+        | 
+    MAP | [ng-repeat of buildings | filter:search | limitTo: 20?-50?]
+        |
+        |
+    --------------------
+    ====================
+    ```
+
+    * Use Google Charts for the map, and then on click event, query the local base of the array by state ~
+      Dependencies ++
+
+  + Mapping view
+    * MockUp base, but instead of circles it should be squares ~
+    * Retrieve the paths of the pano files (wherever they are), and link them to the index of the original submitted files.
+      This should be done without the user having to wait for all the files to be converted (ie async), and should not refresh the page or what not (i.e. not using the http 'res', but rather a socket or a service)
+        - *Assigned to Alex for now*
+        - No idea about the frontend part (listener/observer) yet
+    * No drag and drop, selection will be done by numbers (nth number picture at x square etc)
+    * *IMPORTANT* Graph algo that creates navigation buttons relations between the files/room objs
+      - Continuous pictures should be made into each others navigation buttons. blank ones will be buffers zone
+    * How to edit buildings' room configuration?
+      - Save the 'structure' used to generate the the navigation buttons angles, repopulate the picture side menu (lots of downloads/data use)?, and allow for the same process as initial floor creation f(x)nality.
+
+
+
+# Old Readme stuff
 ## Panoramic Conversion (Alex)
 ### Instalation
 + Install *Hugin* by either installing [Hugin-win64.msi](stiching/Hugin-win64.msi) on windows, or [download it](http://hugin.sourceforge.net/download/) if you're not on Window x64
