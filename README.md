@@ -5,18 +5,24 @@
 
 ## Installation
 - Clone/Download
-- Browse to `react-demo`, then run `npm install` and `npm start`. Then browse to [localhost port 8081 /vr](http://localhost:8081/vr). **Note:** it'll take a while to compile/bundle the first time you load it.
+- Browse to 'motherload'
+- run 'npm run first install' (this may take several minutes)
+- run npm start - opens on [localhost port 5001 /vr](http://localhost:5001/vr)
+
+<!-- ## Installation
+- Clone/Download
+- Browse to `react-demo`, then run `npm install` and `npm start`. Then browse to [localhost port 8081 /vr](http://localhost:8081/vr). **Note:** it'll take a while to compile/bundle the first time you load it. -->
 
 ## Contribution Guidelines
 > WRITE YOUR PROCESS HERE, ALEX
 
-The `master` branch should be kept CLEAN, and with a working code. Make branches and merge with `master` as you FULLY develop/implement new features. 
+The `master` branch should be kept CLEAN, and with a working code. Make branches and merge with `master` as you FULLY develop/implement new features.
 `branch_names_with_underscores_preferred`
 
 **IMPORTANT**: Make issues (or spam code creator/writer) if there's spaghetti code, and we're not on 'hell weeks'.
 
 <!-- commenting this for now -->
-<!-- 
+<!--
 - MEAN (*run the following commands inside* `real-mean`)
     + First Installation
         + Run `npm run first-install`
@@ -61,10 +67,10 @@ The `master` branch should be kept CLEAN, and with a working code. Make branches
     + 'tooltips'
       * notes
       + navigation
-        - hard-coding 1/4 circle degrees 
+        - hard-coding 1/4 circle degrees
           + normal ones (0, 90, 180, 270)
           + diagonals (45, 135, 225, 315)
-        - <a name='bleh'>*TODO*</a>: figure out what's the '0' degree by default... 
+        - <a name='bleh'>*TODO*</a>: figure out what's the '0' degree by default...
           + => Center of the right sphere on the normal file, whatever that means
         - how to make these editable if we're moving them around??
         allow for 'navigation' toggle ~ or just make them into 'tooltips - toggle' compatible/friendly
@@ -92,7 +98,7 @@ The `master` branch should be kept CLEAN, and with a working code. Make branches
     --------------------
         | Search bar ng-model='search'
         | --------------
-        | 
+        |
     MAP | [ng-repeat of buildings | filter:search | limitTo: 20?-50?]
         |
         |
