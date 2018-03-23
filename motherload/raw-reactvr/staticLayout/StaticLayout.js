@@ -20,6 +20,7 @@ export default class StaticLayout extends React.Component {
     }
 
     this.test = this.test.bind(this);
+    this.save = this.save.bind(this);
     this.goHome = this.goHome.bind(this);
     this.editNote = this.editNote.bind(this);
     this.moveNote = this.moveNote.bind(this);
@@ -34,8 +35,8 @@ export default class StaticLayout extends React.Component {
     this.toggleNotes = this.toggleNotes.bind(this);
     this.toggleNavs = this.toggleNavs.bind(this);
     this.refreshTooltips = this.refreshTooltips.bind(this);
-    this.buildingSelection = this.buildingSelection.bind(this);
-    this.selectAll = this.selectAll.bind(this);
+    this.floorSelection = this.floorSelection.bind(this);
+    this.selectFloorRoom = this.selectFloorRoom.bind(this);
   }
 
   componentWillMount(){
@@ -58,17 +59,8 @@ export default class StaticLayout extends React.Component {
     RCTDeviceEventEmitter.addListener('overlayOpen2', () => {
       this.setState({overlayOpen2: true,})
     });
-    RCTDeviceEventEmitter.addListener('selectBuilding', obj => {
-      this.props.selectBuilding(obj);
-    });
-    RCTDeviceEventEmitter.addListener('selectFloor', obj => {
-      this.props.selectFloor(obj);
-    });
-    RCTDeviceEventEmitter.addListener('selectRoom', obj => {
-      this.props.selectRoom(obj);
-    });
-    RCTDeviceEventEmitter.addListener('selectAll', obj => {
-      this.selectAll(obj);
+    RCTDeviceEventEmitter.addListener('selectFloorRoom', obj => {
+      this.selectFloorRoom(obj);
     });
     RCTDeviceEventEmitter.addListener('cameraRot', obj => {
       this.setState({cameraRot: obj});
@@ -318,6 +310,10 @@ export default class StaticLayout extends React.Component {
         };
         this.props.focusNote(obj);
       }.bind(this), 25);
+
+      if(this.state.overlayOpen1){
+        this.openOverlay(-1, "General");
+      }
     }
 
 
@@ -349,7 +345,7 @@ export default class StaticLayout extends React.Component {
     this.setState({adjustRate : magnitude })
   }
 
-  buildingSelection(){
+  floorSelection(){
     if(this.state.overlayOpen2){
       NativeModules.DomOverlayModule.closeOverlay2();
     }
@@ -369,8 +365,8 @@ export default class StaticLayout extends React.Component {
     const photoData = (locationId && data.photos[locationId]) || null;
     let notes = (photoData && photoData.notes) || null;
     let gNotes = (photoData && photoData.gNotes) || null;
-    let {currentFloor, currentBuilding, buildings} = this.props.location;
-    let BU = JSON.parse(JSON.stringify(buildings));
+    let {currentFloor, floors} = this.props.location;
+    let FL = JSON.parse(JSON.stringify(floors));
     if(type == "Text"){
       NativeModules.DomOverlayModule.closeOverlay1();
       NativeModules.DomOverlayModule.openOverlay1(notes[index].text, notes[index].title, "Both", gNotes);
@@ -381,19 +377,19 @@ export default class StaticLayout extends React.Component {
     }
     if(type == "Select"){
       NativeModules.DomOverlayModule.closeOverlay2();
-      NativeModules.DomOverlayModule.openOverlay2(locationId, currentFloor, currentBuilding, BU);
+      NativeModules.DomOverlayModule.openOverlay2(locationId, currentFloor, FL);
     }
   }
 
-  selectAll(obj){
-    let {currentBuilding, currentFloor} = this.props.location;
+  selectFloorRoom(obj){
+    let {currentFloor} = this.props.location;
     let {locationId, data} = this.props.photo;
-    if(obj.building == currentBuilding && obj.floor == currentFloor && obj.room == locationId){
+    if(obj.floor == currentFloor && obj.room == locationId){
       console.log("Already here.");
     }
     else{
-      this.props.selectAll(obj);
-      let roomData = this.props.location.buildings[obj.building].floors[obj.floor];
+      this.props.selectFloor(obj.floor);
+      let roomData = this.props.location.floors[obj.floor];
       let rdp = Object.keys(roomData.photos);
       if(!rdp.includes(obj.room)){
         obj.room = rdp[0];
@@ -416,13 +412,11 @@ export default class StaticLayout extends React.Component {
 
   goHome(){
     let {data} = this.props.photo;
-    let bLocs = Object.keys(this.props.location.buildings);
-    building = bLocs[0];
-    let fLocs = Object.keys(this.props.location.buildings[bLocs[0]].floors);
+    let fLocs = Object.keys(this.props.location.floors);
     floor = fLocs[0];
-    let rLocs = Object.keys(this.props.location.buildings[bLocs[0]].floors[fLocs[0]].photos);
+    let rLocs = Object.keys(this.props.location.floors[fLocs[0]].photos);
     room = rLocs[0];
-    this.selectAll({building, floor, room});
+    this.selectFloorRoom({floor, room});
     //this.props.changeNextLocationId(locs[0]);
     this.setState({displayNotes: false})
     NativeModules.DomOverlayModule.closeOverlay1();
@@ -438,7 +432,24 @@ export default class StaticLayout extends React.Component {
     // NativeModules.DomOverlayModule.closeOverlay2();
   }
 
+  save(){
+    var url = this.props.jsonPath;
+    var data = this.props.json;
+
+    fetch(url, {
+      method: 'POST', // or 'PUT'
+      body: JSON.stringify(data),
+      headers: new Headers({
+        'Content-Type': 'application/json'
+      })
+    }).then(res => res.json())
+    .catch(error => console.error('Error:', error))
+    .then(response => console.log('Success:', response));
+
+  }
+
   test(){
+
   }
 
   render() {
@@ -477,7 +488,11 @@ export default class StaticLayout extends React.Component {
         <VrButton style={styles.menuButton} onClick={ () => this.openOverlay(-1, "General")}>
                <Text style={styles.menuText}>Room Notes</Text>
         </VrButton>
+
 {/*
+        <VrButton style={styles.menuButton} onClick={this.save}>
+               <Text style={styles.menuText}>Save</Text>
+        </VrButton>
         <VrButton style={styles.menuButton} onClick={this.test}>
                <Text style={styles.menuText}>Log It</Text>
         </VrButton>
@@ -500,7 +515,7 @@ export default class StaticLayout extends React.Component {
         </VrButton>
       </View>
       {!this.state.overlayOpen2 &&
-      <VrButton style={styles.selection} onClick={this.buildingSelection}>
+      <VrButton style={styles.selection} onClick={this.floorSelection}>
         <Image style={styles.selectionImage} source={asset('expand_arrow.png')}></Image>
       </VrButton>
       }

@@ -23,12 +23,11 @@ const MAX_TEXTURE_HEIGHT = 720;
 const MAX_TEXTURE_WIDTH = 4096;
 const PPM = 1 / (2 * Math.PI * 3) * MAX_TEXTURE_WIDTH;
 const degreesToPixels = degrees => -(degrees / 360) * MAX_TEXTURE_WIDTH;
+let fullJSON;
+// let jsonPath = 'dummy.json';
+let jsonPath = 'http://localhost:5001/dummy';
 
 class VRLayout extends React.Component{
-  static defaultProps = {
-    tourSource: 'PhotoAssets.json',
-    // TODO: change this to a http get call to '/dummy'
-  };
 
   constructor(props){
     super(props);
@@ -48,7 +47,9 @@ class VRLayout extends React.Component{
 
   componentDidMount() {
     // Gets the json file, and later initiallizes the component
-    fetch(asset(this.props.tourSource).uri)
+    //asset(this.props.jsonPath).uri
+    // this.props.jsonPath
+    fetch(this.props.jsonPath)
       .then(response => response.json())
       .then(responseData => {
         this.init(responseData);
@@ -57,9 +58,9 @@ class VRLayout extends React.Component{
   }
 
   componentWillUpdate(nextProps, nextState){
-    if(nextProps.location.buildings && this.props.location.buildings !== nextProps.location.buildings){
-      let {currentBuilding, currentFloor} = nextProps.location;
-      let roomData = nextProps.location.buildings[currentBuilding].floors[currentFloor];
+    if(nextProps.location.floors && this.props.location.floors !== nextProps.location.floors){
+      let {currentFloor} = nextProps.location;
+      let roomData = nextProps.location.floors[currentFloor];
 
       this.props.updatePhoto({
         zoomZ: 0,
@@ -73,22 +74,18 @@ class VRLayout extends React.Component{
   }
 
   init(roomConfig) {
+    fullJSON = roomConfig;
     let {currentFloor} = this.props.location;
-    let locs = Object.keys(roomConfig.buildings);
-    let currentBuilding = locs[0];
 
-
-    this.props.initBuildings({
-      buildings: roomConfig.buildings,
-      floors: roomConfig.buildings[currentBuilding].floors,
-      rooms: roomConfig.buildings[currentBuilding].floors[currentFloor].photos,
+    this.props.initFloors({
+      floors: roomConfig.floors,
+      rooms: roomConfig.floors[currentFloor].photos,
     })
-    //console.log(roomConfig.buildings);
   }
 
   render(){
     // map short names to state values that will be used.
-    let {zoomZ, locationId, nextLocationId, data} = this.props.photo;
+    let {locationId, nextLocationId, data} = this.props.photo;
     let rot = this.props.photo.rotation;
     let trans = this.props.photo.translation;
 
@@ -177,6 +174,8 @@ const mapStateToProps = state => ({
   // photo props
   photo: state.photo,
   location: state.location,
+  json: fullJSON,
+  jsonPath: jsonPath
 });
 
 //in "mapDispatchToProps", map names to use functions returned from action
@@ -195,10 +194,8 @@ const mapDispatchToProps = dispatch => ({
   changeLocationId: (locationId) => dispatch(photo.changeLocationId(locationId)),
   changeNextLocationId: (locationId) => dispatch(photo.changeNextLocationId(locationId)),
 
-  initBuildings: (obj) => dispatch(location.initBuildings(obj)),
-  selectAll: (obj) => dispatch(location.selectAll(obj)),
+  initFloors: (obj) => dispatch(location.initFloors(obj)),
   selectFloor: (floor) => dispatch(location.selectFloor(floor)),
-  selectBuilding: (building) => dispatch(location.selectBuilding(building)),
 });
 
 //This sends the variables and functions to be referenced as "this.props"

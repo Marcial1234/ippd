@@ -22,6 +22,10 @@ class CameraModule extends Module {
   _setRNContext(rnctx) {
       this.rnContext = rnctx;
     }
+
+    viewStuff(){
+      console.log(window);
+    }
 }
 
 function init(bundle, parent, options) {
