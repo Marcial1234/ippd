@@ -6,8 +6,8 @@
 ## Installation
 - Clone/Download
 - Browse to 'motherload'
-- run 'npm run first install' (this may take several minutes)
-- run npm start - opens on [localhost port 5001 /vr](http://localhost:5001/vr)
+- run `npm run first install` - this may take several minutes
+- run `npm start`. It'll open on [localhost port 5001 /vr](http://localhost:5001/vr)
 
 <!-- ## Installation
 - Clone/Download
