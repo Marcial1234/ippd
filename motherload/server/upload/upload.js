@@ -120,9 +120,9 @@ function processAndUploadImage(image) {
 function pushToCloud(image) {
   cloudinary.v2.uploader.upload(image.panoPath, 
     {
-      resource_type: "image",
+      overwrite: true,
       public_id: image.id,
-      overwrite: true
+      resource_type: "image",
     },
     function(error, result) {
       console.log(result);

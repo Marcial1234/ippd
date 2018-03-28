@@ -63,8 +63,8 @@ function init(bundle, parent, options) {
     // Any custom behavior you want to perform on each frame goes here
   };
   // Begin the animation loop
-  //Adds a camera and attaches the "Menu" component to it
-  //This is for Stationary ReactVR
+  // Adds a camera and attaches the "Menu" component to it
+  // This is for Stationary ReactVR
   vr.scene.add(vr.camera());
   // console.log(vr.rootView.context);
   vr.mountComponent('StaticLayout', {},  vr.camera());
@@ -76,12 +76,10 @@ function init(bundle, parent, options) {
 
   // #####
   // START of zoom code
-  // #####
   window.playerCamera = vr.player._camera;
   window.vr = vr;
   window.ondblclick = onRendererDoubleClick;
   window.onmousewheel = onRendererMouseWheel;
-  // don't need this??? says 'worker' is undef .. but won't work without it
   vr.rootView.context.worker.addEventListener('message', onVRMessage);
   // RCTDeviceEventEmitter.addListener('testIt', () => {
   //   console.log("VR:", vr.player.overlay.compass);

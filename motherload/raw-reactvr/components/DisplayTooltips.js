@@ -1,11 +1,6 @@
 import React from 'react';
 import {Text, View, VrButton, NativeModules, asset} from 'react-vr';
 
-// bug...
-// not being used... ?
-import styles from '../static_assets/styles'
-// if you're gonna use it, you're gonna have fun moving around more files... just hardcode it
-
 import NavButton from './NavButton';
 import InfoButton from './InfoButton';
 import LoadingSpinner from './LoadingSpinner';

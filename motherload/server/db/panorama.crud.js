@@ -3,7 +3,6 @@ mongoose.Promise = global.Promise;
 var Panorama = require('./panorama.model.js') ;
 var exec = require('child_process').exec;
 
-
 //----------------------------------------------------------------------
 // CRUD functionality for the 360 images. Everything is based on DB ID
 //----------------------------------------------------------------------
@@ -64,16 +63,28 @@ module.exports = {
   
   // Middleware
   panoramaByID: function(req, res, next, id) {
-    Panorama.findById(id).exec(function(err, pano) {
-      if (err) {
-        console.log(err) ;
-        res.status(400).send(err) ;
-      }
-      else {
-        req.pano = pano;
-        next() ;
-      }
-    });
+
+    if (id < 2) {
+      req.pano = id;
+      next();
+    }
+    else {
+      req.err = "dale";
+      next();
+    }
+    
+    // Panorama.findById(id).exec(function(err, pano) {
+    //   if (err) {
+    //     console.log(err);
+    //     req.pano = {err: "dale"};
+    //     // res.status(400).send(err) ;
+    //     next();
+    //   }
+    //   else {
+    //     req.pano = pano;
+    //     next();
+    //   }
+    // });
   }
 
 };

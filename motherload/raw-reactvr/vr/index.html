@@ -10,11 +10,23 @@
     <!-- When you're ready to deploy your app, update this line to point to your compiled client.bundle.js -->
     <script src="./client.bundle?platform=vr"></script>
     <script>
+
+      // // gets the url?key=values
+      // function getQueryStringValue (key) {  
+      //   return decodeURIComponent(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + encodeURIComponent(key).replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));  
+      // }
+
+      // let query = getQueryStringValue("room");
+      // if (!query) {
+      //   query = "0";
+      // }
+
       // Initialize the React VR application
       ReactVR.init(
         // When you're ready to deploy your app, update this line to point to
         // your compiled index.bundle.js
-        '../index.vr.bundle?platform=vr&dev=true',
+        '../index.vr.bundle?platform=vr&dev=true&room=0',
+        // '../index.vr.bundle?platform=vr&dev=true',
         // Attach it to the body tag
         document.body
         // document.getElementById("reactvr")

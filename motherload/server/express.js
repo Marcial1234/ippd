@@ -6,8 +6,9 @@ var bodyParser = require("body-parser");
 var fileUpload = require("express-fileupload");
 
 // Created modules
-var dummy = require("./dummy.js");
-var uploadFiles = require("./upload/upload.js");
+var dummy = require("./dummy");
+var panos = require("./vr_routes");
+var uploadFiles = require("./upload/upload");
 
 module.exports.init = function() {
 
@@ -31,6 +32,16 @@ module.exports.init = function() {
 
   // serve static files
   app.use("/", express.static(__dirname + "/../client"));
+
+  // THIS WAS A BLOCKING ISSUE, mutual dev on two ports available after ~
+  // I think Alex might have had this earlier ~ or not
+  // OMIT IN PRODUCTION
+  // TODO: figure out the node env var to do this automatically...
+  app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+  });
 
   // TODO soon: move to express router ~
 
@@ -58,11 +69,16 @@ module.exports.init = function() {
     res.render("production", {});
   });
 
+  app.use("/search", panos);
+
+  // // ReactVR Routing
+  // app.use("/test", function(req, res) {
+  //   res.render(".\\raw-reactvr\\vr\\index", {});
+  // });
 
   app.get("/dummy", function(req, res) {
     res.json(dummy.buildings.IPPD);
   });
-
 
   // Wildcard for everything else
   app.use("/*", function(req, res) {

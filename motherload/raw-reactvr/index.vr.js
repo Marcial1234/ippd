@@ -19,13 +19,33 @@ import InfoButton from './components/InfoButton';
 import LoadingSpinner from './components/LoadingSpinner';
 import DisplayTooltips from './components/DisplayTooltips';
 
+let fullJSON, jsonPath, url, query;
 const MAX_TEXTURE_HEIGHT = 720;
 const MAX_TEXTURE_WIDTH = 4096;
 const PPM = 1 / (2 * Math.PI * 3) * MAX_TEXTURE_WIDTH;
 const degreesToPixels = degrees => -(degrees / 360) * MAX_TEXTURE_WIDTH;
-let fullJSON;
-// let jsonPath = 'dummy.json';
-let jsonPath = 'http://localhost:5001/dummy';
+
+// TODO: clean this??
+
+if (window.process.env.NODE_ENV === "production") {
+  url = "http://" + window.location.href.split("/").slice(2, 3).join("/");
+}
+else {
+  url = "http://localhost:5001";
+}
+
+// ATTEMPTS TO get the url?key=values
+function getQueryStringValue (key) {  
+  return decodeURIComponent(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + encodeURIComponent(key).replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));  
+}
+
+// add a server side fault... 404 or something
+query = getQueryStringValue("room");
+if (!query) {
+  query = "0";
+}
+jsonPath = url + "/search/" + query;
+console.log(jsonPath);
 
 class VRLayout extends React.Component{
 
@@ -46,19 +66,24 @@ class VRLayout extends React.Component{
   }
 
   componentDidMount() {
-    // Gets the json file, and later initiallizes the component
-    //asset(this.props.jsonPath).uri
-    // this.props.jsonPath
+    // Gets the JSON data, and later initiallize component
+    // This "fetch" works as a GET request
+
+    console.log(this.props.jsonPath);
+    console.log(this.props.jsonPath);
+    console.log(this.props.jsonPath);
+
     fetch(this.props.jsonPath)
       .then(response => response.json())
       .then(responseData => {
         this.init(responseData);
       })
       .done();
+    //asset(this.props.jsonPath).uri
   }
 
   componentWillUpdate(nextProps, nextState){
-    if(nextProps.location.floors && this.props.location.floors !== nextProps.location.floors){
+    if (nextProps.location.floors && this.props.location.floors !== nextProps.location.floors){
       let {currentFloor} = nextProps.location;
       let roomData = nextProps.location.floors[currentFloor];
 
@@ -172,10 +197,10 @@ const mapStateToProps = state => ({
   VRTextBox: state.mode.VRTextBox,
   StaticTextBox: state.mode.StaticTextBox,
   // photo props
-  photo: state.photo,
-  location: state.location,
   json: fullJSON,
-  jsonPath: jsonPath
+  photo: state.photo,
+  jsonPath: jsonPath,
+  location: state.location,
 });
 
 //in "mapDispatchToProps", map names to use functions returned from action
@@ -194,6 +219,7 @@ const mapDispatchToProps = dispatch => ({
   changeLocationId: (locationId) => dispatch(photo.changeLocationId(locationId)),
   changeNextLocationId: (locationId) => dispatch(photo.changeNextLocationId(locationId)),
 
+  // any difference between these 2 groups?
   initFloors: (obj) => dispatch(location.initFloors(obj)),
   selectFloor: (floor) => dispatch(location.selectFloor(floor)),
 });
