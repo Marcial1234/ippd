@@ -28,7 +28,26 @@ class CameraModule extends Module {
     }
 }
 
+// Gets the url?key=values
+function getQueryStringValue (key) {  
+  return decodeURIComponent(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + encodeURIComponent(key).replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));  
+}
+
 function init(bundle, parent, options) {
+
+  // Grabbing url query to search for a specific building
+  // add a server side fault... 404 or something
+  let query = getQueryStringValue("building");
+  if (!query) {
+    query = "0";
+  }
+  jsonPath = "/search/" + query;
+
+  // gets the url?key=values
+  console.log("query", jsonPath);
+  console.log("query", jsonPath);
+  console.log("query", jsonPath);
+
 
   //create div from overlay
   const domOverlayContainer1 = document.createElement('div');
@@ -38,6 +57,7 @@ function init(bundle, parent, options) {
   //create instance of module
   const domOverlayModule = new DomOverlayModule(domOverlayContainer1, domOverlayContainer2);
   const cameraModule = new CameraModule();
+
   // let element = this.props.doc.body.children[2].children[0].children[2].children[0];
   // element.style.transform = "";
   // setTimeout(function() {this.toggleNotes()}.bind(this), 10000);
@@ -45,6 +65,11 @@ function init(bundle, parent, options) {
     // Add custom options here
     hideFullscreen: true, //hides the button
     ...options,
+
+    // HOW?????
+    testjsonPath: jsonPath,
+
+    
     //register dom overlay
     nativeModules: [domOverlayModule, cameraModule],
   });

@@ -19,40 +19,48 @@ import InfoButton from './components/InfoButton';
 import LoadingSpinner from './components/LoadingSpinner';
 import DisplayTooltips from './components/DisplayTooltips';
 
-let fullJSON, jsonPath, url, query;
+let fullJSON, jsonPath, url;
 const MAX_TEXTURE_HEIGHT = 720;
 const MAX_TEXTURE_WIDTH = 4096;
 const PPM = 1 / (2 * Math.PI * 3) * MAX_TEXTURE_WIDTH;
 const degreesToPixels = degrees => -(degrees / 360) * MAX_TEXTURE_WIDTH;
 
-// TODO: clean this??
+// TODOs: 
+// Get 'jsonPath' that is passed to 'VRInstance' in 'client.js', and attach it here/constructor
+// dummy for now ~
+jsonPath = "http://localhost:5001/search/1";
 
-if (window.process.env.NODE_ENV === "production") {
-  url = "http://" + window.location.href.split("/").slice(2, 3).join("/");
-}
-else {
-  url = "http://localhost:5001";
-}
+// UI changes:
+// Save button on the "toggle" menus that will trigger backend PUTs for positions
+// trigger backend PUTs on "Submit" on notes (including room notes)
+// trigger backend DELETE on "Delete" buttons click
+// format of the requests:
+//    /edit/[building id]/[floor]/, {note obj}
+//    /delete/[building id]/[floor]/[index]
+// navigation endpoint:
+//    /editNavs/[building id]/[floor]/, [new rotationY int]
 
-// ATTEMPTS TO get the url?key=values
-function getQueryStringValue (key) {  
-  return decodeURIComponent(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + encodeURIComponent(key).replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));  
-}
-
-// add a server side fault... 404 or something
-query = getQueryStringValue("room");
-if (!query) {
-  query = "0";
-}
-jsonPath = url + "/search/" + query;
-console.log(jsonPath);
 
 class VRLayout extends React.Component{
 
   constructor(props){
+    // console.log(props);
+    // jsonPath = this.formatSearchQuery(props.jsonPath);
+
     super(props);
     this.handleMove = this.handleMove.bind(this);
     this.handleInput = this.handleInput.bind(this);
+  }
+
+  formatSearchQuery(query){
+    if (window.process.env.NODE_ENV === "production") {
+      url = "http://" + window.location.host;
+    }
+    else {
+      url = "http://localhost:5001";
+    }
+
+    return url + query;
   }
 
   handleMove(e){
@@ -199,7 +207,7 @@ const mapStateToProps = state => ({
   // photo props
   json: fullJSON,
   photo: state.photo,
-  jsonPath: jsonPath,
+  jsonPath: VRLayout.formatSearchQuery(state.jsonPath),
   location: state.location,
 });
 
