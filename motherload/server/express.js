@@ -82,7 +82,8 @@ module.exports.init = function() {
 
   // Wildcard for everything else
   app.use("/*", function(req, res) {
-    res.redirect("/vr");
+    res.render("index", {});
+    // res.redirect("/vr");
   });
 
   return app;
