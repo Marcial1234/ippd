@@ -10,8 +10,11 @@ function waitForEnvironmentVariables(count) {
   // we need this else the ".env" is worthless
   
   // if (process.env.CLOUD_MONGODB_URI)
-  if (process.env.LOCAL_MONGODB_URI)
-    startServer();
+  if (process.env.LOCAL_MONGODB_URI) {
+    var upload_base_tooltips = require('./JSONtoMongo.js').upload_base_tooltips;
+    upload_base_tooltips();
+    // startServer();
+  }
   else {
     // console.log("loading...", count);
     // Recurses ~1100 times... wow
