@@ -88,7 +88,6 @@ The `master` branch should be kept CLEAN, and with a working code. Make branches
       - from there we can define go-to commands ~
 
 - Frontend
-  + What's the deal with Teresa's 2D stuff??
   + Search View
     * // Only needed if the building search bar is too hard/ugly/inconvinient in ReactVR
 
