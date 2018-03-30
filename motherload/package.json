@@ -1,0 +1,32 @@
+{
+  "main": "server.js",
+  "author": "Marcial Abrahantes",
+  "scripts": {
+    "first-install": "npm install -g gulp && npm run build",
+    "build": "npm install && npm run build-vr",
+    "get-vr": "cd raw-reactvr && npm run move-vr",
+    "build-vr": "cd raw-reactvr && npm run build-vr",
+    "update-vr": "cd raw-reactvr && npm run prod-vr",
+    "start": "cls && gulp",
+    "test": "python test.py"
+  },
+  "dependencies": {
+    "body-parser": "1.18.1",
+    "browser-sync": "2.18.13",
+    "clear": "0.0.1",
+    "cloudinary": "1.11.0",
+    "dotenv": "4.0.0",
+    "ejs": "2.5.6",
+    "express": "4.15.2",
+    "express-fileupload": "0.4.0",
+    "gulp": "3.9.1",
+    "gulp-nodemon": "2.2.1",
+    "mongoose": "4.12.3",
+    "morgan": "1.8.2"
+  },
+  "devDependencies": {
+    "should": "13.1.2",
+    "request": "^2.81.0",
+    "tape": "^4.7.0"
+  }
+}

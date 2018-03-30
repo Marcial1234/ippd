@@ -1,0 +1,22 @@
+# MEANjs
+meanjs/*
+
+
+# The Following were imported from the MEANjs .gitignore
+# ===========
+# Apple OS
+# ===========
+.DS_Store
+ehthumbs.db
+Thumbs.db
+
+# Node and related ecosystem
+# ==========================
+.nodemonignore
+.sass-cache/
+node_modules/
+public/lib/
+app/tests/coverage/
+.bower-*/
+.idea/
+coverage/
