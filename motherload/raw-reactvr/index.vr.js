@@ -74,13 +74,12 @@ class VRLayout extends React.Component{
   }
 
   componentDidMount() {
+    console.log(this.props.jsonPath);
+    console.log(this.props.jsonPath);
+    console.log(this.props.jsonPath);
+
     // Gets the JSON data, and later initiallize component
     // This "fetch" works as a GET request
-
-    console.log(this.props.jsonPath);
-    console.log(this.props.jsonPath);
-    console.log(this.props.jsonPath);
-
     fetch(this.props.jsonPath)
       .then(response => response.json())
       .then(responseData => {
@@ -207,7 +206,7 @@ const mapStateToProps = state => ({
   // photo props
   json: fullJSON,
   photo: state.photo,
-  jsonPath: VRLayout.formatSearchQuery(state.jsonPath),
+  jsonPath: jsonPath,
   location: state.location,
 });
 
