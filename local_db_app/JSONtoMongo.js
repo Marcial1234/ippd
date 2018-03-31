@@ -1,13 +1,13 @@
 
 // save a json file into a DB ~ modify at will 
-// run within npm/app for DB link
+// run as 'node [file_name]'
 
 var fs = require('fs');
 var mongoose = require('mongoose');
 var entries = require('./server/db/base_tooltips.js');
 
 // Models
-var Room = require('./server/db/rooms.model.js');
+var Floor = require('./server/db/floors.model.js');
 var Building = require('./server/db/buildings.model.js');
 
 mongoose.Promise = global.Promise;
@@ -18,41 +18,49 @@ mongoose.connect(process.env.CLOUD_MONGODB_URI, { useMongoClient: true });
 module.exports.upload_base_tooltips = function() {
 
   // hardcoding buildings ~
-  // new Building({
-  //   name :  "Library",
-  //   city :  "Tucson",
-  //   state:  "AZ",
-  //   num_floors:  1,
-  // }).save();
+  var a = new Building({
+    name :  "Library",
+    city :  "Tucson",
+    state:  "AZ",
+    num_floors:  1,
+  })
 
-  // new Building({
-  //   name :  "IPPD",
-  //   city :  "Gainesville",
-  //   state:  "FL",
-  //   num_floors:  1,
-  // }).save();
+  var b = new Building({
+    name :  "IPPD",
+    city :  "Gainesville",
+    state:  "FL",
+    num_floors:  1,
+  })
+  a.save();
+  b.save();
 
   // went to cloud db and got this ~
-  blds_refs = ["5abdbf848ab18c28d497c25e", "5abdbf848ab18c28d497c25f"];
-  var entry;
+  blds_refs = [a._id, b._id];
+  var entry, data, size, next;
 
   for (var i = 0; i < entries.length; i++) {
       // odd way of indexing.. but works vs json file
       entry = entries[i];
-
-      for (dale in entry.photos) {
-          console.log(dale);
-          console.log(entry.photos[dale]);
-      }
-
-      // console.log(entry, blds_refs[i]);
-      // console.log(entry["firstPhotoId"], blds_refs[i]);
       
-      // new Room({
-      //     uri: entry.uri,
-      //     y_rotation_offset: entry.rotationOffset,
-      //     tooltips: entry.tooltips,
-      //     adjacent_rooms: entry.adjacent_rooms,
-      // }).save();
+      var newFloor = new Floor({
+        room_parent: blds_refs[i],
+        firstPhotoId: parseInt(entry["firstPhotoId"]) - 1,
+      });
+
+      // full 'deep' copy of photos obj
+      var photos = [];
+      for (dale in entry.photos) {
+        data = JSON.parse(JSON.stringify(entry.photos[dale]))
+        photos.push(data);
+        size = photos.length - 1;
+
+        // correct 'linkedPhotoId' type reassignment
+        for (var j = 0; j < photos[size].navs.length; j++) {
+          next = photos[size].navs[j].linkedPhotoId;
+          photos[size].navs[j].linkedPhotoId = parseInt(next) - 1;
+        }
+      }
+      newFloor.photos = photos;
+      newFloor.save();
   }
 }

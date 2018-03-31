@@ -15,9 +15,9 @@ var BuildingSchema = new mongoose.Schema({
   //   "rooms": "ref",
   // }
 
-  city:   {type: String, required: true},
-  name:   {type: String, required: true},
-  state:  {type: String, required: true},
+  city:        {type: String, required: true},
+  name:        {type: String, required: true},
+  state:       {type: String, required: true},
   num_floors:  {type: Number, required: true},
   
   // will be auto population from State
@@ -26,7 +26,7 @@ var BuildingSchema = new mongoose.Schema({
   // 'rooms' array, ie floors
   floors: [{
     number: Number,
-    hash  : {
+    hash: {
       ref : "Rooms",
       type: mongoose.Schema.Types.ObjectId,
     },
@@ -35,6 +35,8 @@ var BuildingSchema = new mongoose.Schema({
 
 BuildingSchema.pre("save", function(next) {
   // Pre-save processing ~
+
+  // no need for the if really, but w/e ~
   if (!this.long_state)
     this.long_state = us_states_abbvs_to_long_name[this.state];
 

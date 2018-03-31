@@ -3,13 +3,14 @@ mongoose.Promise = global.Promise;
 
 // bldg => floor => rooms
 var FloorSchema = new mongoose.Schema({
+  // add 'default' keyword? for null responses ~
 
   "room_parent": {
     ref: "Buildings",
     type: mongoose.Schema.Types.ObjectId,
   },
   // entry point, and it's more like index
-  "firstPhotoId": String,
+  "firstPhotoId": Number,
 
   // NOTICE the change from object to array ~
   "photos": [{
@@ -19,12 +20,13 @@ var FloorSchema = new mongoose.Schema({
         {
           "text": String,
           "rotationY": Number,
-          "linkedPhotoId": String,
+          "linkedPhotoId": Number,
         },
       ],
       "notes": [
         {
-          "type": String,
+          // changed this from 'type', due to reserved keyword
+          "Type": String,
           "text": String,
           "title": String,
           "width": Number,
@@ -38,14 +40,6 @@ var FloorSchema = new mongoose.Schema({
       ],
     }
   ],
-
-  // rooms: [{
-  //   floor: Number
-  //   hash : {
-  //     ref: 'Room',
-  //     type: mongoose.Schema.Types.ObjectId,
-  //   },
-  // }],
 
 });
 

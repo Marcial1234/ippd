@@ -27,7 +27,7 @@ module.exports = [
                     "linkedPhotoId": "000003"
                 }],
                 "notes": [{
-                    "type": "textblock",
+                    "Type": "textblock",
                     "title": "Lockers",
                     "text": "Full of Things",
                     "attribution": "Photo Credit to: Scott",
@@ -37,7 +37,7 @@ module.exports = [
                     "height": 1.5,
                     "selected": false
                 }, {
-                    "type": "textblock",
+                    "Type": "textblock",
                     "title": "Chris",
                     "text": "Full of knowledge",
                     "attribution": "Photo Credit to: Scott",
@@ -64,7 +64,7 @@ module.exports = [
 
                 ],
                 "notes": [{
-                    "type": "textblock",
+                    "Type": "textblock",
                     "title": "Lockers",
                     "text": "Full of Things",
                     "attribution": "Photo Credit to: Scott",
@@ -74,7 +74,7 @@ module.exports = [
                     "height": 1.5,
                     "selected": false
                 }, {
-                    "type": "textblock",
+                    "Type": "textblock",
                     "title": "Scott",
                     "text": "Photographer",
                     "attribution": "Photo Credit to: Scott",
@@ -99,7 +99,7 @@ module.exports = [
                     "linkedPhotoId": "000003"
                 }],
                 "notes": [{
-                    "type": "textblock",
+                    "Type": "textblock",
                     "title": "Lockers",
                     "text": "Full of Things",
                     "attribution": "Photo Credit to: Scott",
@@ -108,7 +108,7 @@ module.exports = [
                     "width": 1.3,
                     "height": 1.5
                 }, {
-                    "type": "textblock",
+                    "Type": "textblock",
                     "title": "Chris",
                     "text": "Creep",
                     "attribution": "Photo Credit to: Scott",

@@ -75,4 +75,4 @@ mongod
 *.sln
 
 # Sensitive Config Files
-*.env
+# *.env
