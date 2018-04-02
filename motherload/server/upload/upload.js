@@ -86,7 +86,7 @@ function processAndUploadImage(image) {
   var script_path = dirname + STICHING_SCRIPT_PATH;
   var cmd = [
     script_path + WIN_SCRIPT_NAME, image.path, "-o", upload_dir,
-    // HOW THE HELL TO DELETE/OVERRIDE?? I WORKED BEFORE...
+    // HOW THE HELL TO DELETE/OVERRIDE?? IT WORKED BEFORE...
   ].join(" ");
 
   // console.log(cmd);

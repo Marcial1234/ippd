@@ -5,10 +5,17 @@ var cloudinary = require("cloudinary");
 var bodyParser = require("body-parser");
 var fileUpload = require("express-fileupload");
 
+// var uploadFiles = require("./upload/upload");
+
 // Created modules
-var dummy = require("./dummy");
-var panos = require("./vr_routes");
-var uploadFiles = require("./upload/upload");
+var vr_api = require("./vr_routes");
+var upload_api = require("./upload_routes");
+
+// original dummy code
+// var dummy = require("./dummy");
+// app.get("/dummy", function(req, res) {
+//   res.json(dummy.buildings.IPPD);
+// });
 
 module.exports.init = function() {
 
@@ -18,17 +25,16 @@ module.exports.init = function() {
   // initialize app
   var app = express();
 
-  // enable request logging for development debugging
-  app.use(morgan("dev"));
-
   // middleware
   app.use(fileUpload());
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({extended: true}));
+  // enable request logging for development debugging
+  app.use(morgan("dev"));
 
   // views is directory for all template files
   app.set("views", __dirname + "/../client");
-  app.set("view engine", "ejs");
+  app.set("view engine", "ejs"); // NOTE THIS - *.html files will not render
 
   // serve static files
   app.use("/", express.static(__dirname + "/../client"));
@@ -37,52 +43,33 @@ module.exports.init = function() {
   // I think Alex might have had this earlier ~ or not
   // OMIT IN PRODUCTION
   // TODO: figure out the node env var to do this automatically...
-  app.use(function(req, res, next) {
+  app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     next();
   });
 
-  // TODO soon: move to express router ~
-
   // File uploading code+routing ~
-  app.get("/upload", function(req, res) {
-    res.render("upload", {});
-  });
-
-  app.post("/upload", function(req, res) {
-    if (!req.files)
-      return res.status(400).send("No files were sent.");
-
-    if (!uploadFiles(req.files.image, res, __dirname)) {
-      // TODO: change later ~
-      res.write("<h1>Uploaded </h1>"); 
-      res.write("<a href='/'>Back</a>");
-      res.end();
-    }
-    else
-      res.json({error: "no files attached"});
-  });
+  app.use("/upload", upload_api);
 
   // ReactVR Routing
-  app.use("/vr", function(req, res) {
+  app.use("/vr", (req, res) => {
     res.render("production", {});
   });
 
-  app.use("/search", panos);
+  app.use("/api", vr_api);
 
-  // // ReactVR Routing
-  // app.use("/test", function(req, res) {
+  // useful for rendering .ejs files in sub-directories
+  // app.use("/test", (req, res) => {
   //   res.render(".\\raw-reactvr\\vr\\index", {});
   // });
 
-  app.get("/dummy", function(req, res) {
-    res.json(dummy.buildings.IPPD);
-  });
+  // TODO: add random f(x)nality of sending state mappings
 
   // Wildcard for everything else
-  app.use("/*", function(req, res) {
-    res.redirect("/vr");
+  app.use("/*", (req, res) => {
+    res.render("index", {});
+    // res.redirect("/vr");
   });
 
   return app;

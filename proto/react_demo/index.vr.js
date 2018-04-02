@@ -100,8 +100,8 @@ class TourSample extends React.Component {
   }
 
   render() {
-    console.log(this.props);
-    console.log(this.state);
+    console.log(this);
+    // console.log(this.state);
 
     if (!this.state.data) {
       return null;
@@ -114,6 +114,7 @@ class TourSample extends React.Component {
     // just made these 'vars', cuz idk if const are worth it
     var tooltips = (photoData && photoData.tooltips) || null;
     var rotation = ((photoData && photoData.rotationOffset) || 0);
+    var adjacent_rooms = (photoData && photoData.adjacent_rooms) || null;
 
     return (
       <View
@@ -150,6 +151,7 @@ class TourSample extends React.Component {
           source={asset(this.state.data.photos[this.state.nextLocationId].uri)}
         />
 
+        {/* this is what we interact with, not with the Pano */}
         <CylindricalPanel
           layer={{
             width: MAX_TEXTURE_WIDTH,
@@ -180,7 +182,53 @@ class TourSample extends React.Component {
                 // console.log(tooltips);
             */}
 
+            {/* Moves right */}
+            <NavButton
+              onInput={() => {
+                // tooltips[tooltips.length-1].rotationY -= 10;
+                adjacent_rooms[0].rotationY -= 10;
+                console.log(adjacent_rooms);
+                // gotta do this for effects ~
+                this.setState({
+                  rotZ: this.state.rotZ,
+                });
+
+              }}
+              source={asset(this.state.data.nav_icon)}
+              textLabel={"MoOoOve"}
+              pixelsPerMeter={PPM}
+
+              translateX={degreesToPixels(20)}
+              translateY={degreesToPixels(90)}
+            />
+
+          {/* New button */}
+            <NavButton
+              onInput={() => {
+                const temp = {...adjacent_rooms[adjacent_rooms.length-1]};
+                temp.rotationY = (temp.rotationY - 10);
+                // temp.rotationX = temp.rotationX ? (temp.rotationX - 10) : 10;
+
+                temp.linkedPhotoId += 200;
+                adjacent_rooms.push(temp);
+                console.log(adjacent_rooms);
+
+                // gotta do this for effects ~
+                this.setState({
+                  rotZ: this.state.rotZ,
+                });
+
+              }}
+              source={asset(this.state.data.nav_icon)}
+              textLabel={"New"}
+              pixelsPerMeter={PPM}
+
+              translateX={degreesToPixels(-25)}
+              translateY={degreesToPixels(10)}
+            />
+
             {/* this button bring the picture forward (increases base z axis) */}
+            {/*
             <NavButton
               onInput={() => {
                 this.setState({
@@ -189,10 +237,14 @@ class TourSample extends React.Component {
               }}
 
               source={asset(this.state.data.nav_icon)}
-              textLabel={"Zoom"}
+              textLabel={"Move forwards"}
               // This prop seems to be required, check the NavButton file for more
               pixelsPerMeter={PPM}
+
+              translateX={degreesToPixels(-15)}
+              translateY={degreesToPixels(50)}
             />
+            */}
 
           {/* Main Content View */}
             <View>
@@ -208,24 +260,21 @@ class TourSample extends React.Component {
 
               {tooltips &&
                 tooltips.map((tooltip, index) => {
-                  // Iterate through items related to this location, creating either:
-                  // - Nav buttons: change Pano source and tooltips associated it with them
-                  // - Info buttons: show tooltip on hover
-                  // P.S: idk what's the use of the key props ~
+                  return (
+                    <InfoButton
+                      // key={index}
+                      source={asset('info_icon.png')}
+                      tooltip={tooltip}
+                      pixelsPerMeter={PPM}
+                      translateX={degreesToPixels(tooltip.rotationY)}
+                      translateY={degreesToPixels(tooltip.translateX)}
+                    />
+                  );
 
-                  if (tooltip.type) {
-                    return (
-                      <InfoButton
-                        // key={index}
-                        source={asset('info_icon.png')}
-                        tooltip={tooltip}
-                        pixelsPerMeter={PPM}
-                        translateX={degreesToPixels(tooltip.rotationY)}
-                        translateY={degreesToPixels(tooltip.translateX)}
-                      />
-                    );
-                  }
+                })}
 
+              {adjacent_rooms &&
+                adjacent_rooms.map((tooltip, index) => {
                   return (
                     <NavButton
                       // key={tooltip.linkedPhotoId}
@@ -244,7 +293,8 @@ class TourSample extends React.Component {
                       translateX={degreesToPixels(tooltip.rotationY)}
                     />
                   );
-                })}
+              })}
+
             </View>
 
           </View>
