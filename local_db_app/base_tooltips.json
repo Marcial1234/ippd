@@ -1,9 +1,6 @@
 {
-  "nav_icon": "UpArrowNav.png",
-  "firstPhotoId":"112211",
-  "firstPhotoRotation": 0,
-  "photos": {
-    "112211": {
+  "entries": [
+    {
       "rotationOffset": 0,
       "uri": "JapanPano.jpg",
       "adjacent_rooms": [
@@ -16,7 +13,7 @@
       "tooltips": [
       ]
     },
-    "112234": {
+    {
       "rotationOffset": 40,
       "uri": "CISCO--v112234.jpg",
       "adjacent_rooms": [
@@ -48,7 +45,7 @@
         }
       ]
     },
-    "112235": {
+    {
       "rotationOffset": -50,
       "uri": "Genband--v112235.jpg",
       "adjacent_rooms": [
@@ -70,7 +67,7 @@
 
       ]
     },
-    "112236": {
+    {
       "rotationOffset": 40,
       "uri": "FIOS--v112236.JPG",
       "adjacent_rooms": [
@@ -92,7 +89,7 @@
         }
       ]
     },
-    "113344": {
+    {
       "rotationOffset": -130,
       "uri": "360_0025[1]_pano.jpg",
       "adjacent_rooms": [
@@ -130,7 +127,7 @@
         }
       ]
     },
-    "113355": {
+    {
       "rotationOffset": 110,
       "uri": "360_0026[1]_pano.jpg",
       "adjacent_rooms": [
@@ -168,7 +165,7 @@
         }
       ]
     },
-    "113366": {
+    {
       "rotationOffset": 40,
       "uri": "360_0028[1]_pano.jpg",
       "adjacent_rooms" : [
@@ -206,7 +203,7 @@
         }
       ]
     },
-    "112233": {
+    {
       "rotationOffset": 120,
       "uri": "Basement--v112233.jpg",
       "adjacent_rooms": [
@@ -237,5 +234,5 @@
         }
       ]
     }
-  }
+  ]
 }

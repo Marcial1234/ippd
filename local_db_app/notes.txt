@@ -1,0 +1,16 @@
+
+// Marcial: using MongoDB 3.4
+
+Creating a mongodump script that can be used locally to modify the notes ~
+
+Dumping changes (dumps in ./dump/db_name/ by default):
+    `mongodump --db somedb --collection somecollection`
+Upload objects: `mongostore` on the root directory of the `dump` folder
+
+# TODO:
+~ change the 'linkedPhotoId' to mongo id references...
+
+// get return value from npm command for port??
+
+// did mock mongoose schema
+// todo: move tooltips with 'linkedPhotoId' to another structure ~ cleans something?
