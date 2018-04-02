@@ -5,14 +5,15 @@
 var fs = require('fs');
 var mongoose = require('mongoose');
 var entries = require('./server/db/base_tooltips.js');
+mongoose.Promise = global.Promise;
 
 // Models
 var Floor = require('./server/db/floors.model.js');
 var Building = require('./server/db/buildings.model.js');
 
-mongoose.Promise = global.Promise;
+mongoose.connect(process.env.MONGO_URI, { useMongoClient: true });
 // mongoose.connect(process.env.LOCAL_MONGODB_URI, { useMongoClient: true });
-mongoose.connect(process.env.CLOUD_MONGODB_URI, { useMongoClient: true });
+// mongoose.connect(process.env.CLOUD_MONGODB_URI, { useMongoClient: true });
 
 // Instantiate a mongoose model for each object in the JSON file, and then save it
 module.exports.upload_base_tooltips = function() {

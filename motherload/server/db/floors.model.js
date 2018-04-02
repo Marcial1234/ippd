@@ -3,8 +3,7 @@ mongoose.Promise = global.Promise;
 
 // bldg => floor => rooms
 var FloorSchema = new mongoose.Schema({
-  // add 'default' keyword? for null responses ~
-
+  // is this a good name?
   "room_parent": {
     ref: "Buildings",
     type: mongoose.Schema.Types.ObjectId,

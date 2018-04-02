@@ -1,5 +1,5 @@
 module.exports = [
-    // ippd
+    // ippd, floor 1!
     {
         "firstPhotoId": "000001",
         "photos": {
@@ -122,7 +122,7 @@ module.exports = [
             }
         }
     },
-    // library
+    // library, floor 1!
     {
         "firstPhotoId": "000001",
         "photos": {

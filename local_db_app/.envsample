@@ -1,2 +1,0 @@
-LOCAL_MONGODB_URI='mongodb://localhost:27017/'
-CLOUD_MONGODB_URI='other_link_here'

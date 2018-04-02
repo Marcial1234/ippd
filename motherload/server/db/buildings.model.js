@@ -1,4 +1,4 @@
-var mongoose = require("mongoose") ;
+var mongoose = require("mongoose");
 mongoose.Promise = global.Promise;
 
 var us_states_abbvs_to_long_name = require("./state_abbv_mapping");
@@ -20,16 +20,16 @@ var BuildingSchema = new mongoose.Schema({
   state:       {type: String, required: true},
   num_floors:  {type: Number, required: true},
   
-  // will be auto population from State
+  // will be auto-populated
   long_state:  String,
 
-  // 'rooms' array, ie floors
   floors: [{
     number: Number,
     hash: {
       ref : "Rooms",
       type: mongoose.Schema.Types.ObjectId,
     },
+    // structure?? for map creation...
   }],
 });
 
@@ -46,8 +46,8 @@ BuildingSchema.pre("save", function(next) {
 });
 
 // Create model from schema
-var Bldg = mongoose.model("Buildings", BuildingSchema) ;
+var Bldg = mongoose.model("Buildings", BuildingSchema);
 // THIS CLEANS/FIXES SOME DB PROBLEMS
 // this.collection.dropIndexes();
 
-module.exports = Bldg ;
+module.exports = Bldg;
