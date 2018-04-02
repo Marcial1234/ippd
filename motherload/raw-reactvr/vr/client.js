@@ -36,18 +36,19 @@ function getQueryStringValue (key) {
 function init(bundle, parent, options) {
 
   // Grabbing url query to search for a specific building
-  // add a server side fault... 404 or something
-  let query = getQueryStringValue("building");
-  if (!query) {
-    query = "0";
-  }
-  jsonPath = "/search/" + query;
+  //  => url?key=values
+  let bldg = getQueryStringValue("building");
+  if (!bldg) bldg = "0";
 
-  // gets the url?key=values
-  console.log("query", jsonPath);
-  console.log("query", jsonPath);
-  console.log("query", jsonPath);
+  // let room = getQueryStringValue("room");
+  // if (!room) bldg = "0";
+  
+  // TODO: change construction of this to a "/" separated array join ~
+  jsonPath = "/search/" + bldg;
 
+  console.log("query", jsonPath);
+  console.log("query", jsonPath);
+  console.log("query", jsonPath);
 
   //create div from overlay
   const domOverlayContainer1 = document.createElement('div');
@@ -62,14 +63,13 @@ function init(bundle, parent, options) {
   // element.style.transform = "";
   // setTimeout(function() {this.toggleNotes()}.bind(this), 10000);
   const vr = new VRInstance(bundle, 'VRLayout', parent, {
-    // Add custom options here
-    hideFullscreen: true, //hides the button
+    // Add custom options here, still some work to be done... 
+    // when it renders it for a 2nd time it goes away...
+    initialProps: { jsonPath, },
+    
     ...options,
 
-    // HOW?????
-    testjsonPath: jsonPath,
-
-    
+    hideFullscreen: true, //hides the button
     //register dom overlay
     nativeModules: [domOverlayModule, cameraModule],
   });
@@ -99,8 +99,7 @@ function init(bundle, parent, options) {
   //This is how the overlay(React) can connect with ReactVR
   domOverlayModule._setRNContext(vr.rootView.context);
 
-  // #####
-  // START of zoom code
+  // zoom code
   window.playerCamera = vr.player._camera;
   window.vr = vr;
   window.ondblclick = onRendererDoubleClick;
@@ -109,6 +108,7 @@ function init(bundle, parent, options) {
   // RCTDeviceEventEmitter.addListener('testIt', () => {
   //   console.log("VR:", vr.player.overlay.compass);
   // });
+
   return vr;
 }
 
