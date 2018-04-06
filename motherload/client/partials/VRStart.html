@@ -1,48 +1,51 @@
 <div class="container">
     <div class="row">
-        <div class="col-lg-12">
-            <h1 class="page-header">
-                VR Page Selection
-            </h1>
-            <ol class="breadcrumb">
-                <li class="active">Select a location to start</li>
-                <li>
-                    <a href="#/LocationCreation">Location not listed? List it Here</a>
-                </li>
-            </ol>
-        </div>
-    </div>
-    
-    <!--New row for drop down selection form-->
-    <div class="row">
-        <!--Form for building/floor/room-->
-        <div ng-app="tutorialWebApp" ng-controller="formCtrl">
-            <form novalidate>
-                <!-- do the map/search here ~ -->
+        <ol class="breadcrumb">
+            <li > <a href="../">Home</a> </li>
+            <li> VR Page Selection </li>
 
-                <!-- Change to dynamic forms that rerfence information stored, created in LocationCreation-->
-                Building: <br>
-                <select ng-model="building">
-                    <!-- <option value=""></option> -->
-                    <option value="dogs">Dogs</option>
-                </select>
-                <br> Floor: <br>
-                <select ng-model="floor">
-                    <!-- <option value=""></option> -->
-                    <option value="dogs">Dogs</option>
-                </select>
-                <br> Room: <br>
-                <select ng-model="room">
-                    <!-- <option value="this.room">List rooms</option> -->
-                    <option value="dogs">Dogs</option>
-                </select>
-                <br> <br>
-                <button ng-click="submit()">SUBMIT NOT IMPLEMENTED</button>
-            </form>
-        </div>
+            <!-- <li class="active">Select a location to start</li> -->
+        </ol>
     </div>
-    <!--Go button redirect to desired destination-->
-    <div>
-        <a href="#VRView">Theoretical Go button</a>
+
+    <!-- New row for drop down selection form -->
+    <!--Form for building/floor/room-->
+    <div ng-app="app" ng-controller="FormCtrl">
+        <h1 class="page-header"> VR Page Selection </h1>
+        <!-- novalidate ? -->
+        <form>
+
+          <!-- do the map/search here ~ -->
+  
+          <!-- Change to dynamic forms that rerfence information stored, created in LocationCreation-->
+          Building: <br>
+          <select ng-model="building">
+              <!-- <option value=""></option> -->
+              <option value="dogs">Dogs</option>
+          </select>
+          <br> 
+
+          Floor: <br>
+          <select ng-model="floor">
+              <!-- <option value=""></option> -->
+              <option value="dogs">Dogs</option>
+          </select>
+          <br> 
+
+          Room: <br>
+          <select ng-model="room">
+              <!-- <option value="this.room">List rooms</option> -->
+              <option value="dogs">Dogs</option>
+          </select>
+          <br> <br>
+
+          <input ng-click="submit()" class="btn btn-success" 
+                 value="Initiate your VR experience!" type="submit">
+          </input>
+        </form>
+
+        <br> <br>
+
+        <p> <a href="/LocationCreation"> Location not listed? List it Here </a> </p>
     </div>
 </div>

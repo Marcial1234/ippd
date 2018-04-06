@@ -18,7 +18,8 @@ module.exports = {
       if (err) {
         console.log(err);
         res.status(400).send(err);
-      } else res.json(realNewBuilding);
+      } 
+      else res.json(realNewBuilding);
     });
   },
 
@@ -32,21 +33,28 @@ module.exports = {
   // },
   
   delete: (req, res) => {
-    Building.findByIdAndRemove(req.building.id, (err) => {
+    Building.findByIdAndRemove(req.building.id, (err, bldg) => {
       if (err) res.status(404).send(err);
       else {
-        // TODO: remove all the floors inside the building as well ~
-        res.json(req.building);
+        for (var i = 0; i < bldg.floors.length; i++) {
+          Floor.findByIdAndRemove(bldg.floors[i].hash, (err) => {
+            if (err) console.log(err);
+            else console.log(" :( ~ bai bai");
+          });
+
+          if (i == bldg.floors.length - 0) res.json(req.building);
+        }
       }
     });
   },
 
   getAll: (req, res) => {
-    Building.find({}, (err, building) => {
+    Building.find({}, (err, buildings) => {
       if (err) {
         console.log(err);
         res.status(404).send(err);
-      } else res.json(building);
+      }
+      else res.json(buildings);
     });
   },
   

@@ -1,0 +1,245 @@
+{
+  "nav_icon": "UpArrowNav.png",
+  "firstPhotoId":"112211",
+  "firstPhotoRotation": 0,
+  "photos": {
+    "112211": {
+      "rotationOffset": 0,
+      "uri": "JapanPano.jpg",
+      "tooltips": [
+        {
+          "rotationY": -20,
+          "text": "CISCO",
+          "linkedPhotoId": "112234"
+        },
+        {
+          "text": "Basement",
+          "rotationY": -10,
+          "linkedPhotoId": "112233"
+        },
+        {
+          "rotationY": 0,
+          "text": "IPPD Room",
+          "linkedPhotoId": "113344"
+        },
+        {
+          "text": "FiOS",
+          "rotationY": 10,
+          "linkedPhotoId": "112236"
+        },
+        {
+          "text": "Genband",
+          "rotationY": 20,
+          "linkedPhotoId": "112235"
+        }
+      ]
+    },
+    "112234": {
+      "rotationOffset": 40,
+      "uri": "CISCO--v112234.jpg",
+      "tooltips": [
+        {
+          "text": "The Basement",
+          "rotationY": -9.929,
+          "linkedPhotoId": "112233"
+        },
+        {
+          "text": "Genband",
+          "rotationY": -106.844,
+          "linkedPhotoId": "112235"
+        },
+        {
+          "text": "FiOS",
+          "rotationY": 60,
+          "linkedPhotoId": "112236"
+        },
+        {
+          "type": "image",
+          "rotationY": 115,
+          "width": 1.388,
+          "height": 1.388,
+          "source": "eco_label_brown.png",
+          "attribution": "Photo from Clipart",
+          "attributionUri": "https://openclipart.org/detail/238163/eco-label-brown"
+        }
+      ]
+    },
+    "112235": {
+      "rotationOffset": -50,
+      "uri": "Genband--v112235.jpg",
+      "tooltips": [
+        {
+          "text": "Cisco",
+          "rotationY": 100,
+          "linkedPhotoId": "112234"
+        },
+        {
+          "type": "image",
+          "rotationY": 0,
+          "width": 1.388,
+          "height": 1.388,
+          "source": "COview--v112222.jpg",
+          "attribution": "Photo by Harish"
+        }
+
+      ]
+    },
+    "112236": {
+      "rotationOffset": 40,
+      "uri": "FIOS--v112236.JPG",
+      "tooltips": [
+        {
+          "text": "Cisco",
+          "rotationY": -110,
+          "linkedPhotoId": "112234"
+        },
+        {
+          "type": "textblock",
+          "title": "A Shelf",
+          "text": "Full of Things",
+          "attribution": "Photo Credit to: Harish",
+          "rotationY": 0,
+          "width": 1.5,
+          "height": 1.5
+        }
+      ]
+    },
+    "113344": {
+      "rotationOffset": -130,
+      "uri": "360_0025[1]_pano.jpg",
+      "tooltips": [
+        {
+          "text": "Home Page",
+          "rotationY": -130,
+          "linkedPhotoId": "112211"
+        },
+        {
+          "text": "Next",
+          "rotationY": 110,
+          "linkedPhotoId": "113355"
+        },
+        {
+          "type": "textblock",
+          "title": "Lockers",
+          "text": "Full of Things",
+          "attribution": "Photo Credit to: Scott",
+          "rotationY": 170,
+          "translateX": 100,
+          "width": 1.3,
+          "height": 1.5
+        },
+        {
+          "type": "textblock",
+          "title": "Chris",
+          "text": "Full of knowledge",
+          "attribution": "Photo Credit to: Scott",
+          "rotationY": 75,
+          "translateX": 100,
+          "width": 1.3,
+          "height": 1.5
+        }
+      ]
+    },
+    "113355": {
+      "rotationOffset": 110,
+      "uri": "360_0026[1]_pano.jpg",
+      "tooltips": [
+        {
+          "text": "Next",
+          "rotationY": 110,
+          "linkedPhotoId": "113366"
+        },
+        {
+          "text": "Back",
+          "rotationY": -150,
+          "linkedPhotoId": "113344"
+        },
+        {
+          "type": "textblock",
+          "title": "Lockers",
+          "text": "Full of Things",
+          "attribution": "Photo Credit to: Scott",
+          "rotationY": 170,
+          "translateX": 100,
+          "width": 1.3,
+          "height": 1.5
+        },
+        {
+          "type": "textblock",
+          "title": "Scott",
+          "text": "Photographer",
+          "attribution": "Photo Credit to: Scott",
+          "rotationY": -10,
+          "translateX": 100,
+          "width": 1.3,
+          "height": 1.5
+        }
+      ]
+    },
+    "113366": {
+      "rotationOffset": 40,
+      "uri": "360_0028[1]_pano.jpg",
+      "tooltips": [
+        {
+          "text": "Home Page",
+          "rotationY": 93,
+          "linkedPhotoId": "112211"
+        },
+        {
+          "text": "Back",
+          "rotationY": -120,
+          "linkedPhotoId": "113355"
+        },
+        {
+          "type": "textblock",
+          "title": "Lockers",
+          "text": "Full of Things",
+          "attribution": "Photo Credit to: Scott",
+          "rotationY": 175,
+          "translateX": 100,
+          "width": 1.3,
+          "height": 1.5
+        },
+        {
+          "type": "textblock",
+          "title": "Chris",
+          "text": "Creep",
+          "attribution": "Photo Credit to: Scott",
+          "rotationY": -90,
+          "translateX": 100,
+          "width": 1.3,
+          "height": 1.5
+        }
+      ]
+    },
+    "112233": {
+      "rotationOffset": 120,
+      "uri": "Basement--v112233.jpg",
+      "tooltips": [
+        {
+          "text": "Cisco",
+          "rotationY": -64.525,
+          "linkedPhotoId": "112234"
+        },
+        {
+          "type": "textblock",
+          "rotationY": 140,
+          "width": 1.280,
+          "height": 1.280,
+          "title": "Exide",
+          "text": "Exide Technologies is an American manufacturer of lead-acid batteries, including automotive batteries and industrial batteries. Its four global business groups...",
+          "attribution": "From Wikipedia.org"
+        },
+        {
+          "type": "textblock",
+          "title": "A Start",
+          "text": "We begin in the basement DC Power area. The other three areas are on the 2nd floor: Cisco, FiOS, and Genband. Some annotations from the previous project are included to show a range of posibilities.",
+          "attribution": "Photo Credit to: Harish",
+          "rotationY": 0,
+          "width": 1.5,
+          "height": 1.5
+        }
+      ]
+    }
+  }
+}
