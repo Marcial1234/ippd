@@ -1,6 +1,7 @@
 var mongoose = require("mongoose");
 mongoose.Promise = global.Promise;
 
+var Floor = require('./floors.model.js');
 var us_states_abbvs_to_long_name = require("./state_abbv_mapping");
 
 // building => floors => room
@@ -24,7 +25,7 @@ var BuildingSchema = new mongoose.Schema({
   long_state:  String,
 
   floors: [{
-    number: Number,
+    name: String,
     hash: {
       ref : "Rooms",
       type: mongoose.Schema.Types.ObjectId,
@@ -33,16 +34,16 @@ var BuildingSchema = new mongoose.Schema({
   }],
 });
 
-BuildingSchema.pre("save", function(next) {
-  // Pre-save processing ~
+// Post-processing ~
+BuildingSchema.post("save", (doc) => {
+  // auto-populate .long_state
+  var correctState = doc.long_state == us_states_abbvs_to_long_name[doc.state];
+  if (!doc.long_state || !correctState) {
+    doc.long_state = us_states_abbvs_to_long_name[doc.state];
+    doc.save();
+  }
 
-  // no need for the if really, but w/e ~
-  if (!this.long_state)
-    this.long_state = us_states_abbvs_to_long_name[this.state];
-
-  console.log("saving ~");
-  // console.log(this);
-  next();
+  // console.log("saving ~");
 });
 
 // Create model from schema

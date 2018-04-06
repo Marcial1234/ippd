@@ -1,5 +1,4 @@
-var config_loader = require('dotenv');
-config_loader.load();
+require('dotenv').load();
 
 function startServer() {
   var app = require("./server/app");

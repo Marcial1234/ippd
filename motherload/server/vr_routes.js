@@ -2,7 +2,6 @@ var express = require("express");
 var router = express.Router();
 
 // Created Models
-var dummy = require("./dummy").buildings;
 var floors = require("./db/floors.crud.js") ;
 var buildings = require("./db/buildings.crud.js") ;
 
@@ -12,6 +11,7 @@ var buildings = require("./db/buildings.crud.js") ;
 //       .put(pano.update)
 //       .post(pano.create)
 //       ;
+// var dummy = require("./dummy").buildings;
 
 // Bldgs routes
 router.route("/getAllBuildings")

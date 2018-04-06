@@ -29,7 +29,7 @@ module.exports = {
 
   update: (req, res) => {
     Floor.findByIdAndUpdate(req.floor._id, req.floor, {new: true},
-      function(err, updatedNote) {
+      (err, updatedNote) => {
         if (err) res.status(404).send(err);
         else res.json(updatedNote);
     });    
@@ -47,7 +47,8 @@ module.exports = {
       if (err) {
         console.log(err);
         res.status(404).send(err);
-      } else res.json(floor);
+      }
+      else res.json(floor);
     });
   },
 
