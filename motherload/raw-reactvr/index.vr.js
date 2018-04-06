@@ -1,7 +1,7 @@
 import React from 'react';
 import { createStore } from "redux";
 import { connect, Provider } from "react-redux";
-import { AppRegistry, asset, Pano, Text, View} from 'react-vr';
+import { AppRegistry, asset, Pano, Text, View, NativeModules} from 'react-vr';
 import CylindricalPanel from 'CylindricalPanel';
 
 import * as mode from "./actions/modeActions";
@@ -24,8 +24,9 @@ const MAX_TEXTURE_HEIGHT = 720;
 const MAX_TEXTURE_WIDTH = 4096;
 const PPM = 1 / (2 * Math.PI * 3) * MAX_TEXTURE_WIDTH;
 const degreesToPixels = degrees => -(degrees / 360) * MAX_TEXTURE_WIDTH;
+const RCTDeviceEventEmitter = require('RCTDeviceEventEmitter');
 
-// TODOs: 
+// TODOs:
 // Get 'jsonPath' that is passed to 'VRInstance' in 'client.js', and attach it here/constructor
 // dummy for now ~
 jsonPath = "http://localhost:5001/search/1";
@@ -43,18 +44,22 @@ jsonPath = "http://localhost:5001/search/1";
 
 class VRLayout extends React.Component{
 
-  constructor(props){
-    // console.log(props);
-    // jsonPath = this.formatSearchQuery(props.jsonPath);
+  constructor(){
 
-    super(props);
+    RCTDeviceEventEmitter.addListener('getJson', obj => {
+      jsonPath = obj;
+    });
+    NativeModules.ClientModule.getJson();
+
+    super();
     this.handleMove = this.handleMove.bind(this);
     this.handleInput = this.handleInput.bind(this);
   }
 
   formatSearchQuery(query){
     if (window.process.env.NODE_ENV === "production") {
-      url = "http://" + window.location.host;
+      url = window.location.origin;
+      //url = "http://" + window.location.host;
     }
     else {
       url = "http://localhost:5001";
@@ -74,31 +79,33 @@ class VRLayout extends React.Component{
   }
 
   componentDidMount() {
-    console.log(this.props.jsonPath);
-    console.log(this.props.jsonPath);
-    console.log(this.props.jsonPath);
 
     // Gets the JSON data, and later initiallize component
     // This "fetch" works as a GET request
-    fetch(this.props.jsonPath)
-      .then(response => response.json())
-      .then(responseData => {
-        this.init(responseData);
-      })
-      .done();
+    setTimeout(function() {
+
+      console.log("Full Path", this.formatSearchQuery(jsonPath));
+      fetch(this.formatSearchQuery(jsonPath))
+        .then(response => response.json())
+        .then(responseData => {
+          this.init(responseData);
+        })
+        .done();
+    }.bind(this), 50);
+
     //asset(this.props.jsonPath).uri
   }
 
   componentWillUpdate(nextProps, nextState){
     if (nextProps.location.floors && this.props.location.floors !== nextProps.location.floors){
       let {currentFloor} = nextProps.location;
-      let roomData = nextProps.location.floors[currentFloor];
-
+      let roomData = nextProps.location.rooms;
+      console.log("CWU:", nextProps);
       this.props.updatePhoto({
         zoomZ: 0,
         data: roomData,
         locationId: null,
-        nextLocationId: roomData.firstPhotoId,
+        nextLocationId: roomData[0],
         rotation: roomData.firstPhotoRotation +
         (roomData.photos[roomData.firstPhotoId].rotationOffset || 0),
       });
@@ -107,12 +114,24 @@ class VRLayout extends React.Component{
 
   init(roomConfig) {
     fullJSON = roomConfig;
-    let {currentFloor} = this.props.location;
+    let buildingPath = ["", "api", "building", roomConfig.parent].join("/");
+    console.log("#Init", roomConfig);
+    fetch(this.formatSearchQuery(buildingPath))
+      .then(response => response.json())
+      .then(responseData => {
+        console.log("RD:", responseData);
+        let building = responseData;
+        if(roomConfig.firstPhotoId == 0){
+          roomConfig.firstPhotoId = "5ac6d11c0aa88b2dec945e1e";
+        }
+        this.props.initFloors({
+          floors: building.floors,
+          rooms: roomConfig.photos,
+        })
+      })
+      .done();
 
-    this.props.initFloors({
-      floors: roomConfig.floors,
-      rooms: roomConfig.floors[currentFloor].photos,
-    })
+
   }
 
   render(){

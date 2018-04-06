@@ -81,6 +81,7 @@ export default class SelectorOverlay extends React.Component{
   }
 
   updateSelections(){
+    // console.log("SO:", this.props);
     this.setState({
       floors: Object.keys(this.props.floors),
       lFloors: Object.keys(this.props.floors),

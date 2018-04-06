@@ -7,10 +7,11 @@ import {VRInstance, Module} from 'react-vr-web';
 import './process'; //necessary from DOMOverlay instructions
 import DomOverlayModule from '../overlay/DomOverlayModule';
 
-class CameraModule extends Module {
+class ClientModule extends Module {
   constructor() {
-    super('CameraModule');
+    super('ClientModule');
     this.rnContext = null;
+    this.json = null;
   }
 
   getRotation() {
@@ -19,18 +20,35 @@ class CameraModule extends Module {
       'cameraRot', obj,
     ]);
   }
+
+  getJson() {
+    let obj = this.json;
+    this.rnContext.callFunction('RCTDeviceEventEmitter', 'emit', [
+      'getJson', obj,
+    ]);
+  }
+
+  getWindow() {
+    let obj = this.json;
+    this.rnContext.callFunction('RCTDeviceEventEmitter', 'emit', [
+      'getJson', obj,
+    ]);
+  }
   _setRNContext(rnctx) {
       this.rnContext = rnctx;
     }
+  _setJson(json) {
+    this.json = json;
+  }
 
     viewStuff(){
-      console.log(window);
+      console.log(decodeURIComponent(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + encodeURIComponent(key).replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1")));
     }
 }
 
 // Gets the url?key=values
-function getQueryStringValue (key) {  
-  return decodeURIComponent(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + encodeURIComponent(key).replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));  
+function getQueryStringValue (key) {
+  return decodeURIComponent(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + encodeURIComponent(key).replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));
 }
 
 function init(bundle, parent, options) {
@@ -38,17 +56,21 @@ function init(bundle, parent, options) {
   // Grabbing url query to search for a specific building
   //  => url?key=values
   let bldg = getQueryStringValue("building");
-  if (!bldg) bldg = "0";
-
+  console.log("GQS", getQueryStringValue("building"));
+  if (!bldg) bldg = "5abed5d1571e152138346d24";
+  let floor = "5ac6d11c0aa88b2dec945e0e";
   // let room = getQueryStringValue("room");
   // if (!room) bldg = "0";
-  
-  // TODO: change construction of this to a "/" separated array join ~
-  jsonPath = "/search/" + bldg;
 
-  console.log("query", jsonPath);
-  console.log("query", jsonPath);
-  console.log("query", jsonPath);
+  // TODO: change construction of this to a "/" separated array join ~
+  // jsonPath = "/api/building/" + bldg;
+  let jsonPath = ["", "api", "floor", floor].join("/");
+
+  //jsonPath = "/api/" + bldg;
+  //
+  // console.log("query", jsonPath);
+  // console.log("query", jsonPath);
+  // console.log("query", jsonPath);
 
   //create div from overlay
   const domOverlayContainer1 = document.createElement('div');
@@ -57,24 +79,21 @@ function init(bundle, parent, options) {
   domOverlayContainer2.id = 'dom-overlay2';
   //create instance of module
   const domOverlayModule = new DomOverlayModule(domOverlayContainer1, domOverlayContainer2);
-  const cameraModule = new CameraModule();
+  const clientModule = new ClientModule();
 
-  // let element = this.props.doc.body.children[2].children[0].children[2].children[0];
-  // element.style.transform = "";
-  // setTimeout(function() {this.toggleNotes()}.bind(this), 10000);
+
   const vr = new VRInstance(bundle, 'VRLayout', parent, {
-    // Add custom options here, still some work to be done... 
+    // Add custom options here, still some work to be done...
     // when it renders it for a 2nd time it goes away...
-    initialProps: { jsonPath, },
-    
     ...options,
 
     hideFullscreen: true, //hides the button
     //register dom overlay
-    nativeModules: [domOverlayModule, cameraModule],
+    nativeModules: [domOverlayModule, clientModule],
   });
 
-  cameraModule._setRNContext(vr.rootView.context);
+  clientModule._setRNContext(vr.rootView.context);
+  clientModule._setJson(jsonPath);
 
   function testIt(){
     //document.body.children[2].children[0].children[2].click();

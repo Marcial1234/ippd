@@ -96,7 +96,7 @@ export default class StaticLayout extends React.Component {
       this.setState({noteID: 0});
       ID = 0;
     }
-    NativeModules.CameraModule.getRotation();
+    NativeModules.ClientModule.getRotation();
     setTimeout(function() {
       let rot = (this.state.cameraRot._y*57)%360;
     }.bind(this), 25);
@@ -275,7 +275,7 @@ export default class StaticLayout extends React.Component {
       }
       data.photos[locationId].notes = notes;
       this.props.updateData(data);
-      NativeModules.CameraModule.getRotation();
+      NativeModules.ClientModule.getRotation();
 
       setTimeout(function() {
         let rot = (this.state.cameraRot._y*57)%360;
@@ -300,7 +300,7 @@ export default class StaticLayout extends React.Component {
       }
       data.photos[locationId].navs = navs;
       this.props.updateData(data);
-      NativeModules.CameraModule.getRotation();
+      NativeModules.ClientModule.getRotation();
 
       setTimeout(function() {
         let rot = (this.state.cameraRot._y*57)%360;
@@ -420,7 +420,7 @@ export default class StaticLayout extends React.Component {
     //this.props.changeNextLocationId(locs[0]);
     this.setState({displayNotes: false})
     NativeModules.DomOverlayModule.closeOverlay1();
-    NativeModules.CameraModule.getRotation();
+    NativeModules.ClientModule.getRotation();
     setTimeout(function() {
       let rot = (this.state.cameraRot._y*57)%360;
       let obj = {
@@ -449,7 +449,7 @@ export default class StaticLayout extends React.Component {
   }
 
   test(){
-
+    console.log(this.props.jsonPath);
   }
 
   render() {
@@ -487,6 +487,10 @@ export default class StaticLayout extends React.Component {
         </VrButton>
         <VrButton style={styles.menuButton} onClick={ () => this.openOverlay(-1, "General")}>
                <Text style={styles.menuText}>Room Notes</Text>
+        </VrButton>
+
+        <VrButton style={styles.menuButton} onClick={this.test}>
+               <Text style={styles.menuText}>Log It</Text>
         </VrButton>
 
 {/*
