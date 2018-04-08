@@ -41,8 +41,8 @@ router.route("/gNotes/:floor/:pindex/:note")
       // note values passed as JSON payload ~
 router.route("/notes/:floor/:pindex/:nindex")
       .get(floors.changeNotes, floors.update)
-      .delete(floors.deleteNotes, floors.update)
       .put(floors.changeNotes, floors.update)
+      .delete(floors.deleteNotes, floors.update)
       ;
 
 router.route("/navs/:floor/:pindex/:nindex/:newRotation")

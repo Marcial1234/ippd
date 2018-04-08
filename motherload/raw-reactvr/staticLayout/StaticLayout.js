@@ -124,7 +124,7 @@ export default class StaticLayout extends React.Component {
       selected: false,
     }
     data.notes.push(newNote);
-    this.save("notes", data.notes, ID);
+    this.save("notes", newNote, ID);
     this.props.updateData(data);
     if(this.state.displayNotes){
       this.refreshTooltips();
@@ -196,15 +196,9 @@ export default class StaticLayout extends React.Component {
         else{
           navs[NavID].rotationY *=-1;
         }
-        break;
-        case "up":
-        navs[NavID].translateX -=adj;
-        break;
-        case "down":
-        navs[NavID].translateX +=adj;
-        break;
       }
-      data.navs = navs;
+      this.save("navs", navs[NavID].rotationY, NavID);
+      // data.navs = navs;
     }
 
     this.props.updateData(data);
@@ -473,21 +467,29 @@ export default class StaticLayout extends React.Component {
         let jsonPath = ["", "api", type, floors[currentFloor].hash, locationId, index].join("/");
         console.log(jsonPath);
         console.log(JSON.stringify(obj));
-        fetch(this.formatSearchQuery(jsonPath),{
-            // method: 'PUT',
-            // body: JSON.stringify(obj),
-            // // method: 'DELETE',
-            // headers: {"Content-Type": "application/json"}
-        })
-        .then(response => response.json())
-        .then(responseData => {
-          //this.props.updateData(responseData.photos[locationId]);
-          console.log("RD:", responseData);
-        })
-        .done();
+        // fetch(this.formatSearchQuery(jsonPath),{
+        //     method: 'PUT',
+        //     body: JSON.stringify(obj),
+        //     // method: 'DELETE',
+        // })
+        // .then(response => response.json())
+        // .then(responseData => {
+        //   //this.props.updateData(responseData.photos[locationId]);
+        //   console.log("RD:", responseData);
+        // })
+        // .done();
     }
+    // "/navs/:floor/:pindex/:nindex/:newRotation"
     else if(type == "navs"){
-        let jsonPath = ["", "api", type, floors[currentFloor].hash, locationId, text].join("/");
+      console.log(obj);
+        let jsonPath = ["", "api", type, floors[currentFloor].hash, locationId, index, obj].join("/");
+        fetch(this.formatSearchQuery(jsonPath))
+          .then(response => response.json())
+          .then(responseData => {
+            this.props.updateData(responseData.photos[locationId]);
+            console.log("RD:", responseData);
+          })
+          .done();
     }
 
 
