@@ -1,7 +1,7 @@
 const defaultState = {
   floors: null,
   rooms: null,
-  currentFloor: "01",
+  currentFloor: "0",
 };
 
 export default function room(state=defaultState, action){

@@ -32,7 +32,7 @@ module.exports = {
       (err, updatedNote) => {
         if (err) res.status(404).send(err);
         else res.json(updatedNote);
-    });    
+    });
   },
 
   delete: (req, res) => {

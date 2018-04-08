@@ -97,40 +97,46 @@ class VRLayout extends React.Component{
   }
 
   componentWillUpdate(nextProps, nextState){
-    if (nextProps.location.floors && this.props.location.floors !== nextProps.location.floors){
-      let {currentFloor} = nextProps.location;
+     // console.log("Component Will Update!:", nextProps.photo.nextLocationId, this.props.photo.nextLocationId);
+    if ((nextProps.photo.nextLocationId == null) || (nextProps.photo.locationId !== nextProps.photo.nextLocationId ) || this.props.location.currentFloor != nextProps.location.currentFloor){
+      // let {currentFloor} = nextProps.location;
+      // console.log("Trying to update");
+      // console.log(nextProps);
       let roomData = nextProps.location.rooms;
-      console.log("CWU:", nextProps);
-      this.props.updatePhoto({
-        zoomZ: 0,
-        data: roomData,
-        locationId: null,
-        nextLocationId: roomData[0],
-        rotation: roomData.firstPhotoRotation +
-        (roomData.photos[roomData.firstPhotoId].rotationOffset || 0),
-      });
+      let {nextLocationId} = nextProps.photo;
+      let room;
+      if(nextLocationId){
+        room = roomData[nextLocationId];
+      }
+      else{
+         room = roomData[nextProps.json.firstPhotoId];
+      }
+        this.props.updatePhoto({
+          zoomZ: 0,
+          data: room,
+          locationId: nextLocationId,
+          nextLocationId: nextLocationId ? nextLocationId : nextProps.json.firstPhotoId,
+          rotation: 0,
+          // rotation: roomData.firstPhotoRotation +
+          // (roomData.photos[roomData.firstPhotoId].rotationOffset || 0),
+        });
     }
   }
 
   init(roomConfig) {
     fullJSON = roomConfig;
     let buildingPath = ["", "api", "building", roomConfig.parent].join("/");
-    console.log("#Init", roomConfig);
+    // console.log("#Init", roomConfig);
     fetch(this.formatSearchQuery(buildingPath))
       .then(response => response.json())
       .then(responseData => {
-        console.log("RD:", responseData);
         let building = responseData;
-        if(roomConfig.firstPhotoId == 0){
-          roomConfig.firstPhotoId = "5ac6d11c0aa88b2dec945e1e";
-        }
         this.props.initFloors({
           floors: building.floors,
           rooms: roomConfig.photos,
-        })
+        });
       })
       .done();
-
 
   }
 
@@ -140,28 +146,27 @@ class VRLayout extends React.Component{
     let rot = this.props.photo.rotation;
     let trans = this.props.photo.translation;
 
-    //console.log("Trans:", trans, "Rot:", rot);
     //map short names to functions that will be used.
     let {updatePhoto, changeLocationId, changeNextLocationId, changeZoom} = this.props;
 
     if (!data) {
       return null;
     }
-
-    const photoData = (locationId && data.photos[locationId]) || null;
+     console.log("Data", data);
     const isLoading = nextLocationId !== locationId;
     //console.log("Props in render: ", this.props);
 
-    const navs = (photoData && photoData.navs) || null;
-    const notes = (photoData && photoData.notes) || null;
-    const rotation = ((photoData && photoData.rotationOffset) || 0);
-    //console.log(this.props.photo.rotation);
+    const navs = (data && data.navs) || null;
+    const notes = (data && data.notes) || null;
+
+
+    // const rotation = ((photoData && photoData.rotationOffset) || 0);
       return (
         <View onInput={this.handleInput}
           style={{
             transform: [
               {rotateX: + trans},
-              {rotateY: - ((rot == 0) ? rotation : rot)},
+              {rotateY: - ((rot == 0) ? 0 : rot)},
             ]
           }}
           >
@@ -169,8 +174,11 @@ class VRLayout extends React.Component{
             style={{
               tintColor: isLoading ? 'grey' : 'white',
             }}
-            onLoad={() => {changeLocationId(nextLocationId)}}
-            source={asset(data.photos[nextLocationId].uri)}
+            onLoad={() => {
+              // console.log("LOADED:", nextLocationId);
+              changeLocationId(nextLocationId)
+            }}
+            source={asset(data.uri)}
           />
 
           <CylindricalPanel
@@ -199,7 +207,7 @@ class VRLayout extends React.Component{
                     style={{layoutOrigin: [0.5, 0.5]}}
 
                     // Undo the rotation so spinner is centered
-                    translateX={degreesToPixels(rotation) * -1}
+                    translateX={degreesToPixels(0) * -1}
                   />}
                   {navs && <DisplayTooltips
                     data={data} tooltips={navs} ppm={PPM}

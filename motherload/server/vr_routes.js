@@ -42,6 +42,7 @@ router.route("/gNotes/:floor/:pindex/:note")
 router.route("/notes/:floor/:pindex/:nindex")
       .get(floors.changeNotes, floors.update)
       .delete(floors.deleteNotes, floors.update)
+      .put(floors.changeNotes, floors.update)
       ;
 
 router.route("/navs/:floor/:pindex/:nindex/:newRotation")

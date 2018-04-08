@@ -44,6 +44,9 @@ export default class DisplayTooltips extends React.Component {
         </View>
         <View>
           {notes && notes.map((tooltip, index) => {
+            if(tooltip == null){
+              return null;
+            }
               return (
                 <InfoButton
                   key={index}

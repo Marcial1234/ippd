@@ -37,12 +37,12 @@ export default class DomOverlayModule extends Module {
     //     this._overlayContainer
     //   );
   }
-  openOverlay2(room, floor, floors) {
+  openOverlay2(room, floor, floors, rooms) {
     this.rnContext.callFunction('RCTDeviceEventEmitter', 'emit', [
       'overlayOpen2'
     ]);
     ReactDOM.render(
-      <SelectorOverlay room={room}floor={floor} floors={floors}
+      <SelectorOverlay room={room} rooms={rooms} floor={floor} floors={floors}
          onClose={this.closeOverlay2} submit={this.submitSelection}/>,
        this._overlayContainer2
     );

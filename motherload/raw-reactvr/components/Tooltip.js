@@ -22,7 +22,7 @@ import {asset, Image, MediaPlayerState, Text, Video, VideoControl, View} from 'r
  * and renders either an image, image with text overlay, or text block.
  *
  * When using with CylinderLayer, set pixelsPerMeter to convert units, otherise
- * set translateZ to specify distance between camera and tooltip. 
+ * set translateZ to specify distance between camera and tooltip.
  */
 class Tooltip extends React.Component {
   static defaultProps = {
@@ -37,7 +37,7 @@ class Tooltip extends React.Component {
     const tooltip = this.props.tooltip;
     const PPM = this.props.pixelsPerMeter;
 
-    switch (this.props.tooltip.type) {
+    switch (this.props.tooltip.Type) {
       case 'image':
         return <ImageTooltip tooltip={tooltip} pixelsPerMeter={PPM} />;
       case 'panelimage':

@@ -24,6 +24,7 @@ export default function photo(state=defaultState, action){
         return{...state, locationId : action.payload}
       }
       case "Change Next Location":{
+        // console.log("CNL:", action.payload);
         return{...state, nextLocationId : action.payload, rotation: 0, translation: 0}
       }
       case "Change Zoom":{

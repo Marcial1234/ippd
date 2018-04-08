@@ -25,7 +25,6 @@ export default class StaticLayout extends React.Component {
     this.editNote = this.editNote.bind(this);
     this.moveNote = this.moveNote.bind(this);
     this.updateText = this.updateText.bind(this);
-    this.updateGNotes = this.updateGNotes.bind(this);
     this.deleteNote = this.deleteNote.bind(this);
     this.createNote = this.createNote.bind(this);
     this.adjustRate = this.adjustRate.bind(this);
@@ -45,7 +44,7 @@ export default class StaticLayout extends React.Component {
       this.updateText(obj);
     });
     RCTDeviceEventEmitter.addListener('updateGNotes', obj => {
-      this.updateGNotes(obj);
+      this.save("gNotes", obj);
     });
     RCTDeviceEventEmitter.addListener('overlayClose1', () => {
       this.setState({overlayOpen1: false,})
@@ -88,9 +87,21 @@ export default class StaticLayout extends React.Component {
 
   }
 
+  formatSearchQuery(query){
+    if (window.process.env.NODE_ENV === "production") {
+      url = window.location.origin;
+      //url = "http://" + window.location.host;
+    }
+    else {
+      url = "http://localhost:5001";
+    }
+
+    return url + query;
+  }
+
   createNote(){
-    let {data, locationId} = this.props.photo;
-    let notes = data.photos[locationId].notes;
+    let {data} = this.props.photo;
+    let notes = data.notes;
     let ID = this.state.noteID;
     if(ID >= notes.length){
       this.setState({noteID: 0});
@@ -102,18 +113,18 @@ export default class StaticLayout extends React.Component {
     }.bind(this), 25);
 
     let newNote = {
-      type: "textblock",
+      Type: "textblock",
       title: "New Note",
       text: "It's Full!",
       attribution: "Yes Ma'am",
-      rotationY: notes.length>0 ? notes[ID].rotationY - 20 : 160,
+      rotationY: notes[ID] ? notes[ID].rotationY - 20 : 160,
       translateX: 0,
       width: 1.3,
       height: 1.5,
       selected: false,
     }
-
-    data.photos[locationId].notes.push(newNote);
+    data.notes.push(newNote);
+    this.save("notes", data.notes, ID);
     this.props.updateData(data);
     if(this.state.displayNotes){
       this.refreshTooltips();
@@ -125,9 +136,9 @@ export default class StaticLayout extends React.Component {
   }
 
   moveNote(direction){
-    let {data, locationId} = this.props.photo;
-    let notes = data.photos[locationId].notes;
-    let navs = data.photos[locationId].navs;
+    let {data} = this.props.photo;
+    let notes = data.notes;
+    let navs = data.navs;
     let NoteID = this.state.noteID;
     let NavID = this.state.navID;
     let adj = this.state.adjustRate;
@@ -165,7 +176,7 @@ export default class StaticLayout extends React.Component {
         notes[NoteID].translateX +=adj;
         break;
       }
-      data.photos[locationId].notes = notes;
+      data.notes = notes;
     }
 
     if(this.state.noteOrNav == "nav"){
@@ -193,15 +204,15 @@ export default class StaticLayout extends React.Component {
         navs[NavID].translateX +=adj;
         break;
       }
-      data.photos[locationId].navs = navs;
+      data.navs = navs;
     }
 
     this.props.updateData(data);
   }
 
   editNote(index){
-    let {data, locationId} = this.props.photo;
-    let notes = data.photos[locationId].notes;
+    let {data} = this.props.photo;
+    let notes = data.notes;
     this.selectTooltip(index, "note");
     if(notes.length> 0){
        this.openOverlay(index, "Text");
@@ -212,8 +223,8 @@ export default class StaticLayout extends React.Component {
   }
 
   deleteNote(index){
-    let {data, locationId} = this.props.photo;
-    let notes = data.photos[locationId].notes;
+    let {data} = this.props.photo;
+    let notes = data.notes;
       if(index == this.state.noteID && this.overlayOpen1){
         NativeModules.DomOverlayModule.closeOverlay1();
         this.openOverlay(-1, "General");
@@ -221,26 +232,20 @@ export default class StaticLayout extends React.Component {
       else if(index == this.state.noteID){
         NativeModules.DomOverlayModule.closeOverlay1();
       }
-      data.photos[locationId].notes.splice(index, 1);
+      data.notes.splice(index, 1);
       this.props.updateData(data);
       this.refreshTooltips();
 
     }
 
   updateText(obj){
-    let {data, locationId} = this.props.photo;
-    let notes = data.photos[locationId].notes;
+    let {data} = this.props.photo;
+    let notes = data.notes;
     notes[this.state.noteID].text = obj.text;
     notes[this.state.noteID].title = obj.title;
-    data.photos[locationId].notes = notes;
+    data.notes = notes;
     this.props.updateData(data);
     this.refreshTooltips();
-  }
-
-  updateGNotes(obj){
-    let {data, locationId} = this.props.photo;
-    data.photos[locationId].gNotes = obj;
-    this.props.updateData(data);
   }
 
   toggleNotes(){
@@ -256,10 +261,10 @@ export default class StaticLayout extends React.Component {
   }
 
   selectTooltip(index, type){
-    let {data, locationId} = this.props.photo;
-    let notes = data.photos[locationId].notes;
-    let navs = data.photos[locationId].navs;
-
+    let {data} = this.props.photo;
+    let notes = data.notes;
+    let navs = data.navs;
+    console.log("Data", data, "Index:", index);
     if(type == "note"){
       this.setState({noteID: index, noteOrNav: "note"});
       if(this.state.overlayOpen1){
@@ -273,7 +278,7 @@ export default class StaticLayout extends React.Component {
           notes[i].selected = false;
         }
       }
-      data.photos[locationId].notes = notes;
+      data.notes = notes;
       this.props.updateData(data);
       NativeModules.ClientModule.getRotation();
 
@@ -298,7 +303,7 @@ export default class StaticLayout extends React.Component {
           navs[i].selected = false;
         }
       }
-      data.photos[locationId].navs = navs;
+      data.navs = navs;
       this.props.updateData(data);
       NativeModules.ClientModule.getRotation();
 
@@ -361,12 +366,12 @@ export default class StaticLayout extends React.Component {
   }
 
   openOverlay(index, type){
-    let {data, locationId} = this.props.photo;
-    const photoData = (locationId && data.photos[locationId]) || null;
-    let notes = (photoData && photoData.notes) || null;
-    let gNotes = (photoData && photoData.gNotes) || null;
-    let {currentFloor, floors} = this.props.location;
+    let {locationId, data} = this.props.photo;
+    let notes = (data && data.notes) || null;
+    let gNotes = (data && data.gNotes) || null;
+    let {currentFloor, floors, rooms} = this.props.location;
     let FL = JSON.parse(JSON.stringify(floors));
+    let RMS = JSON.parse(JSON.stringify(rooms));
     if(type == "Text"){
       NativeModules.DomOverlayModule.closeOverlay1();
       NativeModules.DomOverlayModule.openOverlay1(notes[index].text, notes[index].title, "Both", gNotes);
@@ -377,7 +382,7 @@ export default class StaticLayout extends React.Component {
     }
     if(type == "Select"){
       NativeModules.DomOverlayModule.closeOverlay2();
-      NativeModules.DomOverlayModule.openOverlay2(locationId, currentFloor, FL);
+      NativeModules.DomOverlayModule.openOverlay2(locationId, currentFloor, FL, RMS);
     }
   }
 
@@ -387,76 +392,129 @@ export default class StaticLayout extends React.Component {
     if(obj.floor == currentFloor && obj.room == locationId){
       console.log("Already here.");
     }
-    else{
-      this.props.selectFloor(obj.floor);
-      let roomData = this.props.location.floors[obj.floor];
-      let rdp = Object.keys(roomData.photos);
-      if(!rdp.includes(obj.room)){
-        obj.room = rdp[0];
-      }
+    else if (obj.floor == currentFloor){
+      let roomData = this.props.location.rooms[obj.room];
       this.props.updatePhoto({
         zoomZ: 0,
         data: roomData,
         locationId: null,
         nextLocationId: obj.room,
-        rotation: roomData.firstPhotoRotation +
-        (roomData.photos[roomData.firstPhotoId].rotationOffset || 0)
+        rotation: 0
       });
-      let locs = Object.keys(roomData.photos);
-      // console.log();
-      setTimeout(function() {this.props.changeNextLocationId(locs[0])}.bind(this), 25);
-      setTimeout(function() {this.props.changeNextLocationId(locs[1])}.bind(this), 25);
-      setTimeout(function() {this.props.changeNextLocationId(obj.room)}.bind(this), 25);
+    }
+    else{
+      let jsonPath = ["", "api", "floor", this.props.location.floors[obj.floor].hash].join("/");
+      fetch(this.formatSearchQuery(jsonPath))
+        .then(response => response.json())
+        .then(responseData => {
+          this.props.selectFloor(obj.floor);
+          let roomData = responseData.photos;
+          let rdp = Object.keys(roomData);
+          if(!rdp.includes(obj.room)){
+            obj.room = rdp[0];
+          }
+          this.props.updatePhoto({
+            zoomZ: 0,
+            data: roomData[obj.room],
+            locationId: null,
+            nextLocationId: obj.room,
+            rotation: 0
+          });
+          let locs = Object.keys(roomData);
+          // console.log();
+          setTimeout(function() {this.props.changeNextLocationId(locs[0])}.bind(this), 25);
+          setTimeout(function() {this.props.changeNextLocationId(locs[1])}.bind(this), 25);
+          setTimeout(function() {this.props.changeNextLocationId(obj.room)}.bind(this), 25);
+        })
+        .done();
     }
   }
 
   goHome(){
+    // console.log("Props:", this.props);
     let {data} = this.props.photo;
     let fLocs = Object.keys(this.props.location.floors);
     floor = fLocs[0];
-    let rLocs = Object.keys(this.props.location.floors[fLocs[0]].photos);
+    let rLocs = Object.keys(this.props.location.rooms);
     room = rLocs[0];
     this.selectFloorRoom({floor, room});
     //this.props.changeNextLocationId(locs[0]);
     this.setState({displayNotes: false})
     NativeModules.DomOverlayModule.closeOverlay1();
-    NativeModules.ClientModule.getRotation();
-    setTimeout(function() {
-      let rot = (this.state.cameraRot._y*57)%360;
-      let obj = {
-        rotation: -rot,
-        translation: 0,
-      };
-      this.props.focusNote(obj);
-    }.bind(this), 25);
+    // NativeModules.ClientModule.getRotation();
+    // setTimeout(function() {
+    //   let rot = (this.state.cameraRot._y*57)%360;
+    //   let obj = {
+    //     rotation: -rot,
+    //     translation: 0,
+    //   };
+    //   this.props.focusNote(obj);
+    // }.bind(this), 25);
     // NativeModules.DomOverlayModule.closeOverlay2();
   }
 
-  save(){
-    var url = this.props.jsonPath;
-    var data = this.props.json;
+  save(type, obj, index = -1){
+    let {currentFloor, floors} = this.props.location;
+    let {locationId} = this.props.photo;
+    console.log(obj);
+    // /gNotes/:floor/:pindex/:note
+    if(type == "gNotes"){
+        let jsonPath = ["", "api", type, floors[currentFloor].hash, locationId, obj].join("/");
+        fetch(this.formatSearchQuery(jsonPath))
+          .then(response => response.json())
+          .then(responseData => {
+            this.props.updateData(responseData.photos[locationId]);
+            console.log("RD:", responseData);
+          })
+          .done();
+    }
+    // "/notes/:floor/:pindex/:nindex"
+    else if(type == "notes"){
+        let jsonPath = ["", "api", type, floors[currentFloor].hash, locationId, index].join("/");
+        console.log(jsonPath);
+        console.log(JSON.stringify(obj));
+        fetch(this.formatSearchQuery(jsonPath),{
+            // method: 'PUT',
+            // body: JSON.stringify(obj),
+            // // method: 'DELETE',
+            // headers: {"Content-Type": "application/json"}
+        })
+        .then(response => response.json())
+        .then(responseData => {
+          //this.props.updateData(responseData.photos[locationId]);
+          console.log("RD:", responseData);
+        })
+        .done();
+    }
+    else if(type == "navs"){
+        let jsonPath = ["", "api", type, floors[currentFloor].hash, locationId, text].join("/");
+    }
 
-    fetch(url, {
-      method: 'POST', // or 'PUT'
-      body: JSON.stringify(data),
-      headers: new Headers({
-        'Content-Type': 'application/json'
-      })
-    }).then(res => res.json())
-    .catch(error => console.error('Error:', error))
-    .then(response => console.log('Success:', response));
+
+
+    // var url = this.props.jsonPath;
+    // var data = this.props.json;
+    //
+    // fetch(url, {
+    //   method: 'POST', // or 'PUT'
+    //   body: JSON.stringify(data),
+    //   headers: new Headers({
+    //     'Content-Type': 'application/json'
+    //   })
+    // }).then(res => res.json())
+    // .catch(error => console.error('Error:', error))
+    // .then(response => console.log('Success:', response));
 
   }
 
   test(){
-    console.log(this.props.jsonPath);
+    this.save("notes", "Test", 0);
   }
 
   render() {
-    let {data, locationId} = this.props.photo;
-    const photoData = (locationId && data.photos[locationId]) || null;
-    let notes = (photoData && photoData.notes) || null;
-    let navs = (photoData && photoData.navs) || null;
+    let {data} = this.props.photo;
+    let notes = (data && data.notes) || null;
+    let navs = (data && data.navs) || null;
     var lvls = [];
     for (let i = 2; i <= 20; i+=2){
       lvls.push(i);
