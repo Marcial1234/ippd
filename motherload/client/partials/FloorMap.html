@@ -1,0 +1,35 @@
+<div class="container">
+  <div class="row">
+    <ol class="breadcrumb">
+      <li> <a href="../">Home</a> </li>
+      <li class="active"> Map Creation </li>
+    </ol>
+  </div>
+  <div class="row">
+    <div class="col-lg-12" ng-app="app" ng-controller="PageCtrl">
+      <h1 class="page-header"> Create Contiguous Floor Map  </h1>
+
+      <!-- add inputs for x and y size ~ -->
+
+      <div ng-repeat="x in meh"
+           style="display: flex; justify-content: center;">
+
+        <div ng-repeat="x in meh[$index] track by $index"
+        >
+          <!-- type="number" min="0" step="1" -->
+          <!-- custom filter... check old code ~ -->
+          <!-- | notTaken" -->
+          <select ng-model="meh[$parent.$index][$index]"
+                  ng-options="x for x in picsOptions"
+          >
+            <option value="" disabled>Choose picture</option>
+          </select>
+        </div>
+      </div>
+
+      <br> <br>
+      {{meh}}
+
+    </div>
+  </div>
+</div>

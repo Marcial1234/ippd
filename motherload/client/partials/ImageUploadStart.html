@@ -1,23 +1,22 @@
 <!-- Page Content -->
 <div class="container">
-    <div class="row">
-            <ol class="breadcrumb">
-                <li > <a href="../">Home</a> </li>
-                <li class="active"> Image Portal </li>
-            </ol>
+  <div class="row">
+    <ol class="breadcrumb">
+      <li> <a href="../">Home</a> </li>
+      <li class="active"> Image Portal </li>
+    </ol>
+  </div>
+  <div class="row">
+    <div class="col-lg-12">
+      <h1 class="page-header">Image Portal</h1>
     </div>
-    <div class="row">
-        <div class="col-lg-12">
-            <h1 class="page-header">Image Portal</h1>
-        </div>
-        <div class="col-lg-12">
-            <h5>Select image(s) to upload (up to 1000, or 1GB):</h5>
-
-            <form action="/upload" method="POST" accept="images/*" enctype="multipart/form-data">
-                <input type="file" name="image" multiple> 
-                <br>
-                <input class="btn btn-primary" type="submit" value="Upload All Images">
-            </form>
-        </div>
+    <div class="col-lg-12">
+      <h5>Select image(s) to upload (up to 1000, or 1GB):</h5>
+      <form action="/upload" method="POST" accept="images/*" enctype="multipart/form-data">
+        <input type="file" name="image" multiple>
+        <br>
+        <input class="btn btn-primary" type="submit" value="Upload All Images">
+      </form>
     </div>
+  </div>
 </div>
