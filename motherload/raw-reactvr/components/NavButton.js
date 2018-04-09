@@ -41,7 +41,7 @@ class NavButton extends React.Component {
     pixelsPerMeter: 1,
     rotateY: 0,
     scaleFactor: 1.3,
-    textLabel: 'go',
+    textLabel: 'Next',
     translateX: 0,
     translateZ: 0,
   };

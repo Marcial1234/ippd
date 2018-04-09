@@ -12,8 +12,8 @@ export default class SelectorOverlay extends React.Component{
       floors: null,
       lRooms: null,
       lFloors: null,
-      floor: props.floor || "01",
-      room: props.room || "000001",
+      floor: props.floor || "0",
+      room: props.room || "0",
       updated: false,
     };
 

@@ -1,0 +1,60 @@
+Idea for Map View
+  Have a defined start point and end point (cotiguous space)
+  just have 'boxes' with number input fields/dropdowns
+  === end of frontend ~
+
+  auto assign rotations based relative coors ~
+  copy 'safe spiral's way of doing bounds ~
+    =>
+  n^2 lazy parsing, find out how many used, push as you see ~
+    record index of start ~
+    TODO Later: delete pics not used
+  push as you see, link ~ based on spiral : coors
+    [step].join(""):
+      "01" => right 90
+      "10" => left -90
+      "-10" => forward 0
+      "0-1" => backward -178?
+      and diagonals?
+  * view from button-to-top as front/back *
+    - need a huge ass visual indicator
+        - ARROWS!
+
+  default one? 5 x 5
+  1* 1 0          0 1*
+  0  1 0          1 1
+  0  1 1* start   1 0
+  =>
+  {
+    navs:  [
+      {
+        rotationY: Number,
+        linkedPhotoId: Number,
+      },
+    ],
+  }
+
+  map pics different f(x) ~ 
+
+
+Idea for image uploading:
+  Move to server on bldg => floor hash based folder structure
+  Stitch
+  get index: url mapping, with some time of DB/endpoint parsing? via a DB boolean
+  create room objects from that
+  add them to floor.photos
+
+  return promise to frontend once done ~
+  or one by one??
+
+Other TODOs:
+  Move to remote image sources/uris
+
+  "/preview" endpoint to server ~ _tab pano
+
+  no name/text navs? 
+    null => "go" tooltip
+    default to "next"? or hide it altogether?
+
+  Create a '404' eq for react vr if nothing is passed ~ 
+    Basic/Template view, with either our/verizon's logo and some 'not supposed to be here'/'wrong page' message

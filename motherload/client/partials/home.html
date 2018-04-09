@@ -1,17 +1,27 @@
 <div class="container">
-    <div class="row">
-        <ol class="breadcrumb">
-            <li class="active"> Home </li>
-        </ol>
+  <div class="row">
+    <ol class="breadcrumb">
+      <li class="active"> Home </li>
+    </ol>
+  </div>
+  <div class="row">
+    <div class="col-lg-12" ng-app="app" ng-controller="FormCtrl">
+      <h3 class="centered">Choose from the following</h3>
+      <!-- turn into buttons ~ side by side -->
+      <div style="display: flex; justify-content: center;">
+        <a href="/FloorMap">
+          <!-- <a href="/ImageUploadStart"> -->
+          <p class="btn btn-warning">
+            Upload Images
+          </p>
+        </a>
+        <p>&nbsp;</p>
+        <a href="/VRStart">
+          <p class="btn btn-primary">
+            Explore VR
+          </p>
+        </a>
+      </div>
     </div>
-    <div class="row">
-        <div class="col-lg-12" ng-app="app" ng-controller="FormCtrl">
-            <h4>Choose:</h4>
-            <!-- turn into buttons ~ side by side -->
-            <ul>
-                <li> <a href="/ImageUploadStart">Upload Images</a> </li>
-                <li> <a href="/VRStart">Explore VR</a> </li>
-            </ul>
-        </div>
-    </div>
+  </div>
 </div>

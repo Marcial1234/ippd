@@ -12,6 +12,12 @@ let config = ['$routeProvider', '$locationProvider',
         controller: "PageCtrl",
         templateUrl: "partials/ImageUploadStart.html",
       })
+
+      .when("/FloorMap", {
+        controller: "PageCtrl",
+        templateUrl: "partials/FloorMap.html",
+      })
+
       .when("/ImageUploadEdits", {
         controller: "PageCtrl",
         templateUrl: "partials/ImageUploadEdits.html",
@@ -21,10 +27,12 @@ let config = ['$routeProvider', '$locationProvider',
         controller: "PageCtrl",
         templateUrl: "partials/VRStart.html",
       })
+
       .when("/VRView", {
         controller: "PageCtrl",
         templateUrl: "partials/VRView.html",
       })
+
       .when("/LocationCreation", {
         controller: "PageCtrl",
         templateUrl: "partials/LocationCreation.html",

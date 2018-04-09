@@ -28,7 +28,7 @@ module.exports.init = function() {
   // middleware
   app.use(fileUpload());
   app.use(bodyParser.json());
-  app.use(bodyParser.urlencoded({extended: true}));
+  // app.use(bodyParser.urlencoded({extended: true}));
   // enable request logging for development debugging
   app.use(morgan("dev"));
 
