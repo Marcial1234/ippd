@@ -36,6 +36,7 @@ export default class StaticLayout extends React.Component {
     this.refreshTooltips = this.refreshTooltips.bind(this);
     this.floorSelection = this.floorSelection.bind(this);
     this.selectFloorRoom = this.selectFloorRoom.bind(this);
+    this.setRotation = this.setRotation.bind(this);
   }
 
   componentWillMount(){
@@ -82,9 +83,7 @@ export default class StaticLayout extends React.Component {
           if(this.state.displayNotes){
             this.refreshTooltips();
           }
-
     }
-
   }
 
   formatSearchQuery(query){
@@ -509,8 +508,24 @@ export default class StaticLayout extends React.Component {
 
   }
 
+  setRotation(){
+    let {data} = this.props.photo;
+    NativeModules.ClientModule.getRotation();
+
+    setTimeout(function() {
+      let rot = (this.state.cameraRot._y*57)%360;
+      data.rotationOffset = rot;
+      this.props.updateData(data);
+    }.bind(this), 25);
+  }
+
   test(){
-    this.save("notes", "Test", 0);
+    // this.save("notes", "Test", 0);
+    NativeModules.ClientModule.getRotation();
+    setTimeout(function() {
+      let rot = (this.state.cameraRot._y*57)%360;
+      console.log(rot);
+    }.bind(this), 25);
   }
 
   render() {
@@ -551,6 +566,9 @@ export default class StaticLayout extends React.Component {
 
         <VrButton style={styles.menuButton} onClick={this.test}>
                <Text style={styles.menuText}>Log It</Text>
+        </VrButton>
+        <VrButton style={styles.menuButton} onClick={this.setRotation}>
+               <Text style={styles.menuText}>Set Rotation</Text>
         </VrButton>
 
 {/*

@@ -158,9 +158,7 @@ class VRLayout extends React.Component{
 
     const navs = (data && data.navs) || null;
     const notes = (data && data.notes) || null;
-
-
-    // const rotation = ((photoData && photoData.rotationOffset) || 0);
+    // const rotation = ((data && data.rotationOffset) || 0);
       return (
         <View onInput={this.handleInput}
           style={{
