@@ -26,25 +26,9 @@ const PPM = 1 / (2 * Math.PI * 3) * MAX_TEXTURE_WIDTH;
 const degreesToPixels = degrees => -(degrees / 360) * MAX_TEXTURE_WIDTH;
 const RCTDeviceEventEmitter = require('RCTDeviceEventEmitter');
 
-// TODOs:
-// Get 'jsonPath' that is passed to 'VRInstance' in 'client.js', and attach it here/constructor
-// dummy for now ~
-jsonPath = "http://localhost:5001/search/1";
-
-// UI changes:
-// Save button on the "toggle" menus that will trigger backend PUTs for positions
-// trigger backend PUTs on "Submit" on notes (including room notes)
-// trigger backend DELETE on "Delete" buttons click
-// format of the requests:
-//    /edit/[building id]/[floor]/, {note obj}
-//    /delete/[building id]/[floor]/[index]
-// navigation endpoint:
-//    /editNavs/[building id]/[floor]/, [new rotationY int]
-
-
 class VRLayout extends React.Component{
 
-  constructor(){
+  constructor() {
 
     RCTDeviceEventEmitter.addListener('getJson', obj => {
       jsonPath = obj;
@@ -56,25 +40,28 @@ class VRLayout extends React.Component{
     this.handleInput = this.handleInput.bind(this);
   }
 
-  formatSearchQuery(query){
+  // TODO: can we just use the 'formatSearchQuery' in StaticLayout?
+  // Returns the correct url for DB queries for BOTH dev and production
+  formatSearchQuery(query) {
     if (window.process.env.NODE_ENV === "production") {
       url = window.location.origin;
-      //url = "http://" + window.location.host;
+      // this will return the domain of the current site
+      // 'http[s]://[domain].[extension]'
     }
     else {
       url = "http://localhost:5001";
     }
 
-    return url + query;
+    return [url, query].join("/");
   }
 
-  handleMove(e){
+  handleMove(e) {
     console.log(e);
   }
 
   // "handleInput" can listen for mouse clicks or key presses and perform actions accordingly
   // Use "onInput" inside a View. Ex: <View onInput={handleInput} style={styles.rootView}>
-  handleInput(e){
+  handleInput(e) {
     let event = e.nativeEvent.inputEvent;
   }
 
@@ -96,19 +83,22 @@ class VRLayout extends React.Component{
     //asset(this.props.jsonPath).uri
   }
 
-  componentWillUpdate(nextProps, nextState){
+  componentWillUpdate(nextProps, nextState) {
      // console.log("Component Will Update!:", nextProps.photo.nextLocationId, this.props.photo.nextLocationId);
-    if ((nextProps.photo.nextLocationId == null) || (nextProps.photo.locationId !== nextProps.photo.nextLocationId ) || this.props.location.currentFloor != nextProps.location.currentFloor){
+    if ( (nextProps.photo.nextLocationId == null) 
+      || (nextProps.photo.locationId !== nextProps.photo.nextLocationId ) 
+      || this.props.location.currentFloor != nextProps.location.currentFloor) {
       // let {currentFloor} = nextProps.location;
       // console.log("Trying to update");
       // console.log(nextProps);
       let roomData = nextProps.location.rooms;
       let {nextLocationId} = nextProps.photo;
       let room;
-      if(nextLocationId){
+      
+      if (nextLocationId) {
         room = roomData[nextLocationId];
       }
-      else{
+      else {
          room = roomData[nextProps.json.firstPhotoId];
       }
         this.props.updatePhoto({
@@ -125,8 +115,9 @@ class VRLayout extends React.Component{
 
   init(roomConfig) {
     fullJSON = roomConfig;
-    let buildingPath = ["", "api", "building", roomConfig.parent].join("/");
+    let buildingPath = ["api", "building", roomConfig.parent].join("/");
     // console.log("#Init", roomConfig);
+    
     fetch(this.formatSearchQuery(buildingPath))
       .then(response => response.json())
       .then(responseData => {
@@ -137,88 +128,86 @@ class VRLayout extends React.Component{
         });
       })
       .done();
-
   }
 
-  render(){
+  render() {
     // map short names to state values that will be used.
     let {locationId, nextLocationId, data} = this.props.photo;
-    let rot = this.props.photo.rotation;
-    let trans = this.props.photo.translation;
-
-    //map short names to functions that will be used.
-    let {updatePhoto, changeLocationId, changeNextLocationId, changeZoom} = this.props;
 
     if (!data) {
       return null;
     }
-     console.log("Data", data);
-    const isLoading = nextLocationId !== locationId;
+    // console.log("Data", data);
+    
+    let rot = this.props.photo.rotation;
+    let trans = this.props.photo.translation;
+
+    // map short names to functions that will be used.
+    let {updatePhoto, changeLocationId, changeNextLocationId, changeZoom} = this.props;
     //console.log("Props in render: ", this.props);
 
+    const isLoading = nextLocationId !== locationId;
     const navs = (data && data.navs) || null;
     const notes = (data && data.notes) || null;
 
-
-    // const rotation = ((photoData && photoData.rotationOffset) || 0);
-      return (
-        <View onInput={this.handleInput}
+    return (
+      <View onInput={this.handleInput}
+        style={{
+          transform: [
+            {rotateX: + trans},
+            {rotateY: - ((rot == 0) ? 0 : rot)},
+          ]
+        }}
+        >
+        <Pano
           style={{
-            transform: [
-              {rotateX: + trans},
-              {rotateY: - ((rot == 0) ? 0 : rot)},
-            ]
+            tintColor: isLoading ? 'grey' : 'white',
           }}
-          >
-          <Pano
-            style={{
-              tintColor: isLoading ? 'grey' : 'white',
-            }}
-            onLoad={() => {
-              // console.log("LOADED:", nextLocationId);
-              changeLocationId(nextLocationId)
-            }}
-            source={asset(data.uri)}
-          />
+          onLoad={() => {
+            // console.log("LOADED:", nextLocationId);
+            changeLocationId(nextLocationId)
+          }}
+          source={asset(data.uri)}
+        />
 
-          <CylindricalPanel
-            layer={{
+        <CylindricalPanel
+          layer={{
+            width: MAX_TEXTURE_WIDTH,
+            height: MAX_TEXTURE_HEIGHT,
+            density: MAX_TEXTURE_WIDTH,
+          }}
+          style={{ position: 'absolute'}}
+          >
+
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
               width: MAX_TEXTURE_WIDTH,
               height: MAX_TEXTURE_HEIGHT,
-              density: MAX_TEXTURE_WIDTH,
-            }}
-            style={{ position: 'absolute'}}
-            >
+            }}>
+            {/* Need container view, else using absolute position on buttons removes them from cylinder */}
 
-            <View
-              style={{
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: MAX_TEXTURE_WIDTH,
-                height: MAX_TEXTURE_HEIGHT,
-              }}>
-              {/* Need container view, else using absolute position on buttons removes them from cylinder */}
+          {/* Main Content View */}
+            <View>
+              {/* Show a spinner while first pano is loading */}
+              {locationId == null && <LoadingSpinner
+                  pixelsPerMeter={PPM}
+                  style={{layoutOrigin: [0.5, 0.5]}}
 
-            {/* Main Content View */}
-              <View>
-                {/* Show a spinner while first pano is loading */}
-                {locationId == null && <LoadingSpinner
-                    pixelsPerMeter={PPM}
-                    style={{layoutOrigin: [0.5, 0.5]}}
-
-                    // Undo the rotation so spinner is centered
-                    translateX={degreesToPixels(0) * -1}
-                  />}
-                  {navs && <DisplayTooltips
-                    data={data} tooltips={navs} ppm={PPM}
-                    changeNextLocationId={changeNextLocationId} isLoading={isLoading}
-                    degreesToPixels={degreesToPixels} notes={notes}
-                  />}
-              </View>
+                  // Undo the rotation so spinner is centered
+                  translateX={degreesToPixels(0) * -1}
+                />}
+                {navs && <DisplayTooltips
+                  data={data} tooltips={navs} ppm={PPM}
+                  changeNextLocationId={changeNextLocationId} isLoading={isLoading}
+                  degreesToPixels={degreesToPixels} notes={notes}
+                />}
             </View>
-          </CylindricalPanel>
-        </View>
-      );
+          </View>
+        </CylindricalPanel>
+      </View>
+    );
   }
 }
 
