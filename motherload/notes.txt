@@ -47,10 +47,18 @@ Idea for image uploading:
   return promise to frontend once done ~
   or one by one??
 
+Go to stuart ~
+
 Other TODOs:
+  Test put from frontend
+
   Move to remote image sources/uris
 
+  Bldg and note search view
+
   "/preview" endpoint to server ~ _tab pano
+    refactor current app to now show menu overlay ~
+    just need a barebone view
 
   no name/text navs? 
     null => "go" tooltip

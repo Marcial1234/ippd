@@ -4,6 +4,8 @@ angular
   .controller('PageCtrl', ["$scope", "$location", "$http",
     function (scope, location, http, ) {
 
+      // pass room stuff as a state param?
+
       // Initial dimensions of the contiguous 'room'
       scope.x = 5, scope.y = 5;
 

@@ -40,14 +40,19 @@ module.exports.init = function() {
   app.use("/", express.static(__dirname + "/../client"));
 
   // THIS WAS A BLOCKING ISSUE, mutual dev on two ports available after ~
-  // I think Alex might have had this earlier ~ or not
-  // OMIT IN PRODUCTION
-  // TODO: figure out the node env var to do this automatically...
   app.use((req, res, next) => {
+    // TODO LATER: Make this node env var dependent
+    // process.env.NODE_ENV?
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE");
-    next();
+    // OMIT Above in PRODUCTION?
+
+    // LEAVE THIS CODE FOR FETCH REQS!!
+    if (req.method === "OPTIONS")
+      res.sendStatus(200);
+    else
+      next();
   });
 
   // File uploading code+routing ~

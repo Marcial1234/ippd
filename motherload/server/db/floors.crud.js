@@ -66,13 +66,12 @@ module.exports = {
   changeNotes: (req, res, next) => {
     // re-assigning all values ~
     // req.body == { note obj }
-    console.log(req.body);
+    console.log(Object.keys(req.body).length);
 
-    // until the frontend works, this stays commented
-    // let notes = req.floor.photos[pindex].notes;
-    // if (nindex > notes.length)
-    //   notes.push({});
-    // notes[nindex] = {...req.body};
+    let notes = req.floor.photos[pindex].notes;
+    if (nindex > notes.length)
+      notes.push({});
+    notes[nindex] = {...req.body};
 
     next();
   },

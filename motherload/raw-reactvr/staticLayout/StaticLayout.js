@@ -495,40 +495,17 @@ export default class StaticLayout extends React.Component {
       console.log(jsonPath);
       console.log(JSON.stringify(obj));
 
-      var myHeaders = new Headers();
-      myHeaders.append('Content-Type', 'application/json');
-
-      //
-      // $.ajax({
-      //   type: "PUT",
-      //   url: this.formatSearchQuery(jsonPath),
-      //   data: JSON.stringify(obj),
-      // })
-      // .then(response => response.json())
-      // .then(responseData => {
-      //   //this.props.updateData(responseData.photos[locationId]);
-      //   console.log("RD:", responseData);
-      // })
-      // .done();
-
-      // the issue seems to lie here ~
-      // https://github.com/matthew-andrews/isomorphic-fetch/issues/34
-      // and still not working...
+      // Always send POSTs, donno why puts aren't working, but ¯\_(ツ)_/¯
       fetch(this.formatSearchQuery(jsonPath), {
-          cache: "default",
-
-          method: "put",
-          mode: 'no-cors',
-
-          body: JSON.stringify(...obj),
+          body: JSON.stringify(obj),
           headers: { "Content-Type": "application/json" },
-          // method: 'DELETE',
+          method: "POST",
       })
-      // .then(response => response.json())
-      // .then(responseData => {
-      //   //this.props.updateData(responseData.photos[locationId]);
-      //   console.log("RD:", responseData);
-      // })
+      .then(response => response.json())
+      .then(responseData => {
+        //this.props.updateData(responseData.photos[locationId]);
+        console.log("RD:", responseData);
+      })
       .done();
     }
     // "/navs/:floor/:pindex/:nindex/:newRotation"
