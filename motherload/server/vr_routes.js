@@ -40,8 +40,7 @@ router.route("/gNotes/:floor/:pindex/:note")
 
       // note values passed as JSON payload ~
 router.route("/notes/:floor/:pindex/:nindex")
-      // .get(floors.changeNotes, floors.update)
-      .put(floors.changeNotes, floors.update)
+      .post(floors.changeNotes, floors.update)
       .delete(floors.deleteNotes, floors.update)
       ;
 
@@ -54,6 +53,8 @@ router.route("/updatePanoramic/:floor/:pindex/:newURL")
       .get(floors.changeURLs)
       ;
 
+router.route("/*")
+      .all((req, res) => res.redirect("/404"));
 
 var preProcess = (req, res, next, param) => {
   // making these global

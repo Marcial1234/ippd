@@ -5,7 +5,7 @@ var router = express.Router();
 var uploadFiles = require("./upload/upload");
 
 router.route('/')
-      .get((req, res) => { res.render("upload") })
+      .get((req, res) => res.render("upload") )
       .post((req, res) => {
         if (!req.files)
           return res.status(400).send("No files were sent.");
@@ -21,6 +21,11 @@ router.route('/')
         else
           res.json({error: "no files attached"});
         })
+      // test this?
+      .all((req, res) => res.redirect("/404"))
       ;
+
+router.route("/*")
+      .all((req, res) => res.redirect("/404"));
 
 module.exports = router;

@@ -34,16 +34,20 @@ class ClientModule extends Module {
       'getJson', obj,
     ]);
   }
+
   _setRNContext(rnctx) {
-      this.rnContext = rnctx;
-    }
+    this.rnContext = rnctx;
+  }
+
   _setJson(json) {
     this.json = json;
   }
 
-    viewStuff(){
-      console.log(decodeURIComponent(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + encodeURIComponent(key).replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1")));
-    }
+  // static ?
+  // changed from 'console.log'
+  viewStuff() {
+    return decodeURIComponent(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + encodeURIComponent(key).replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));
+  }
 }
 
 // Gets the url?key=values
@@ -57,30 +61,23 @@ function init(bundle, parent, options) {
   //  => url?key=values
   let bldg = getQueryStringValue("building");
   console.log("GQS", getQueryStringValue("building"));
+
   if (!bldg) bldg = "5abed5d1571e152138346d24";
   let floor = "5ac6d11c0aa88b2dec945e0e";
   // let room = getQueryStringValue("room");
   // if (!room) bldg = "0";
 
-  // TODO: change construction of this to a "/" separated array join ~
-  // jsonPath = "/api/building/" + bldg;
-  let jsonPath = ["", "api", "floor", floor].join("/");
+  let jsonPath = ["api", "floor", floor].join("/");
 
-  //jsonPath = "/api/" + bldg;
-  //
-  // console.log("query", jsonPath);
-  // console.log("query", jsonPath);
-  // console.log("query", jsonPath);
-
-  //create div from overlay
+  // create div from overlay
   const domOverlayContainer1 = document.createElement('div');
   const domOverlayContainer2 = document.createElement('div');
   domOverlayContainer1.id = 'dom-overlay1';
   domOverlayContainer2.id = 'dom-overlay2';
+
   //create instance of module
   const domOverlayModule = new DomOverlayModule(domOverlayContainer1, domOverlayContainer2);
   const clientModule = new ClientModule();
-
 
   const vr = new VRInstance(bundle, 'VRLayout', parent, {
     // Add custom options here, still some work to be done...
@@ -95,17 +92,12 @@ function init(bundle, parent, options) {
   clientModule._setRNContext(vr.rootView.context);
   clientModule._setJson(jsonPath);
 
-  function testIt(){
-    //document.body.children[2].children[0].children[2].click();
-    // console.log(vr);
-    return vr.player.camera.rotation;
-  }
-
   vr.player._wrapper.appendChild(domOverlayContainer1);
   vr.player._wrapper.appendChild(domOverlayContainer2);
-  vr.render = function() {
-    // Any custom behavior you want to perform on each frame goes here
-  };
+
+  // Any custom behavior you want to perform on each frame goes here
+  // vr.render = () => {};
+
   // Begin the animation loop
   // Adds a camera and attaches the "Menu" component to it
   // This is for Stationary ReactVR
@@ -124,9 +116,6 @@ function init(bundle, parent, options) {
   window.ondblclick = onRendererDoubleClick;
   window.onmousewheel = onRendererMouseWheel;
   vr.rootView.context.worker.addEventListener('message', onVRMessage);
-  // RCTDeviceEventEmitter.addListener('testIt', () => {
-  //   console.log("VR:", vr.player.overlay.compass);
-  // });
 
   return vr;
 }
