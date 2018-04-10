@@ -8,20 +8,21 @@ export default class SelectorOverlay extends React.Component{
   constructor(props) {
     super(props);
     this.state = {
-      rooms: null,
-      floors: null,
-      lRooms: null,
-      lFloors: null,
-      floor: props.floor || "01",
-      room: props.room || "000001",
+      // change these from 'null' ~ causing odd errors every so often
+      rooms: {},
+      floors: {},
+      lRooms: [],
+      lFloors: [],
+      room: props.room,
+      floor: props.floor,
       updated: false,
     };
 
     this.goToRoom = this.goToRoom.bind(this);
     this.updateSearch = this.updateSearch.bind(this);
-    this.handleFloorChange = this.handleFloorChange.bind(this);
     this.handleRoomChange = this.handleRoomChange.bind(this);
     this.updateSelections = this.updateSelections.bind(this);
+    this.handleFloorChange = this.handleFloorChange.bind(this);
   }
 
   componentDidMount(){
@@ -80,12 +81,20 @@ export default class SelectorOverlay extends React.Component{
     // setTimeout(function() {this.setState({updated: false});}.bind(this), 1000);
   }
 
-  updateSelections(){
+  updateSelections() {
+    let floorNames = [];
+
+    if (this.props.floors) {
+      for (var i = 0; i < this.props.floors.length; i++) {
+        floorNames.push(this.props.floors[i].name);
+      }
+    }
+
     this.setState({
-      floors: Object.keys(this.props.floors),
-      lFloors: Object.keys(this.props.floors),
       rooms: Object.keys(this.props.rooms),
       lRooms: Object.keys(this.props.rooms),
+      floors: Object.keys(this.props.floors),
+      lFloors: floorNames,
     })
   }
 
@@ -93,32 +102,33 @@ export default class SelectorOverlay extends React.Component{
     if(!this.state.rooms){
       return null;
     }
+
     return (
       <div className="select-container">
         <div className="select-content">
           <div className="close2" onClick={this.props.onClose} />
-                <div className="selCol">Floor:
-                   <select value={this.state.floor} onChange={ (e) => {this.handleFloorChange(e, "update");}}>
-                     {this.state.lFloors.map((num, index) =>
-                      <option key={index}>
-                        {num}
-                      </option>
-                    )}
-                  </select>
-                </div>
-                <div className="selCol">Room:
-                   <select value={this.state.room} onChange={ (e) => {this.handleRoomChange(e, "update");}}>
-                     {this.state.lRooms.map((num, index) =>
-                        <option key={index}>
-                          {num}
-                        </option>
-                      )}
-                    </select>
-                </div>
-                <button onClick={this.goToRoom} className="selCol">GO</button>
-                {this.state.updated && <img className="check" src="../static_assets/check.png"/>}
+          <div className="selCol">Floor:
+            <select value={this.state.floor} onChange={ (e) => {this.handleFloorChange(e, "update");}}> 
+              {this.state.lFloors.map((num, index) =>
+                <option key={index}>
+                  {num}
+                </option>
+              )}
+            </select>
           </div>
+          <div className="selCol">Room:
+            <select value={this.state.room} onChange={ (e)=> {this.handleRoomChange(e, "update");}}> 
+              {this.state.lRooms.map((num, index) =>
+                <option key={index}>
+                  {num}
+                </option>
+              )}
+            </select>
+          </div>
+          <button onClick={this.goToRoom} className="selCol">GO</button>
+          {this.state.updated && <img className="check" src="../static_assets/check.png" />}
         </div>
+      </div>
     )
   }
 }

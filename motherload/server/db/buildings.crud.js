@@ -12,7 +12,7 @@ module.exports = {
   // this should work ~
   create: (req, res) => {
     var newBuilding = new Building(req.body);
-    console.log(newBuilding);
+    // console.log(newBuilding);
     
     newBuilding.save((err, realNewBuilding) => {
       if (err) {
@@ -35,6 +35,7 @@ module.exports = {
   delete: (req, res) => {
     Building.findByIdAndRemove(req.building.id, (err, bldg) => {
       if (err) res.status(404).send(err);
+      // if (err) res.sendstatus(404);
       else {
         for (var i = 0; i < bldg.floors.length; i++) {
           Floor.findByIdAndRemove(bldg.floors[i].hash, (err) => {
@@ -64,10 +65,12 @@ module.exports = {
     
     Building.findById(id).exec((err, building) => {
       if (err) {
+        res.sendStatus(400);
         console.log(err);
-        req.err = err;
-        // res.status(400).send(err);
-        next();
+        
+        // req.err = err;
+        // res.send(400).send(err);
+        // next();
       }
       else {
         req.building = building;

@@ -16,8 +16,8 @@ var BuildingSchema = new mongoose.Schema({
   //   "rooms": "ref",
   // }
 
-  city:        {type: String, required: true},
   name:        {type: String, required: true},
+  city:        {type: String, required: true},
   state:       {type: String, required: true},
   num_floors:  {type: Number, required: true},
   
