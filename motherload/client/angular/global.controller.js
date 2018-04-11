@@ -1,15 +1,30 @@
 // Later use ~
 angular
   .module('app')
-  .controller('GlobalCtrl', ["$scope", "$location", "Factory",
-    function (scope, location, Factory, ) {
+  .controller('GlobalCtrl', ["$rootScope", "$scope", "$location", "Factory", 'FileUploader',
+    function (rootScope, scope, location, Factory, FileUploader) {
 
       // ey!
       // var socket = io.connect(window.location.host);
       // var socket = io();
+      
+      // let a = new FileUploader({url:"/"});
+      // console.log(a);
 
-      scope.global = () => {
-        console.log(scope.data);
+      scope.dale = () => {
+        // send to the server as a post?
+        let formdata = new FormData();
+
+        scope.data.forEach((value, key) => {
+          formdata.append(key, value);
+        })
+
+        Factory.postPics(formdata);
+        // .then(
+        //   (res) => {
+        //     console.log(res);
+        //   }
+        // )
       }
 
       scope.search = "";

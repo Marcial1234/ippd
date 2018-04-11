@@ -56,9 +56,8 @@ module.exports.init = function() {
   });
 
   // File uploading code+routing ~
-  app
-    .get("/upload", (req, res) => res.render("index", {}))
-    .use("/upload", upload_api);
+  app.get("/upload", (req, res) => res.render("index", {}))
+     .use("/upload", upload_api);
 
   // ReactVR Routing
   app.use("/vr", (req, res) => {

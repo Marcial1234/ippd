@@ -8,19 +8,22 @@ angular
       link: (scope, element, attributes) => {
         element.bind("change", (event) => {
           scope.$apply(() => {
+            // NOT CLEANING THIS
 
-            let type;
-            scope["severful"] = {}
+            // scope["severful"] = {}
             let size = Object.keys(event.target.files).length
-            console.log(event.target.files)
+            scope["severful"] = []
+            
+            // scope.severful = event.target.files
 
             for (var i = 0; i < size; i++) {
-              type = event.target.files[i].type;
-              scope.severful[i] = new Blob([event.target.files[i]], {type: type});
+              // scope.severful[i] = new Blob([event.target.files[i]], {type: type});
+              // scope.severful[i] = event.target.files[i]
+              scope.severful.push(event.target.files[i])
             }
 
-            console.log(scope)
-            console.log(scope.severful)
+            // console.log(scope)
+            // console.log(scope.severful)
             // scope["severful"] = {...images};
           });
         });

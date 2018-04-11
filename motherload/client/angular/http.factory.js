@@ -4,6 +4,22 @@ angular
     function(http, window) {
 
       let serverMethods = {
+        // Picture Upload
+        postPics: (formdata) => {
+          // THIS IS WHAT WORKED
+          let request = {
+            method: 'POST',
+            url: '/upload',
+            data: formdata,
+            headers: {
+              'Content-Type': undefined
+            }
+          }
+
+          console.log(formdata)
+          return http(request)
+        },
+
         // Basic CRUD
         getFloors: () => {
           return http.get("/api/getAllFloors");

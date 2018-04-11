@@ -9,8 +9,10 @@ router.route('/')
       .post((req, res) => {
 
         // i can name the args ~
-        // console.log(req.files);
-        console.log(req.files.image);
+        console.log(req.body);
+        console.log(req.files);
+        res.json(req.headers);
+        // console.log(req.files.image);
         
         // if (!req.files)
         //   return res.status(400).send("No files were sent.");
