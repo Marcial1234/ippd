@@ -11,12 +11,21 @@
       <h1 class="page-header">Image Portal</h1>
     </div>
     <div class="col-lg-12">
-      <h5>Select image(s) to upload (up to 1000, or 1GB):</h5>
-      <form action="/upload" method="POST" accept="images/*" enctype="multipart/form-data">
-        <input type="file" name="image" multiple>
+      <!--  (up to 1000, or 1GB) -->
+      <h5>Select image(s) to upload:</h5>
+
+      <!-- figure this out ... -->
+      
+      <!-- action="/upload" method="POST" -->
+      <!-- ng-submit="console.log(data)" -->
+      <form accept="image/*" ng-submit="$parent.check()" enctype="multipart/form-data">
+        <!-- custom directive -->
+        <input type="file" name="image" multiple accept="image/*" severful="data">
         <br>
         <input class="btn btn-primary" type="submit" value="Upload All Images">
       </form>
+
     </div>
+
   </div>
 </div>

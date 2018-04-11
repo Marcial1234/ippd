@@ -4,6 +4,14 @@ angular
   .controller('GlobalCtrl', ["$scope", "$location", "Factory",
     function (scope, location, Factory, ) {
 
+      // ey!
+      // var socket = io.connect(window.location.host);
+      // var socket = io();
+
+      scope.global = () => {
+        console.log(scope.data);
+      }
+
       scope.search = "";
 
       scope.newBuilding = () => {
@@ -13,7 +21,7 @@ angular
               scope.allBuildings.push(res.data);
             else
               console.log(res);
-          }
+          } 
         );
       };
 
