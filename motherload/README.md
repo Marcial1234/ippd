@@ -14,9 +14,9 @@
 # Operationalizing TODOs
 
 ### Main Task
-- Graph search algorithm for map view and assignment of navigation elements to each 'room'
 - Async f(x) to link mapping views to cloud image locations
-- Finish React CRUD
+- Finish React CRUD (Deletes, correct indexing for no overrides)
+- Polish up frontend with extra features (floor editing, note search, preview pano)
 - Clean and Document
 - Create dummy VR floor with basic '404'-like message
 

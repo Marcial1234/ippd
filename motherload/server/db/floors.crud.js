@@ -28,6 +28,13 @@ module.exports = {
   },
 
   update: (req, res) => {
+    // for those that an endpoint has been created ~
+    //  => complete floor change, floor name
+    if (req.body.plain) {
+      // does this work?
+      req.floor = {...req.floor, ...req.body};
+    }
+
     Floor.findByIdAndUpdate(req.floor._id, req.floor, {new: true},
       (err, updatedNote) => {
         if (err) res.status(404).send(err);
@@ -77,6 +84,9 @@ module.exports = {
   },
 
   deleteNotes: (req, res, next) => {
+    // todo: only delete if the index == the wanted id
+    // for some ... etcs
+    // on React => attach id to obj from response
     req.floor.photos[pindex].notes.splice(nindex, 1);
     next();
   },
@@ -92,10 +102,12 @@ module.exports = {
 
     Floor.findById(id).exec((err, floor) => {
       if (err) {
+        res.sendStatus(400);
         console.log(err);
-        req.err = err;
-        // res.status(400).send(err);
-        next();
+        
+        // req.err = err;
+        // res.send(400).send(err);
+        // next();
       }
       else {
         req.floor = floor;

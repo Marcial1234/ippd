@@ -1,15 +1,62 @@
-/* 
+/*
 Custom CSS for...
 'Modern Business' HTML Theme by Start Bootstrap
 
-All Start Bootstrap themes are licensed under Apache 2.0. 
+All Start Bootstrap themes are licensed under Apache 2.0.
 For more info and more free Bootstrap 3 HTML themes, visit http://startbootstrap.com!
 */
 
 /* Custome Styles */
-.centered {
+.left {
+    text-align: left;
+}
+
+.right {
+    text-align: right;
+}
+
+.centered, tr.centered > th {
     text-align: center;
 }
+
+.table-centered {
+    display: flex;
+    justify-content: center;
+}
+
+.dropdown {
+    width: 70px;
+    cursor: pointer;
+    text-align-last:center;
+}
+
+#logo {
+    width: 75px;
+    margin-top: -8px;
+}
+
+.logo_small {
+    width: 60px;
+    margin-top: -8px;
+}
+
+#mainTable {
+    /* arbitrary size for no body overflow on laptop */
+    overflow-y: auto;
+    max-height: 580px;
+}
+
+table.table {
+    margin-bottom: 0px;
+}
+
+/* no body overflow and consisten look on laptop */
+/*
+#app {
+    min-height: 750px;
+}
+*/
+
 
 /* Global Styles */
 
@@ -22,11 +69,6 @@ body {
     padding-bottom: 20px;
     /*background-color: grey;*/
 }
-
-.dropdown {
-    cursor:pointer;
-}
-
 
 .img-home-portfolio,
 .img-customer,
@@ -130,7 +172,11 @@ body {
 
 /* Footer Styles */
 footer {
-    margin: 50px 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 1rem;
+    position: absolute;
 }
 
 /* Responsive Styles */

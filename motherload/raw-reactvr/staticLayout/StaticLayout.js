@@ -105,13 +105,13 @@ export default class StaticLayout extends React.Component {
     let {data} = this.props.photo;
     let notes = data.notes;
     let ID = this.state.noteID;
-
+    console.log(notes);
     // ???
     if (ID >= notes.length || ID < 0) {
       this.setState({noteID: 0});
       ID = 0;
     }
-
+    console.log("ID", ID);
     NativeModules.ClientModule.getRotation();
     setTimeout(function() {
       let rot = (this.state.cameraRot._y*57)%360;
@@ -128,10 +128,11 @@ export default class StaticLayout extends React.Component {
       translateX: 0,
     }
 
-    data.notes.push(newNote);
     this.save("notes", newNote, ID);
-    this.props.updateData(data);
 
+    this.setState({
+      noteID : this.state.noteID + 1
+    });
     if (this.state.displayNotes) {
       this.refreshTooltips();
     }
@@ -188,6 +189,7 @@ export default class StaticLayout extends React.Component {
           notes[NoteID].translateX +=adj;
           break;
       }
+      this.save("notes", newNote, ID);
       data.notes = notes;
     }
 
@@ -213,8 +215,6 @@ export default class StaticLayout extends React.Component {
       this.save("navs", navs[NavID].rotationY, NavID);
       // data.navs = navs;
     }
-
-    this.props.updateData(data);
   }
 
   editNote(index) {
@@ -241,21 +241,19 @@ export default class StaticLayout extends React.Component {
     else if (index == this.state.noteID) {
       NativeModules.DomOverlayModule.closeOverlay1();
     }
-
-    data.notes.splice(index, 1);
-    this.props.updateData(data);
+    this.save("delete", "", index);
     this.refreshTooltips();
   }
 
   updateText(obj) {
     let {data} = this.props.photo;
     let notes = data.notes;
+    let note = notes[this.state.noteID];
 
-    notes[this.state.noteID].text = obj.text;
-    notes[this.state.noteID].title = obj.title;
-    data.notes = notes;
+    note.text = obj.text;
+    note.title = obj.title;
 
-    this.props.updateData(data);
+    this.save("notes", note, this.state.noteID);
     this.refreshTooltips();
   }
 
@@ -370,8 +368,8 @@ export default class StaticLayout extends React.Component {
   }
 
   refreshTooltips() {
-    setTimeout(function() {this.toggleNotes()}.bind(this), 25);
-    setTimeout(function() {this.toggleNotes()}.bind(this), 25);
+    setTimeout(function() {this.toggleNotes()}.bind(this), 125);
+    setTimeout(function() {this.toggleNotes()}.bind(this), 125);
   }
 
   openOverlay(index, type) {
@@ -475,7 +473,6 @@ export default class StaticLayout extends React.Component {
   save(type, obj, index = -1) {
     let {currentFloor, floors} = this.props.location;
     let {locationId} = this.props.photo;
-    console.log(obj);
 
     // "/gNotes/:floor/:pindex/:note"
     if (type == "gNotes") {
@@ -492,9 +489,6 @@ export default class StaticLayout extends React.Component {
     else if (type == "notes") {
       let jsonPath = ["api", type, floors[currentFloor].hash, locationId, index].join("/");
 
-      console.log(jsonPath);
-      console.log(JSON.stringify(obj));
-
       // Always send POSTs, donno why puts aren't working, but ¯\_(ツ)_/¯
       fetch(this.formatSearchQuery(jsonPath), {
           body: JSON.stringify(obj),
@@ -503,7 +497,7 @@ export default class StaticLayout extends React.Component {
       })
       .then(response => response.json())
       .then(responseData => {
-        //this.props.updateData(responseData.photos[locationId]);
+        this.props.updateData(responseData.photos[locationId]);
         console.log("RD:", responseData);
       })
       .done();
@@ -521,18 +515,19 @@ export default class StaticLayout extends React.Component {
           .done();
     }
 
-    // var url = this.props.jsonPath;
-    // var data = this.props.json;
-    //
-    // fetch(url, {
-    //   method: 'POST', // or 'PUT'
-    //   body: JSON.stringify(data),
-    //   headers: new Headers({
-    //     'Content-Type': 'application/json'
-    //   })
-    // }).then(res => res.json())
-    // .catch(error => console.error('Error:', error))
-    // .then(response => console.log('Success:', response));
+    else if (type == "delete") {
+      let jsonPath = ["api", "notes", floors[currentFloor].hash, locationId, index].join("/");
+      fetch(this.formatSearchQuery(jsonPath), {
+          method: "DELETE",
+      })
+      .then(response => response.json())
+      .then(responseData => {
+        this.props.updateData(responseData.photos[locationId]);
+        console.log("RD:", responseData);
+      })
+      .done();
+    }
+
   }
 
   setRotation(){

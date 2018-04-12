@@ -10,6 +10,7 @@ var buildings = require("./db/buildings.crud.js") ;
 //       .get(pano.read)
 //       .put(pano.update)
 //       .post(pano.create)
+//       .delete(pano.byebye)
 //       ;
 // var dummy = require("./dummy").buildings;
 
@@ -21,6 +22,8 @@ router.route("/getAllBuildings")
 // what can u edit from buildings? floors? address? idk...
 router.route("/building/:bldg")
       .get(buildings.read)
+      .post(buildings.create)
+      // .put(buildings.update)
       .delete(buildings.delete)
       ;
 
@@ -30,6 +33,9 @@ router.route("/getAllFloors")
 
 router.route("/floor/:floor")
       .get(floors.read)
+      // ...
+      // .post(floors.create)
+      .put(floors.update)
       .delete(floors.read)
       ;
 
@@ -58,9 +64,9 @@ router.route("/*")
 
 var preProcess = (req, res, next, param) => {
   // making these global
-  pindex = req.params.pindex;
-  nindex = req.params.nindex;
   newURL = req.params.newURL;
+  pindex = parseInt(req.params.pindex);
+  nindex = parseInt(req.params.nindex);
   newRot = parseInt(req.params.newRotation);
   newGNote = req.params.note;
   next();

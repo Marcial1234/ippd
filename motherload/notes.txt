@@ -1,41 +1,22 @@
-Idea for Map View
-  Have a defined start point and end point (cotiguous space)
+Idea for Map View => done
+  last resort ~ send picture to frontend?
   just have 'boxes' with number input fields/dropdowns
+  Have a defined start point and end point (cotiguous space)
   === end of frontend ~
-
-  auto assign rotations based relative coors ~
-  copy 'safe spiral's way of doing bounds ~
-    =>
   n^2 lazy parsing, find out how many used, push as you see ~
-    record index of start ~
-    TODO Later: delete pics not used
-  push as you see, link ~ based on spiral : coors
+  auto assign rotations based relative coors ~
+  record index of start ~
     [step].join(""):
       "01" => right 90
       "10" => left -90
       "-10" => forward 0
       "0-1" => backward -178?
-      and diagonals?
+      
+  TODO Later:
+  delete pics not used
   * view from button-to-top as front/back *
     - need a huge ass visual indicator
         - ARROWS!
-
-  default one? 5 x 5
-  1* 1 0          0 1*
-  0  1 0          1 1
-  0  1 1* start   1 0
-  =>
-  {
-    navs:  [
-      {
-        rotationY: Number,
-        linkedPhotoId: Number,
-      },
-    ],
-  }
-
-  map pics different f(x) ~ 
-
 
 Idea for image uploading:
   Move to server on bldg => floor hash based folder structure
@@ -50,9 +31,11 @@ Idea for image uploading:
 Go to stuart ~
 
 Other TODOs:
-  Test put from frontend
+  Move to remote image sources/uris => kevin
 
-  Move to remote image sources/uris
+  Picture uploading and mapping !!
+
+  ===
 
   Bldg and note search view
 
