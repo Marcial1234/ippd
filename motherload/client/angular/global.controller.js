@@ -15,9 +15,9 @@ angular
         // have a building prepared when file uploads work ~
         // then pass the ref of that ?
         formdata.append("bldg", "no")
-        formdata.append("floor", "?")
+        formdata.append("floor", Date.now())
         formdata.append("room", "?")
-        
+
         Factory.postPics(formdata, scope.names.length)
         .then((res) => {
           console.log(res)

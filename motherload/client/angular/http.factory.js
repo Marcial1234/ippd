@@ -11,7 +11,7 @@ angular
             method: 'POST',
             url: '/upload',
             data: formdata,
-            timeout: size * 30000,
+            timeout: size * 300000,
             headers: {
               'Content-Type': undefined
             }

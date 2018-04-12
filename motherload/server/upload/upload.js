@@ -1,13 +1,15 @@
 var fs = require('fs');
 var exec = require('child_process').exec;
 var cloudinary = require('cloudinary');
-var dirname, size;
+var dirname, floor;
 
 const FILE_EXTENTION = ".jpg";
 const PANO_EXTENTION = "_pano.jpg";
-const PANO_DIRECTORY = "panos\\";
 const WIN_SCRIPT_NAME = "win-gear360pano.cmd";
-const STICHING_SCRIPT_PATH = "..\\client\\gear360pano\\";
+
+// these are relative to base folder "..\\server"
+const STICHING_SCRIPT_PATH = "\\client\\gear360pano\\";
+let PANO_DIRECTORY = "client\\static_assets\\"
 
 cloudinary.config({
   api_key: process.env.API_KEY,
@@ -24,10 +26,20 @@ preProcessFiles = (req, res) => {
   if (!req.files)
     res.json({err: "no files"});
   else {
+    if (req.body.floor) {
+      floor = req.body.floor
+      PANO_DIRECTORY += [floor, "\\"].join("")
+
+      if (!fs.existsSync(PANO_DIRECTORY)) {
+        fs.mkdirSync(PANO_DIRECTORY);
+      }
+    }
+
     uploadFiles(Object.values(req.files), res)
   }
 }
 
+// do this on frontned...
 validate = (panoPaths, invalidPanos) => {
   for (let i = panoPaths.length - 1; i < -1 ; i--) {
     if (!fs.existsSync(panoPaths[i])) {
@@ -38,46 +50,22 @@ validate = (panoPaths, invalidPanos) => {
   }
 }
 
-uploadFiles = async (images, res, perent_dir) => {
+const timeout = ms => new Promise(res => setTimeout(res, ms))
 
-  let panoPaths, failedStitching, cloudPaths, invalidPanos = []
-  size = images.length;
-
-  // we're on the "server folder, and want the base project path"
-  // GLOBAL FOR THIS FILE
-  dirname = __dirname + "/../";
-
-  // copy/move images to server ~ get pano paths
-  panoPaths = images.map(uploadToServer)
-  Promise.all(panoPaths).then((responseeee) =>
-    res.json({panos: responseeee})
-  )
-  // console.log(panoPaths)
-
-  // stich images
-  // console.log("startDinggggg")
-  // await stich()
-  // console.log("done with stitching")
-  // await validate(panoPaths, invalidPanos)
-  // console.log(invalidPanos, panoPaths)
-  // Validation: check if all the pano paths are here ~ if not, say which index of them had error
-  // [invalidPanos, panoPaths] = await validate(panoPaths)
-
-  // push to cloud
-  // cloudPaths = panoPaths.map(pushToCloud)
-  // await Promise.all(cloudPaths).then(error => console.error(error))
-  // res.json({paths: cloudPaths, bad: invalidPanos})
+getPanoPath = (imgPath) => {
+  nameWithouthExtension = imgPath.split(".")[0]
+  return [floor, nameWithouthExtension + PANO_EXTENTION].join("/")
 }
 
 // .mv comes from ?? fileUpload?
 uploadToServer = async (image) => {
-  let basePath = dirname + PANO_DIRECTORY + image.name
-  let panoPath = basePath + PANO_EXTENTION
+  let basePath = PANO_DIRECTORY + image.name
   let path = basePath + FILE_EXTENTION
 
+  let panoPath = basePath + PANO_EXTENTION
   await image.mv(path, (err) => {if (err) console.log(err)})
   console.log("Uploaded ", image.name, "as", path)
-  return panoPath
+  return getPanoPath(image.name)
 } 
 
 // TBA LINUX SCRIPT
@@ -90,22 +78,30 @@ uploadToServer = async (image) => {
   exec(dirname + '/public/gear360pano/gear360pano.sh -n ' + 
        '-r -o ' + dirname + '/public/upload ' + image.path,
 */
+
 windowsStitchcommand = () => {
   let upload_dir = dirname + PANO_DIRECTORY;
+  console.log(upload_dir)
+
   let script_path = dirname + STICHING_SCRIPT_PATH;
   let abs_script_path = script_path + WIN_SCRIPT_NAME;
+  
   let cmd = [
-    // abs_script_path, path, "/o", upload_dir,
-    abs_script_path, upload_dir + "*.JPG", "/o", upload_dir,
+    abs_script_path, 
+    upload_dir + "*.JPG", 
+    "/o", 
+    upload_dir,
   ].join(" ");
 
   return cmd
 }
 
-// Process image with gear360pano and, on exit, send to cloudinary
-stich = () => {
+// Process image with gear360pano script
+stich = async () => {
   return new Promise((resolve, reject) => {
     cmd = windowsStitchcommand()
+    // console.log(cmd)
+    // console.log(__dirname)
 
     // converting the files on the background
     let stitch = exec(cmd, (error, stdout, stderr) => {
@@ -114,7 +110,7 @@ stich = () => {
 
       if (error !== null) {
         console.log(stderr);
-        console.log('exec error: ${error}');
+        // console.log('exec error:', error);
       }
 
       resolve(error)
@@ -122,7 +118,29 @@ stich = () => {
   })
 }
 
+uploadFiles = async (images, res, extraParams) => {
+
+  let size = images.length;
+  let panoPaths, failedStitching, cloudPaths, invalidPanos = []
+
+  // we're on the server folder, and want the base project path
+  // GLOBAL FOR THIS FILE
+  dirname = __dirname + "/../../";
+
+  // copy/move images to server ~ get pano paths
+  panoPaths = images.map(uploadToServer)
+  Promise.all(panoPaths).then(async (paths) => {
+    console.log("startDinggggg")
+    await stich()
+    res.json({panoPaths: paths})
+  })
+
+  // push to cloud
+  // NOT IMPLEMENTING THIS
+}
+
 // Send image to cloudinary
+// NOT WORKING
 pushToCloud = (imagePanoPath) => {
   return new Promise((resolve, reject) => {
     console.log(imagePanoPath)
