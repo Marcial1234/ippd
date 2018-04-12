@@ -12,8 +12,13 @@ angular
       // console.log(a);
 
       scope.dale = () => {
-        // send to the server as a post?
-        let formdata = new FormData();
+        // add currently building or SOMETHING ELSE ~ idk why but sure
+
+        let formdata = new FormData()
+        // have a building prepared when file uploads work ~
+        // then pass the ref of that ?
+        formdata.append("bldg", "no")
+        formdata.append("floor", "?")
 
         scope.data.forEach((value, key) => {
           formdata.append(key, value);
