@@ -3,30 +3,47 @@ angular
   .directive("severful", [() => {
     return {
       scope: {
-        "severful": "="
+        "names": "=",
+        "severful": "=",
       },
       link: (scope, element, attributes) => {
-        element.bind("change", (event) => {
-          scope.$apply(() => {
-            // NOT CLEANING THIS
 
-            // scope["severful"] = {}
-            let size = Object.keys(event.target.files).length
-            scope["severful"] = []
+        linkFilesToAngular = (event) => {
+          scope.names = []
+          scope.severful = new FormData()
+          let item, size = Object.keys(event.target.files).length + 1
+
+          for (var i = 0; i < size; i++) {
+            item = event.target.files[i]
             
-            // scope.severful = event.target.files
-
-            for (var i = 0; i < size; i++) {
-              // scope.severful[i] = new Blob([event.target.files[i]], {type: type});
-              // scope.severful[i] = event.target.files[i]
-              scope.severful.push(event.target.files[i])
+            if (item) {
+              scope.names.push(item.name)
+              scope.severful.append(i, item)
             }
+          }
 
-            // console.log(scope)
-            // console.log(scope.severful)
-            // scope["severful"] = {...images};
-          });
+          scope.$apply()
+        }
+
+        element.bind("change", (event) => {
+          linkFilesToAngular(event)
         });
+
+        // makeDropable = (e) => {
+        //   e.preventDefault();
+        //   e.stopPropagation();
+        //   element.classList.remove("dragover");
+        //   linkFilesToAngular(e)
+        // }
+
+        // element.bind("drop", makeDropable);
+        // element.bind("dragleave", makeDropable);
+
+        // element.bind("dragover", function(e) {
+        //   e.preventDefault();
+        //   e.stopPropagation();
+        //   element.classList.add("dragover");
+        // });
       }
     }
   }])

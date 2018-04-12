@@ -5,18 +5,19 @@ angular
 
       let serverMethods = {
         // Picture Upload
-        postPics: (formdata) => {
+        postPics: (formdata, size) => {
           // THIS IS WHAT WORKED
           let request = {
             method: 'POST',
             url: '/upload',
             data: formdata,
+            timeout: size * 30000,
             headers: {
               'Content-Type': undefined
             }
           }
 
-          // console.log(formdata, body)
+          console.log("sending ~")
           return http(request)
         },
 

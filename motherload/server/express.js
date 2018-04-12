@@ -20,7 +20,7 @@ var upload_api = require("./upload_routes");
 module.exports.init = function() {
 
   // Connect to database
-  mongoose.connect(process.env.MONGO_URI, {useMongoClient: true});
+  // mongoose.connect(process.env.MONGO_URI, {useMongoClient: true});
 
   // initialize app
   var app = express();

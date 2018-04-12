@@ -1,39 +1,30 @@
 // Later use ~
 angular
   .module('app')
-  .controller('GlobalCtrl', ["$rootScope", "$scope", "$location", "Factory", 'FileUploader',
-    function (rootScope, scope, location, Factory, FileUploader) {
+  .controller('GlobalCtrl', ["$rootScope", "$scope", "$location", "Factory",
+    function (rootScope, scope, location, Factory, ) {
 
-      // ey!
-      // var socket = io.connect(window.location.host);
-      // var socket = io();
+      // CAN ONLY ACCESS ROOT VARIABLES HERE
+      // scope.search = "";
+
+      scope.showUploadWindow = () => $('#up').trigger('click')
       
-      // let a = new FileUploader({url:"/"});
-      // console.log(a);
-
       scope.dale = () => {
-        // add currently building or SOMETHING ELSE ~ idk why but sure
+        let formdata = scope.data
 
-        let formdata = new FormData()
         // have a building prepared when file uploads work ~
         // then pass the ref of that ?
         formdata.append("bldg", "no")
         formdata.append("floor", "?")
-
-        scope.data.forEach((value, key) => {
-          formdata.append(key, value);
+        formdata.append("room", "?")
+        
+        Factory.postPics(formdata, scope.names.length)
+        .then((res) => {
+          console.log(res)
         })
-
-        Factory.postPics(formdata);
-        // .then(
-        //   (res) => {
-        //     console.log(res);
-        //   }
-        // )
       }
 
-      scope.search = "";
-
+      // tested?
       scope.newBuilding = () => {
         Factory.createBuilding(scope.newBldgObj).then(
           (res) => {

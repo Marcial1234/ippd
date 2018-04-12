@@ -1,15 +1,13 @@
 var fs = require('fs');
 var exec = require('child_process').exec;
 var cloudinary = require('cloudinary');
-var dirname;
+var dirname, size;
 
 const FILE_EXTENTION = ".jpg";
 const PANO_EXTENTION = "_pano.jpg";
 const PANO_DIRECTORY = "panos\\";
 const WIN_SCRIPT_NAME = "win-gear360pano.cmd";
 const STICHING_SCRIPT_PATH = "..\\client\\gear360pano\\";
-// TODO: add other/more reused strings here
-// output paths and such
 
 cloudinary.config({
   api_key: process.env.API_KEY,
@@ -17,128 +15,129 @@ cloudinary.config({
   cloud_name: 'serverful',
 });
 
-// issues here with too many responses
-function uploadFiles(images, res, perent_dir) {
-  if (!images)
-    return true;
+preProcessFiles = (req, res) => {
 
-  // we're on the "server folder, and want the base project path"
-  dirname = perent_dir + "/";
-  let i = 1, size = Object.keys(images).length;
-  console.log("Files incoming:", size);
-  uploadToServer(images[0])
+  console.log(req.body);
+  console.log(req.files);
+  console.log(req.timeout);
 
-  // this is handled beautifully synchrounously :D
-  while (processAndUploadImage(uploadToServer(images[i]))) {
-    i += 1
-    console.log(i, "waiting...")
+  if (!req.files)
+    res.json({err: "no files"});
+  else {
+    uploadFiles(Object.values(req.files), res)
   }
-
-  // We get the url from this and attach + id => send it to db
-  // ignoring for now... 
-  // pushToCloud(image);
 }
 
-// Upload to /public/upload with express-fileupload middleware
-function uploadToServer(image, res) {
-  if (!image)
-    return false
+validate = (panoPaths, invalidPanos) => {
+  for (let i = panoPaths.length - 1; i < -1 ; i--) {
+    if (!fs.existsSync(panoPaths[i])) {
+      console.log(panoPaths[i], "DOESNT'TTT")
+      invalidPanos.push(i)
+      panoPaths = panoPaths.slice(i, 1)
+    }
+  }
+}
 
-  let id = Date.now();  // Time in milliseconds
-  let path = dirname + PANO_DIRECTORY + id + FILE_EXTENTION;
-  let panoPath = dirname + PANO_DIRECTORY + id + PANO_EXTENTION;
+uploadFiles = async (images, res, perent_dir) => {
 
-  console.log("Uploading ", image.name, "as", path);
-  // create paths here if they aren't there ...
+  let panoPaths, failedStitching, cloudPaths, invalidPanos = []
+  size = images.length;
 
-  image.mv(path, function(err) {
-    // fix all this ~
-    // if (err) {
-    //   res.status(500).json({error: err});
-    //   throw err;
-    // }
-  });
+  // we're on the "server folder, and want the base project path"
+  // GLOBAL FOR THIS FILE
+  dirname = __dirname + "/../";
 
-  return {
-    id: id,
-    path: path,
-    name: image.name,
-    panoPath: panoPath,
-  };
+  // copy/move images to server ~ get pano paths
+  panoPaths = images.map(uploadToServer)
+  Promise.all(panoPaths).then((responseeee) =>
+    res.json({panos: responseeee})
+  )
+  // console.log(panoPaths)
+
+  // stich images
+  // console.log("startDinggggg")
+  // await stich()
+  // console.log("done with stitching")
+  // await validate(panoPaths, invalidPanos)
+  // console.log(invalidPanos, panoPaths)
+  // Validation: check if all the pano paths are here ~ if not, say which index of them had error
+  // [invalidPanos, panoPaths] = await validate(panoPaths)
+
+  // push to cloud
+  // cloudPaths = panoPaths.map(pushToCloud)
+  // await Promise.all(cloudPaths).then(error => console.error(error))
+  // res.json({paths: cloudPaths, bad: invalidPanos})
+}
+
+// .mv comes from ?? fileUpload?
+uploadToServer = async (image) => {
+  let basePath = dirname + PANO_DIRECTORY + image.name
+  let panoPath = basePath + PANO_EXTENTION
+  let path = basePath + FILE_EXTENTION
+
+  await image.mv(path, (err) => {if (err) console.log(err)})
+  console.log("Uploaded ", image.name, "as", path)
+  return panoPath
 } 
 
-// Process image with gear360pano and, on exit, send to cloudinary
-function processAndUploadImage(image) {
-
-  if (!image)
-    return false
-
-  // === Linux / Windows Scripts ===
-
-  // LINUX SCRIPT
-  // let upload_dir = dirname + '/public/upload/';
-  // let cmd = dirname + '/public/gear360pano/gear360pano.sh -n ' + 
-  //          '-r -o ' + upload_dir + image.name;
-  // from original: 
-  /*
-    exec(dirname + '/public/gear360pano/gear360pano.sh -n ' + 
-         '-r -o ' + dirname + '/public/upload ' + image.path,
-  */
-
-  // WINDOWS SCRIPT
+// TBA LINUX SCRIPT
+// YOU CAN USE '-P' for PARALLEL PROCESSING IN LINUX! SHOULD BE FASTERR
+// let upload_dir = dirname + '/public/upload/';
+// let cmd = dirname + '/public/gear360pano/gear360pano.sh -n ' + 
+//          '-r -o ' + upload_dir + image.name;
+// from original: 
+/*
+  exec(dirname + '/public/gear360pano/gear360pano.sh -n ' + 
+       '-r -o ' + dirname + '/public/upload ' + image.path,
+*/
+windowsStitchcommand = () => {
   let upload_dir = dirname + PANO_DIRECTORY;
   let script_path = dirname + STICHING_SCRIPT_PATH;
   let abs_script_path = script_path + WIN_SCRIPT_NAME;
   let cmd = [
-    abs_script_path, image.path, "/o", upload_dir,
+    // abs_script_path, path, "/o", upload_dir,
+    abs_script_path, upload_dir + "*.JPG", "/o", upload_dir,
   ].join(" ");
 
-  // this is converting the files on the background :D
+  return cmd
+}
 
-  // let notRan = true;
+// Process image with gear360pano and, on exit, send to cloudinary
+stich = () => {
+  return new Promise((resolve, reject) => {
+    cmd = windowsStitchcommand()
 
-  // while (notRan) {
-  //   // ugly but idk what to do ~
-  //   fs.open(abs_script_path, 'r+', function(err, fd) {
-  //     if (err && err.code === 'EBUSY') {
-  //       fs.close(fd, function() {
-  //         // run now
-  //       }
-  //     }
-  //   }
-  // }
+    // converting the files on the background
+    let stitch = exec(cmd, (error, stdout, stderr) => {
+      console.log(stdout);
+      console.log("GOING OUT");
 
-  // figure out a way to get the 'done'
-  let stitch = exec(cmd, (error, stdout, stderr) => {
-    console.log(stdout);
-      
-    if (error !== null) {
-      console.log(stderr);
-      console.log(`exec error: ${error}`);
-    }
-  });
+      if (error !== null) {
+        console.log(stderr);
+        console.log('exec error: ${error}');
+      }
 
-  stitch.on('close', () => {
-    // push an a ARRAY WITH ALL OF THEM
-    console.log("Stitching complete for", image.path, "\nPushing to cloud.");
-  });
-  stitch.on('error', () => {
-    console.log("Error processing image", image.path);
-  });
+      resolve(error)
+    })
+  })
 }
 
 // Send image to cloudinary
-function pushToCloud(image) {
-  cloudinary.v2.uploader.upload(image.panoPath, 
-    {
+pushToCloud = (imagePanoPath) => {
+  return new Promise((resolve, reject) => {
+    console.log(imagePanoPath)
+
+    cloudinary.v2.uploader.upload(imagePanoPath, {
       overwrite: true,
-      public_id: image.id,
+      // public_id: (Date.now() ** 1.5),
       resource_type: "image",
-    },
-    function(error, result) {
+    }, (error, result) => {
+      console.log(error);
       console.log(result);
+      resolve(result)
     });
+  })  
 }
 
 // do this the ES6 way later...
-module.exports = uploadFiles;
+module.exports = preProcessFiles;
