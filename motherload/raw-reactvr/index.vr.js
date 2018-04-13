@@ -19,7 +19,7 @@ import InfoButton from './components/InfoButton';
 import LoadingSpinner from './components/LoadingSpinner';
 import DisplayTooltips from './components/DisplayTooltips';
 
-let fullJSON, jsonPath, url;
+let loc;
 const MAX_TEXTURE_HEIGHT = 720;
 const MAX_TEXTURE_WIDTH = 4096;
 const PPM = 1 / (2 * Math.PI * 3) * MAX_TEXTURE_WIDTH;
@@ -30,10 +30,14 @@ class VRLayout extends React.Component{
 
   constructor() {
     super();
-    RCTDeviceEventEmitter.addListener('getJson', obj => {
-      jsonPath = obj;
+    // RCTDeviceEventEmitter.addListener('getJson', obj => {
+    //   jsonPath = obj;
+    // });
+    // NativeModules.ClientModule.getJson();
+    RCTDeviceEventEmitter.addListener('getLocation', obj => {
+      loc = obj;
     });
-    NativeModules.ClientModule.getJson();
+    NativeModules.ClientModule.getLocation();
 
     this.handleMove = this.handleMove.bind(this);
     this.handleInput = this.handleInput.bind(this);
@@ -42,6 +46,7 @@ class VRLayout extends React.Component{
   // TODO: can we just use the 'formatSearchQuery' in StaticLayout?
   // Returns the correct url for DB queries for BOTH dev and production
   formatSearchQuery(query) {
+    let url;
     if (window.process.env.NODE_ENV === "production") {
       url = window.location.origin;
       // this will return the domain of the current site
@@ -68,13 +73,28 @@ class VRLayout extends React.Component{
 
     // Gets the JSON data, and later initiallize component
     // This "fetch" works as a GET request
+
     setTimeout(function() {
 
-      console.log("Full Path", this.formatSearchQuery(jsonPath));
-      fetch(this.formatSearchQuery(jsonPath))
+      console.log(loc);
+
+      let buildingPath = ["api", "building", loc.bldg].join("/");
+
+      fetch(this.formatSearchQuery(buildingPath))
         .then(response => response.json())
         .then(responseData => {
-          this.init(responseData);
+          console.log("Building:", responseData);
+          let floor = responseData.floors[loc.floor].hash;
+
+          let floorPath = ["api", "floor", floor].join("/");
+
+          fetch(this.formatSearchQuery(floorPath))
+            .then(response => response.json())
+            .then(responseData => {
+              // console.log("Floor:", responseData)
+              this.init(responseData);
+            })
+            .done();
         })
         .done();
     }.bind(this), 50);
@@ -89,26 +109,27 @@ class VRLayout extends React.Component{
       || this.props.location.currentFloor != nextProps.location.currentFloor) {
       // let {currentFloor} = nextProps.location;
       // console.log("Trying to update");
-      // console.log(nextProps);
+      console.log(nextProps);
       let roomData = nextProps.location.rooms;
       let {nextLocationId} = nextProps.photo;
       let room;
 
-      if (nextLocationId) {
-        room = roomData[nextLocationId];
+      if(typeof roomData[nextLocationId] === 'undefined'){
+        room = roomData[0];
       }
-      else {
-         room = roomData[nextProps.json.firstPhotoId];
+      else{
+        room = roomData[nextLocationId];
       }
         this.props.updatePhoto({
           zoomZ: 0,
           data: room,
           locationId: nextLocationId,
-          nextLocationId: nextLocationId ? nextLocationId : nextProps.json.firstPhotoId,
+          nextLocationId: nextLocationId ? nextLocationId : 0,
           rotation: 0,
           // rotation: roomData.firstPhotoRotation +
           // (roomData.photos[roomData.firstPhotoId].rotationOffset || 0),
         });
+        this.props.setPreview(loc.preview);
     }
   }
 
@@ -125,6 +146,7 @@ class VRLayout extends React.Component{
           floors: building.floors,
           rooms: roomConfig.photos,
         });
+        this.props.changeNextLocationId(loc.room);
       })
       .done();
   }
@@ -157,7 +179,7 @@ class VRLayout extends React.Component{
         style={{
           transform: [
             {rotateX: + trans},
-            {rotateY: - rotation},
+            {rotateY: - rot},
           ]
         }}
         >
@@ -172,7 +194,7 @@ class VRLayout extends React.Component{
           source={asset(data.uri)}
         />
 
-      {!this.props.photo.preview && <CylindricalPanel
+      {this.props.photo.preview != "true" && <CylindricalPanel
           layer={{
             width: MAX_TEXTURE_WIDTH,
             height: MAX_TEXTURE_HEIGHT,
@@ -222,9 +244,7 @@ const mapStateToProps = state => ({
   VRTextBox: state.mode.VRTextBox,
   StaticTextBox: state.mode.StaticTextBox,
   // photo props
-  json: fullJSON,
   photo: state.photo,
-  jsonPath: jsonPath,
   location: state.location,
 });
 
@@ -243,6 +263,7 @@ const mapDispatchToProps = dispatch => ({
   updatePhoto: (nextPhoto) => dispatch(photo.updatePhoto(nextPhoto)),
   changeLocationId: (locationId) => dispatch(photo.changeLocationId(locationId)),
   changeNextLocationId: (locationId) => dispatch(photo.changeNextLocationId(locationId)),
+  setPreview: (preview) => dispatch(photo.setPreview(preview)),
 
   // any difference between these 2 groups?
   initFloors: (obj) => dispatch(location.initFloors(obj)),

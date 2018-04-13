@@ -64,3 +64,11 @@ export function updateGNotes(notes){
     payload: notes,
   }
 }
+
+export function setPreview(preview){
+  // console.log("Notes: ", notes);
+  return{
+    type: "Set Preview",
+    payload: preview,
+  }
+}

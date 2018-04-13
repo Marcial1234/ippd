@@ -43,6 +43,9 @@ export default function photo(state=defaultState, action){
       case "Change gNotes":{
         return{...state, gNotes : action.payload}
       }
+      case "Set Preview":{
+        return{...state, preview : action.payload}
+      }
       default :{
         return{...state}
       }

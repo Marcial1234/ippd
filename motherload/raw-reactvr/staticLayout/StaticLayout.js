@@ -93,6 +93,12 @@ export default class StaticLayout extends React.Component {
       if (this.state.displayNotes) {
         this.refreshTooltips();
       }
+      let {data} = this.props.photo;
+      let notes = data.notes;
+      for (let i = 0; i < notes.length; i++){
+        notes[i].selected = false;
+      }
+      // this.props.photo.updateData(data);
     }
   }
 
@@ -106,7 +112,6 @@ export default class StaticLayout extends React.Component {
     else {
       url = "http://localhost:5001";
     }
-
     return [url, query].join("/");
   }
 
@@ -594,7 +599,7 @@ export default class StaticLayout extends React.Component {
     /* Overlay Menu */
     return (
       <View >
-        {!this.props.photo.preview && <View>
+        {this.props.photo.preview != "true" && <View>
           <View style={styles.menu}>
             <VrButton style={styles.menuButton} onClick={this.goHome}>
               <Text style={styles.menuText}>Home</Text>

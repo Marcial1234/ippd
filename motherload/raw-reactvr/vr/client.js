@@ -11,7 +11,7 @@ class ClientModule extends Module {
   constructor() {
     super('ClientModule');
     this.rnContext = null;
-    this.json = null;
+    this.location = null;
   }
 
   getRotation() {
@@ -21,17 +21,10 @@ class ClientModule extends Module {
     ]);
   }
 
-  getJson() {
-    let obj = this.json;
+  getLocation() {
+    let obj = this.location;
     this.rnContext.callFunction('RCTDeviceEventEmitter', 'emit', [
-      'getJson', obj,
-    ]);
-  }
-
-  getWindow() {
-    let obj = this.json;
-    this.rnContext.callFunction('RCTDeviceEventEmitter', 'emit', [
-      'getJson', obj,
+      'getLocation', obj,
     ]);
   }
 
@@ -39,15 +32,10 @@ class ClientModule extends Module {
     this.rnContext = rnctx;
   }
 
-  _setJson(json) {
-    this.json = json;
+  _setLocation(location) {
+    this.location = location;
   }
 
-  // static ?
-  // changed from 'console.log'
-  viewStuff() {
-    return decodeURIComponent(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + encodeURIComponent(key).replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));
-  }
 }
 
 // Gets the url?key=values
@@ -59,15 +47,17 @@ function init(bundle, parent, options) {
 
   // Grabbing url query to search for a specific building
   //  => url?key=values
-  let bldg = getQueryStringValue("building");
-  console.log("GQS", getQueryStringValue("building"));
+  let location = {
+    bldg: getQueryStringValue("bldg"),
+    floor: getQueryStringValue("floor"),
+    room: getQueryStringValue("room"),
+    preview: getQueryStringValue("preview"),
+  }
+  console.log("GQS", location.bldg, location.floor, location.room, location.preview);
 
-  if (!bldg) bldg = "5abed5d1571e152138346d24";
-  let floor = "5ac6d11c0aa88b2dec945e0e";
-  // let room = getQueryStringValue("room");
-  // if (!room) bldg = "0";
-
-  let jsonPath = ["api", "floor", floor].join("/");
+  if (!location.bldg){
+    location.bldg = "5ac6d11c0aa88b2dec945e0c"
+  }
 
   // create div from overlay
   const domOverlayContainer1 = document.createElement('div');
@@ -92,7 +82,7 @@ function init(bundle, parent, options) {
   });
 
   clientModule._setRNContext(vr.rootView.context);
-  clientModule._setJson(jsonPath);
+  clientModule._setLocation(location);
 
   vr.player._wrapper.appendChild(domOverlayContainer1);
   vr.player._wrapper.appendChild(domOverlayContainer2);
