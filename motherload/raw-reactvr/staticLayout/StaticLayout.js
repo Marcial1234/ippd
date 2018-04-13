@@ -2,7 +2,7 @@ import React from 'react';
 import {Text, View, VrButton, NativeModules, Image, asset} from 'react-vr';
 import styles from '../static_assets/styles'
 
-//This is to be able to recieve calls from the DomOverlay
+//This is to be able to receive calls from the DomOverlay
 const RCTDeviceEventEmitter = require('RCTDeviceEventEmitter');
 export default class StaticLayout extends React.Component {
   constructor(props) {
@@ -37,10 +37,11 @@ export default class StaticLayout extends React.Component {
     this.refreshTooltips = this.refreshTooltips.bind(this);
     this.selectFloorRoom = this.selectFloorRoom.bind(this);
     this.setRotation = this.setRotation.bind(this);
+    this.deleteConfirmation = this.deleteConfirmation.bind(this);
   }
 
   componentWillMount() {
-    // will respond to the call for 'updateText', obj is the value recieved
+    // will respond to the call for 'updateText', obj is the value received
     RCTDeviceEventEmitter.addListener('updateText', obj => {
       this.updateText(obj);
     });
@@ -65,6 +66,9 @@ export default class StaticLayout extends React.Component {
     RCTDeviceEventEmitter.addListener('cameraRot', obj => {
       this.setState({cameraRot: obj});
     });
+    RCTDeviceEventEmitter.addListener('deleteConfirm', obj => {
+      this.deleteConfirmation(obj);
+    });
   }
 
   componentDidMount() {
@@ -73,6 +77,11 @@ export default class StaticLayout extends React.Component {
 
   componentDidUpdate(prevProps) {
     if (prevProps.photo.locationId !== this.props.photo.locationId) {
+      this.setState({
+        navID: -1,
+        noteID: -1,
+      })
+      NativeModules.DomOverlayModule.closeOverlay3();
       NativeModules.DomOverlayModule.closeOverlay2();
       this.openOverlay(-1, "Select");
 
@@ -104,42 +113,40 @@ export default class StaticLayout extends React.Component {
   createNote() {
     let {data} = this.props.photo;
     let notes = data.notes;
-    let ID = this.state.noteID;
-    console.log(notes);
+    let ID = notes.length;
     // ???
-    if (ID >= notes.length || ID < 0) {
-      this.setState({noteID: 0});
-      ID = 0;
-    }
-    console.log("ID", ID);
     NativeModules.ClientModule.getRotation();
     setTimeout(function() {
       let rot = (this.state.cameraRot._y*57)%360;
+      rot += this.props.photo.rotation;
+      if (rot > 180){
+        let diff = (rot - 180);
+        rot*=-1;
+        rot = -180 + diff;
+      }
+      if (rot < -180){
+        let diff = (rot + 180);
+        rot*=-1;
+        rot = 180 + diff;
+      }
+
+      let newNote = {
+        Type: "textblock",
+        text: "It's Full!",
+        title: "New Note",
+        width: 1.3,
+        height: 1.5,
+        selected: false,
+        rotationY: rot,
+        // rotationY: (ID>0) ? notes[ID-1].rotationY -20 : 160,
+        translateX: 0,
+      }
+      this.save("notes", newNote, ID);
+      this.setState({
+        noteID : ID
+      });
     }.bind(this), 25);
 
-    let newNote = {
-      Type: "textblock",
-      text: "It's Full!",
-      title: "New Note",
-      width: 1.3,
-      height: 1.5,
-      selected: false,
-      rotationY: notes[ID] ? notes[ID].rotationY - 20 : 160,
-      translateX: 0,
-    }
-
-    this.save("notes", newNote, ID);
-
-    this.setState({
-      noteID : this.state.noteID + 1
-    });
-    if (this.state.displayNotes) {
-      this.refreshTooltips();
-    }
-    else {
-      this.toggleNotes();
-    }
-    this.selectTooltip(notes.length - 1, "note");
   }
 
   moveNote(direction) {
@@ -189,7 +196,7 @@ export default class StaticLayout extends React.Component {
           notes[NoteID].translateX +=adj;
           break;
       }
-      this.save("notes", newNote, ID);
+      this.save("notes", notes[NoteID], NoteID);
       data.notes = notes;
     }
 
@@ -234,15 +241,22 @@ export default class StaticLayout extends React.Component {
     let {data} = this.props.photo;
     let notes = data.notes;
 
-    if (index == this.state.noteID && this.overlayOpen1) {
-      NativeModules.DomOverlayModule.closeOverlay1();
-      this.openOverlay(-1, "General");
+    NativeModules.DomOverlayModule.openOverlay3(index);
+  }
+
+  deleteConfirmation(obj){
+    if(obj.confirm == "Yes"){
+      if (obj.index == this.state.noteID && this.overlayOpen1) {
+        NativeModules.DomOverlayModule.closeOverlay1();
+        this.openOverlay(-1, "General");
+      }
+      else if (obj.index == this.state.noteID) {
+        NativeModules.DomOverlayModule.closeOverlay1();
+      }
+
+      this.save("delete", "", obj.index);
     }
-    else if (index == this.state.noteID) {
-      NativeModules.DomOverlayModule.closeOverlay1();
-    }
-    this.save("delete", "", index);
-    this.refreshTooltips();
+    NativeModules.DomOverlayModule.closeOverlay3();
   }
 
   updateText(obj) {
@@ -481,14 +495,14 @@ export default class StaticLayout extends React.Component {
         .then(response => response.json())
         .then(responseData => {
           this.props.updateData(responseData.photos[locationId]);
-          console.log("RD:", responseData);
+          // console.log("RD:", responseData);
         })
         .done();
     }
     // "/notes/:floor/:pindex/:nindex"
     else if (type == "notes") {
       let jsonPath = ["api", type, floors[currentFloor].hash, locationId, index].join("/");
-
+      // console.log("Received Index:", index);
       // Always send POSTs, donno why puts aren't working, but ¯\_(ツ)_/¯
       fetch(this.formatSearchQuery(jsonPath), {
           body: JSON.stringify(obj),
@@ -499,6 +513,13 @@ export default class StaticLayout extends React.Component {
       .then(responseData => {
         this.props.updateData(responseData.photos[locationId]);
         console.log("RD:", responseData);
+        this.selectTooltip(index, "note");
+        if (this.state.displayNotes) {
+          this.refreshTooltips();
+        }
+        else {
+          this.toggleNotes();
+        }
       })
       .done();
     }
@@ -510,7 +531,7 @@ export default class StaticLayout extends React.Component {
           .then(response => response.json())
           .then(responseData => {
             this.props.updateData(responseData.photos[locationId]);
-            console.log("RD:", responseData);
+            // console.log("RD:", responseData);
           })
           .done();
     }
@@ -523,7 +544,8 @@ export default class StaticLayout extends React.Component {
       .then(response => response.json())
       .then(responseData => {
         this.props.updateData(responseData.photos[locationId]);
-        console.log("RD:", responseData);
+            this.refreshTooltips();
+        // console.log("RD:", responseData);
       })
       .done();
     }
@@ -536,18 +558,20 @@ export default class StaticLayout extends React.Component {
 
     setTimeout(function() {
       let rot = (this.state.cameraRot._y*57)%360;
+      // rot += this.props.photo.rotation;
       data.rotationOffset = rot;
+      console.log(rot);
       this.props.updateData(data);
     }.bind(this), 25);
   }
 
   test(){
-    // this.save("notes", "Test", 0);
-    NativeModules.ClientModule.getRotation();
-    setTimeout(function() {
-      let rot = (this.state.cameraRot._y*57)%360;
-      console.log(rot);
-    }.bind(this), 25);
+    console.log("cameraRot:", (this.state.cameraRot._y*57)%360);
+    // NativeModules.ClientModule.getRotation();
+    // setTimeout(function() {
+    //   let rot = (this.state.cameraRot._y*57)%360;
+    //   console.log(rot);
+    // }.bind(this), 25);
   }
 
   render() {
@@ -570,6 +594,138 @@ export default class StaticLayout extends React.Component {
     /* Overlay Menu */
     return (
       <View >
+        {!this.props.photo.preview && <View>
+          <View style={styles.menu}>
+            <VrButton style={styles.menuButton} onClick={this.goHome}>
+              <Text style={styles.menuText}>Home</Text>
+            </VrButton>
+
+            {/* does doesn't close the gNotes, only closes a note edit */}
+            <VrButton style={styles.menuButton} onClick={ () => this.openOverlay(-1, "General")}>
+                   <Text style={styles.menuText}>Room Notes</Text>
+            </VrButton>
+
+
+
+    {/*
+            <VrButton style={styles.menuButton} onClick={this.test}>
+                   <Text style={styles.menuText}>Log It</Text>
+            </VrButton>
+            <VrButton style={styles.menuButton} onClick={this.setRotation}>
+                   <Text style={styles.menuText}>Set Rotation</Text>
+            </VrButton>
+            <VrButton style={styles.menuButton} onClick={this.save}>
+                   <Text style={styles.menuText}>Save</Text>
+            </VrButton>
+            <VrButton style={styles.menuButton} onClick={this.test}>
+                   <Text style={styles.menuText}>Log It</Text>
+            </VrButton>
+            <VrButton style={styles.menuButton} onClick={this.editNote}>
+              <Text style={styles.menuText}>Edit Note</Text>
+            </VrButton>
+            <VrButton style={styles.menuButton} onClick={this.changeVal}>
+              <Text style={styles.menuText}>Change Val</Text>
+            </VrButton>
+    */}
+
+            <VrButton style={styles.menuButton} onClick={this.toggleNavs}>
+              <Text style={styles.menuText}>Toggle Navs</Text>
+            </VrButton>
+            <VrButton style={styles.menuButton} onClick={this.createNote}>
+              <Text style={styles.menuText}>Create Note</Text>
+            </VrButton>
+            <VrButton style={styles.menuButton} onClick={this.toggleNotes}>
+              <Text style={styles.menuText}>Toggle Notes</Text>
+            </VrButton>
+
+          </View>
+
+          {!this.state.overlayOpen2 &&
+          <VrButton style={styles.selection} onClick={this.floorSelection}>
+            <Image style={styles.selectionImage} source={asset('expand_arrow.png')}></Image>
+          </VrButton>}
+
+          {(this.state.displayNotes && notes.length == 0) && <View style={styles.noteList}>
+          <VrButton>
+            <Text style={styles.tooltipListItem}>
+            No Notes For This Room
+            </Text>
+          </VrButton>
+          </View>}
+
+          {(this.state.displayNavs && navs.length > 0) && <View style={styles.navList}>
+              {navs.map((nav, index) => {
+              return(
+                <View style={styles.tooltipListRow} key={index}>
+                  <VrButton onClick={() => this.selectTooltip(index, "nav")}>
+                    <Text style={(index==(this.state.navID) && (this.state.noteOrNav == "nav")) ? styles.tooltipListItemSelected : styles.tooltipListItem}>
+                    {nav.text}
+                    </Text>
+                  </VrButton>
+                </View>);
+            })}
+          </View>}
+
+          {(this.state.displayNotes && notes.length > 0) && <View style={styles.noteList}>
+            {notes.map((note, index) => {
+              if (note)
+              return(
+                // ignoring nulls
+                <View style={styles.tooltipListRow} key={index}>
+                  <VrButton onClick={() => this.selectTooltip(index, "note")}>
+                    <Text style={(index==(this.state.noteID) && (this.state.noteOrNav == "note")) ? styles.tooltipListItemSelected : styles.tooltipListItem}>
+                    {note.title}
+                    </Text>
+                  </VrButton>
+                  <VrButton onClick={() => this.editNote(index) }>
+                    <Image style={styles.tooltipListImage} source={asset('edit_icon.png')}></Image>
+                  </VrButton>
+                  <VrButton onClick={() => this.deleteNote(index)}>
+                    <Image style={styles.tooltipListImage} source={asset('deleteX.png')}></Image>
+                  </VrButton>
+                </View>
+              );
+            })}
+          </View>}
+
+          {/* Side "Moving" Menus */}
+          {((this.state.displayNotes && notes.length > 0) || (this.state.displayNavs && navs.length > 0)) && <View style={styles.pBButton}>
+          <VrButton style={this.state.noteOrNav == "nav" ? styles.pBLeftNav : styles.pBLeft} onClick={() => this.moveNote("left")}>
+            <Text style={styles.menuText}>Left</Text>
+          </VrButton>
+          <VrButton style={this.state.noteOrNav == "nav" ? styles.pBRightNav : styles.pBRight} onClick={() => this.moveNote("right")}>
+            <Text style={styles.menuText}>Right</Text>
+          </VrButton>
+
+          {this.state.noteOrNav == "note" && <VrButton style={styles.pBUp} onClick={() => this.moveNote("up")}>
+            <Text style={styles.menuText}>Up</Text>
+          </VrButton>
+          }
+          {this.state.noteOrNav == "note" && <VrButton style={styles.pBDown} onClick={() => this.moveNote("down")}>
+            <Text style={styles.menuText}>Down</Text>
+          </VrButton>
+          }
+          <VrButton style={styles.pBPlus} onClick={() => this.adjustRate("up")}>
+            <Text style={styles.menuText}>+</Text>
+          </VrButton>
+          <VrButton style={styles.pBRate}>
+            <Text style={styles.menuText}>{this.state.adjustRate}</Text>
+          </VrButton>
+          <VrButton style={styles.pBMinus} onClick={() => this.adjustRate("down")}>
+            <Text style={styles.menuText}>-</Text>
+          </VrButton>
+          <View style={styles.pBRateBar}>
+            {lvls.map((mag, index) => {
+              return(
+                <VrButton style={(this.state.adjustRate == mag) ? styles.pBRateBarButtonSelected : styles.pBRateBarButton}
+                    key={index} onClick={() => this.changeRate(mag)}>
+                      <Text style={styles.barText}>{mag}</Text>
+                </VrButton>
+              );
+            })}
+          </View>
+          </View>}
+        </View>}
         {/* The line below Displays the View only if "this.props.textInputActive" is true
           Using the && is a short way of doing it instead of
            this.props.textInputActive ? <View> : null */}
@@ -582,135 +738,7 @@ export default class StaticLayout extends React.Component {
         </View>}
         */}
 
-      <View style={styles.menu}>
-        <VrButton style={styles.menuButton} onClick={this.goHome}>
-          <Text style={styles.menuText}>Home</Text>
-        </VrButton>
 
-        {/* does doesn't close the gNotes, only closes a note edit */}
-        <VrButton style={styles.menuButton} onClick={ () => this.openOverlay(-1, "General")}>
-               <Text style={styles.menuText}>Room Notes</Text>
-        </VrButton>
-
-        <VrButton style={styles.menuButton} onClick={this.test}>
-               <Text style={styles.menuText}>Log It</Text>
-        </VrButton>
-        <VrButton style={styles.menuButton} onClick={this.setRotation}>
-               <Text style={styles.menuText}>Set Rotation</Text>
-        </VrButton>
-
-{/*
-        <VrButton style={styles.menuButton} onClick={this.save}>
-               <Text style={styles.menuText}>Save</Text>
-        </VrButton>
-        <VrButton style={styles.menuButton} onClick={this.test}>
-               <Text style={styles.menuText}>Log It</Text>
-        </VrButton>
-        <VrButton style={styles.menuButton} onClick={this.editNote}>
-          <Text style={styles.menuText}>Edit Note</Text>
-        </VrButton>
-        <VrButton style={styles.menuButton} onClick={this.changeVal}>
-          <Text style={styles.menuText}>Change Val</Text>
-        </VrButton>
-*/}
-
-        <VrButton style={styles.menuButton} onClick={this.toggleNavs}>
-          <Text style={styles.menuText}>Toggle Navs</Text>
-        </VrButton>
-        <VrButton style={styles.menuButton} onClick={this.createNote}>
-          <Text style={styles.menuText}>Create Note</Text>
-        </VrButton>
-        <VrButton style={styles.menuButton} onClick={this.toggleNotes}>
-          <Text style={styles.menuText}>Toggle Notes</Text>
-        </VrButton>
-
-      </View>
-
-      {!this.state.overlayOpen2 &&
-      <VrButton style={styles.selection} onClick={this.floorSelection}>
-        <Image style={styles.selectionImage} source={asset('expand_arrow.png')}></Image>
-      </VrButton>}
-
-      {(this.state.displayNotes && notes.length == 0) && <View style={styles.noteList}>
-      <VrButton>
-        <Text style={styles.tooltipListItem}>
-        No Notes For This Room
-        </Text>
-      </VrButton>
-      </View>}
-
-      {(this.state.displayNavs && navs.length > 0) && <View style={styles.navList}>
-          {navs.map((nav, index) => {
-          return(
-            <View style={styles.tooltipListRow} key={index}>
-              <VrButton onClick={() => this.selectTooltip(index, "nav")}>
-                <Text style={(index==(this.state.navID) && (this.state.noteOrNav == "nav")) ? styles.tooltipListItemSelected : styles.tooltipListItem}>
-                {nav.text}
-                </Text>
-              </VrButton>
-            </View>);
-        })}
-      </View>}
-
-      {(this.state.displayNotes && notes.length > 0) && <View style={styles.noteList}>
-        {notes.map((note, index) => {
-          if (note)
-          return(
-            // ignoring nulls
-            <View style={styles.tooltipListRow} key={index}>
-              <VrButton onClick={() => this.selectTooltip(index, "note")}>
-                <Text style={(index==(this.state.noteID) && (this.state.noteOrNav == "note")) ? styles.tooltipListItemSelected : styles.tooltipListItem}>
-                {note.title}
-                </Text>
-              </VrButton>
-              <VrButton onClick={() => this.editNote(index) }>
-                <Image style={styles.tooltipListImage} source={asset('edit_icon.png')}></Image>
-              </VrButton>
-              <VrButton onClick={() => this.deleteNote(index)}>
-                <Image style={styles.tooltipListImage} source={asset('deleteX.png')}></Image>
-              </VrButton>
-            </View>
-          );
-        })}
-      </View>}
-
-      {/* Side "Moving" Menus */}
-      {((this.state.displayNotes && notes.length > 0) || (this.state.displayNavs && navs.length > 0)) && <View style={styles.pBButton}>
-      <VrButton style={this.state.noteOrNav == "nav" ? styles.pBLeftNav : styles.pBLeft} onClick={() => this.moveNote("left")}>
-        <Text style={styles.menuText}>Left</Text>
-      </VrButton>
-      <VrButton style={this.state.noteOrNav == "nav" ? styles.pBRightNav : styles.pBRight} onClick={() => this.moveNote("right")}>
-        <Text style={styles.menuText}>Right</Text>
-      </VrButton>
-
-      {this.state.noteOrNav == "note" && <VrButton style={styles.pBUp} onClick={() => this.moveNote("up")}>
-        <Text style={styles.menuText}>Up</Text>
-      </VrButton>
-      }
-      {this.state.noteOrNav == "note" && <VrButton style={styles.pBDown} onClick={() => this.moveNote("down")}>
-        <Text style={styles.menuText}>Down</Text>
-      </VrButton>
-      }
-      <VrButton style={styles.pBPlus} onClick={() => this.adjustRate("up")}>
-        <Text style={styles.menuText}>+</Text>
-      </VrButton>
-      <VrButton style={styles.pBRate}>
-        <Text style={styles.menuText}>{this.state.adjustRate}</Text>
-      </VrButton>
-      <VrButton style={styles.pBMinus} onClick={() => this.adjustRate("down")}>
-        <Text style={styles.menuText}>-</Text>
-      </VrButton>
-      <View style={styles.pBRateBar}>
-        {lvls.map((mag, index) => {
-          return(
-            <VrButton style={(this.state.adjustRate == mag) ? styles.pBRateBarButtonSelected : styles.pBRateBarButton}
-                key={index} onClick={() => this.changeRate(mag)}>
-                  <Text style={styles.barText}>{mag}</Text>
-            </VrButton>
-          );
-        })}
-      </View>
-      </View>}
       </View>
     );
   }

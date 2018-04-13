@@ -29,13 +29,12 @@ const RCTDeviceEventEmitter = require('RCTDeviceEventEmitter');
 class VRLayout extends React.Component{
 
   constructor() {
-
+    super();
     RCTDeviceEventEmitter.addListener('getJson', obj => {
       jsonPath = obj;
     });
     NativeModules.ClientModule.getJson();
 
-    super();
     this.handleMove = this.handleMove.bind(this);
     this.handleInput = this.handleInput.bind(this);
   }
@@ -149,13 +148,16 @@ class VRLayout extends React.Component{
     const isLoading = nextLocationId !== locationId;
     const navs = (data && data.navs) || null;
     const notes = (data && data.notes) || null;
-
+    const rotation = (data && data.rotationOffset) || null;
+    // {rotateY: - ((rot == 0) ? 0: rot)},
+// source={asset(data.uri)}
+// source={{uri: 'http://res.cloudinary.com/serverful/image/upload/v1521187672/1521187637743.jpg'}}
     return (
       <View onInput={this.handleInput}
         style={{
           transform: [
             {rotateX: + trans},
-            {rotateY: - ((rot == 0) ? 0 : rot)},
+            {rotateY: - rotation},
           ]
         }}
         >
@@ -170,7 +172,7 @@ class VRLayout extends React.Component{
           source={asset(data.uri)}
         />
 
-        <CylindricalPanel
+      {!this.props.photo.preview && <CylindricalPanel
           layer={{
             width: MAX_TEXTURE_WIDTH,
             height: MAX_TEXTURE_HEIGHT,
@@ -205,7 +207,7 @@ class VRLayout extends React.Component{
                 />}
             </View>
           </View>
-        </CylindricalPanel>
+        </CylindricalPanel>}
       </View>
     );
   }
