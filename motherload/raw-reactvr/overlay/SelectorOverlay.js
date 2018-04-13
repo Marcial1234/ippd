@@ -108,7 +108,7 @@ export default class SelectorOverlay extends React.Component{
         <div className="select-content">
           <div className="close2" onClick={this.props.onClose} />
           <div className="selCol">Floor:
-            <select value={this.state.floor} onChange={ (e) => {this.handleFloorChange(e, "update");}}> 
+            <select value={this.state.floor} onChange={ (e) => {this.handleFloorChange(e, "update");}}>
               {this.state.lFloors.map((num, index) =>
                 <option key={index}>
                   {num}
@@ -117,7 +117,7 @@ export default class SelectorOverlay extends React.Component{
             </select>
           </div>
           <div className="selCol">Room:
-            <select value={this.state.room} onChange={ (e)=> {this.handleRoomChange(e, "update");}}> 
+            <select value={this.state.room} onChange={ (e)=> {this.handleRoomChange(e, "update");}}>
               {this.state.lRooms.map((num, index) =>
                 <option key={index}>
                   {num}

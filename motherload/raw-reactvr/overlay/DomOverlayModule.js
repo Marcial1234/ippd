@@ -4,9 +4,10 @@ import {Module} from 'react-vr-web';
 
 import TextboxOverlay from './TextboxOverlay';
 import SelectorOverlay from './SelectorOverlay';
+import ConfirmationOverlay from './ConfirmationOverlay';
 
 export default class DomOverlayModule extends Module {
-  constructor(overlayContainer1, overlayContainer2) {
+  constructor(overlayContainer1, overlayContainer2, overlayContainer3) {
     super('DomOverlayModule');
     //rnContext will be used to refer to the React Native context
     //This allows communication with React VR
@@ -14,12 +15,16 @@ export default class DomOverlayModule extends Module {
     this.submit = this.submit.bind(this);
     this._overlayContainer1 = overlayContainer1;
     this._overlayContainer2 = overlayContainer2;
+    this._overlayContainer3 = overlayContainer3;
     this.closeOverlay1 = this.closeOverlay1.bind(this);
     this.closeOverlay2 = this.closeOverlay2.bind(this);
+    this.closeOverlay3 = this.closeOverlay3.bind(this);
     this.openOverlay1 = this.openOverlay1.bind(this);
     this.openOverlay2 = this.openOverlay2.bind(this);
+    this.openOverlay3 = this.openOverlay3.bind(this);
     this.submitSelection = this.submitSelection.bind(this);
     this.submitGNotes = this.submitGNotes.bind(this);
+    this.submitConfirmation = this.submitConfirmation.bind(this);
   }
 
   //This method call opens up the overlay for display.
@@ -32,10 +37,6 @@ export default class DomOverlayModule extends Module {
         onClose={this.closeOverlay1} submit={this.submit} submitGNotes={this.submitGNotes}/>,
       this._overlayContainer1
     );
-    // ReactDOM.render(
-    //     <TextboxOverlay text={text} title={title} submit={this.submit}/>,
-    //     this._overlayContainer
-    //   );
   }
   openOverlay2(room, floor, floors, rooms) {
     this.rnContext.callFunction('RCTDeviceEventEmitter', 'emit', [
@@ -46,10 +47,12 @@ export default class DomOverlayModule extends Module {
          onClose={this.closeOverlay2} submit={this.submitSelection}/>,
        this._overlayContainer2
     );
-    // ReactDOM.render(
-    //     <TextboxOverlay text={text} title={title} submit={this.submit}/>,
-    //     this._overlayContainer
-    //   );
+  }
+  openOverlay3(index) {
+    ReactDOM.render(
+      <ConfirmationOverlay index={index} submit={this.submitConfirmation}/>,
+       this._overlayContainer3
+    );
   }
 
 
@@ -65,6 +68,10 @@ export default class DomOverlayModule extends Module {
       'overlayClose2'
     ]);
     ReactDOM.unmountComponentAtNode(this._overlayContainer2);
+  }
+
+  closeOverlay3() {
+    ReactDOM.unmountComponentAtNode(this._overlayContainer3);
   }
 
   _setRNContext(rnctx) {
@@ -88,6 +95,11 @@ export default class DomOverlayModule extends Module {
     submitSelection(obj){
       this.rnContext.callFunction('RCTDeviceEventEmitter', 'emit', [
         'selectFloorRoom', obj,
+      ]);
+    }
+    submitConfirmation(obj){
+      this.rnContext.callFunction('RCTDeviceEventEmitter', 'emit', [
+        'deleteConfirm', obj,
       ]);
     }
 }

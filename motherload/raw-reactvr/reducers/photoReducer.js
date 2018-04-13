@@ -7,6 +7,7 @@ const defaultState = {
   nextLocationId: null,
   notes: null,
   gNotes: "",
+  preview: false,
 };
 
 export default function photo(state=defaultState, action){
