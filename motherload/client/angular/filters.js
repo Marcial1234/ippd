@@ -38,11 +38,11 @@ angular
             options.splice(foundIndex, 1);
         }
 
-        // record indices of first room if this is it
-        if (selected != null && scope.startRoom == selected) {
-          scope.startRoomCoors = {x: x, y: y};
-          // console.log(scope.startRoomCoors);
-        }
+        // // record indices of first room if this is it
+        // if (selected != null && scope.startRoom == selected) {
+        //   scope.startRoomCoors = {x: x, y: y};
+        //   // console.log(scope.startRoomCoors);
+        // }
       }
     }
 

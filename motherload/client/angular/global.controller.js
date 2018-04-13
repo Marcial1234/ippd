@@ -1,16 +1,31 @@
-// Later use ~
+
 angular
   .module('app')
-  .controller('GlobalCtrl', ["$rootScope", "$scope", "$location", "Factory",
-    function (rootScope, scope, location, Factory, ) {
+  .controller('GlobalCtrl', ["$rootScope", "$scope", "$location", "$interval", "Factory",
+    function (rootScope, scope, location, interval, Factory, ) {
 
-      // CAN ONLY ACCESS ROOT VARIABLES HERE
-      // scope.search = "";
+      // ACCESS ROOT VARIABLES HERE
+      // OR ROUTE-TO-ROUTE COMMUNICATIONS
+      rootScope.search = ""
+      rootScope.currentBldgId = ""
+      rootScope.currentFloorId = ""
+      rootScope.tba = () => alert("functionality TBDone")
 
-      scope.showUploadWindow = () => $('#up').trigger('click')
+      // scope.showUploadWindow = () => $('#up').trigger('click')
+
+      // force waits, EVEN ASYCN ~ copied from server code, although overkill
+      const timeout = ms => new Promise(res => setTimeout(res, ms))
       
-      scope.dale = () => {
+      // rename ~
+      scope.sendImagesToServer = () => {
+        rootScope.names = scope.names
+        // console.log(rootScope.names)
         let formdata = scope.data
+
+        if (!formdata) {
+          alert("Select at least one file")
+          return
+        }
 
         // have a building prepared when file uploads work ~
         // then pass the ref of that ?
@@ -18,10 +33,25 @@ angular
         formdata.append("floor", Date.now())
         formdata.append("room", "?")
 
-        Factory.postPics(formdata, scope.names.length)
-        .then((res) => {
-          console.log(res)
+        Factory.postPics(scope.names, scope.names.length)
+        .then( async (res) => {
+          // asynchorously return file paths and let angular know a change happened
+          await timeout(3000)
+          rootScope.pics = res
+          rootScope.$apply()
         })
+        
+        location.path("/FloorMap")
+      }
+
+      scope.setBldg = (id) => {
+        rootScope.currentBldgId = id
+        console.log(id)
+      }
+
+      scope.setFloor = (id) => {
+        rootScope.currentFloorId = id
+        console.log(id)
       }
 
       // tested?

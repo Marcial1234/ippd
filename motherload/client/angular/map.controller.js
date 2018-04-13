@@ -1,34 +1,63 @@
 // Main controller
 angular
   .module('app')
-  .controller('PageCtrl', ["$scope", "$location", "Factory",
-    function (scope, location, Factory) {
+  .controller('MapCtrl', ["$rootScope", "$scope", "$location", "$interval", "Factory",
+    function (rootScope, scope, location, interval, Factory, ) {
 
-      // pass picture data as a state param ~
-      // or as parent controller var?
+      if (!rootScope.currentBuildingId) {
+        alert("Not building refence found. Please browse to this page in a valid sequence")
+        location.path("/")
+        scope.$apply()
+      }
 
       // Dynamically create a 2D array
       scope.createMatrix = (x, y) => {
         return Array(x).fill(0).map(x => Array(y).fill(null))
       }
+      
+      // 'service' that waits for file data to be done ~ killed after
+      const checkFilesDones = () => {
+        if (rootScope.pics && scope.loading) {
+          scope.loading = false
+          console.log(rootScope.pics)
+
+          rootScope.names.forEach((item, index) => {
+            scope.picsOptions.push(index)
+            scope.picsToUrls[index] = item
+          })
+
+          interval.cancel(waitForFiles)
+          delete waitForFiles
+        }
+        else if (!scope.loading)
+          delete waitForFiles
+        else
+          console.log("Got nonin")
+      }
 
       // Initial variables of the contiguous 'room'
-      scope.x = 5, scope.y = 5 // dimensions
+      scope.startRoom, scope.x = 5, scope.y = 5 // dimensions
       scope.table = scope.createMatrix(scope.x, scope.y)
-      scope.startRoom, scope.startRoomCoors = {}
 
-      // extra f(x)s
+      // wait for picture data from parent controller
+      let waitForFiles = interval(checkFilesDones, 5000)
+      scope.loading = true
+
+      // mapping to picture data TBUsed later
+      scope.picsToUrls, scope.picsOptions
+
       // scope.getDefaultDropdownText = (counter) => {
       //   return counter > 0 ? "Picture: " : "Done!"
       // }
 
-      function isWithinBounds(x, y) {
+      // 2D Array 'Map' => Floor Object logic
+      const isWithinBounds = (x, y) => {
         return -1 < x && x < scope.x && -1 < y && y < scope.y
       }
 
       // provide a way to preserve data and increment the table ~
       // table offset f(x)nality
-      function shift(increment_x, increment_y) {
+      const shift = (increment_x, increment_y) => {
         // console.log(increment_x, increment_y)
 
         let tempTable = scope.createMatrix(scope.x, scope.y)
@@ -58,9 +87,9 @@ angular
       scope.shiftRight = () => shift(0,-1)
 
       // === BUILD PHOTO OBJ CODE ===
-      let increments = [[-1,0], [1,0], [0, 1], [0, -1]]
+      const increments = [[-1,0], [1,0], [0, 1], [0, -1]]
 
-      let incrementsStringsToNavRots = {
+      const incrementsStringsToNavRots = {
         // "0-1" => left -90
         // "01" => right -178
         // "-10" => forward 0
@@ -71,21 +100,21 @@ angular
         "10": -178,
       }
 
-      function incrementsToNavRots(x, y) {
+      const incrementsToNavRots = (x, y) => {
         let incrementSting = [x, y].join("")
-        console.log(incrementSting)
+        // console.log(incrementSting)
         return incrementsStringsToNavRots[incrementSting]
       }
 
-      function newnav(rotation, index) {
+      const newnav = (rotation, index) => {
         return {
-          text: "Next",
+          text: "To room " + index,
           rotationY: rotation,
           linkedPhotoId: index,
         }
       }
 
-      function processNavs(x, y) {
+      const processNavs = (x, y) => {
         let navs = []
         let increment_x, increment_y
         let item, shifted_x, shifted_y
@@ -110,7 +139,7 @@ angular
         return navs
       }
 
-      function processPhoto(obj) {
+      const processPhoto = (obj) => {
         let rot, currentValue
         let {x, y} = obj
         let photo = {}
@@ -123,7 +152,7 @@ angular
         return photo
       }
 
-      function buildPhotoObj() {
+      const buildPhotoObj = () => {
         let tempPhotos = []
         let indices = Object.keys(scope.photoToIndex)
         let size = indices.length
@@ -137,7 +166,7 @@ angular
       }
 
       // preprocess table to generate maps to indices and coordinates
-      function preProcess() {
+      const preProcess = () => {
         let item
         scope.photoToIndex = {}
         scope.photoToCoors = {}
@@ -158,41 +187,26 @@ angular
         // console.log(scope.photoToCoors)
       }
 
-      // built: navs => photos => floor
-      // but called in reverse ~ ofc
+      // build order: navs => photos => floor
+      // but called in reverse ofc
       scope.buildFloor = () => {
-
         if (!scope.startRoom) {
           alert("Select a start room before continuing")
           return
         }
 
         preProcess()
-
-        let data = {
+        const data = {
           photos: buildPhotoObj(),
-          // parent: buldPhotoObj(),
+          parent: rootScope.currentBuildingId,
           firstPhotoId: scope.photoToIndex[scope.startRoom],
         }
-
         console.log(JSON.stringify(data))
         scope.vid = JSON.stringify(data)
         // make a post ~ done
+        // Factory.createFloor(data)
       }
       // === END ===
-
-      // Replace this with pano data ~
-      // create x random rumbers up to x^2
-      scope.picsToUrls = {0: "url-1"}
-      scope.picsOptions = [0]
-      let val
-
-      for (let i = 0; i < 7; i++) {
-        val = Math.floor(Math.random() * (scope.x ** 3))
-        scope.picsOptions.push(val)
-        scope.picsToUrls[val] = "url" + i
-      }
-
 		}
   ])
 	

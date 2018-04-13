@@ -9,18 +9,22 @@ gulp.task('default', ['nodemon', 'browser-sync']);
 
 gulp.task('browser-sync', ['nodemon'], function() {
     
-    // bs.init(null, {
-    //     port: "5001",
-    //     proxy: "http://localhost:5000",
-    //     files: ["client/**/*.*", "!client/**/.jpg"],
-    //     reloadOnRestart: true,
-    //     browser: "chrome",
-    // });
+    bs.init(null, {
+        port: "5001",
+        proxy: "http://localhost:5000",
+        files: [
+            "client/**/*.*", 
+            "!client/**/*.jpg", 
+            "!client/**/*.JPG",
+        ],
+        reloadOnRestart: true,
+        browser: "chrome",
+    });
 });
 
 function load_frontend() {
     console.log('-------- Starting browser-sync (frontend loader) --------');
-    // bs.reload();
+    bs.reload();
 }
 
 gulp.task('nodemon', function (cb) {

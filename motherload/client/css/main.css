@@ -59,13 +59,14 @@ table.table {
     margin-left: 10px;
 }
 
-/* no body overflow and consisten look on laptop */
-/*
-#app {
-    min-height: 750px;
+.padding-less {
+    padding: 1px 6px;
 }
-*/
 
+/* for consistent table headers */
+.third {width: 33%}
+.fifth {width: 25%}
+.twoha {width: 40%}
 
 /* Global Styles */
 
@@ -76,6 +77,8 @@ html, body {
 body {
     padding-top: 50px;
     padding-bottom: 20px;
+    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+    font-size: 1.5em;
     /*background-color: grey;*/
 }
 
@@ -111,9 +114,6 @@ body {
 }
 
 /* Half Page Height Carousel Customization */
-.carousel {
-    height: 50%;
-}
 
 .item,
 .active,
@@ -128,32 +128,6 @@ body {
     background-size: cover;
 }
 
-/* Social Icons Styles */
-.list-social-icons {
-    margin-bottom: 45px;
-}
-
-.tooltip-social a {
-    text-decoration: none;
-    color: inherit;
-}
-
-.facebook-link a:hover {
-    color: #3b5998;
-}
-
-.linkedin-link a:hover {
-    color: #007fb1;
-}
-
-.twitter-link a:hover {
-    color: #39a9e0;
-}
-
-.google-plus-link a:hover {
-    color: #d14836;
-}
-
 /* Service Page Styles */
 .service-icon {
     font-size: 50px;
@@ -164,21 +138,6 @@ body {
     font-size: 8em;
 }
 
-/* Pricing Page Styles */
-.price {
-    font-size: 4em;
-}
-
-.price-cents {
-    vertical-align: super;
-    font-size: 50%;
-}
-
-.price-month {
-    font-size: 35%;
-    font-style: italic;
-}
-
 /* Footer Styles */
 footer {
     left: 0;
@@ -186,13 +145,4 @@ footer {
     bottom: 0;
     padding: 1rem;
     position: absolute;
-}
-
-/* Responsive Styles */
-@media (max-width: 767px) {
-
-    .carousel {
-        height: 70%;
-        /* increases the carousel height so it looks good on phones */
-    }
 }

@@ -1,33 +1,40 @@
 <div class="container">
   <div class="row">
     <ol class="breadcrumb">
-      <li> <a href="../">Home</a> </li>
+      <li> <a href="/">Home</a> </li>
       <li class="active"> Map Creation </li>
     </ol>
   </div>
   <div class="row">
-    <div class="col-lg-12" ng-app="app" ng-controller="PageCtrl">
-      <h1 class="page-header"> 
+    <!-- add information about current building ~ -->
+    <!-- add name! -->
+
+    <!-- https://fontawesome.com/icons/spinner?style=solid -->
+    <!-- preview or nah ? -->
+
+    <div class="col-lg-12" ng-app="app" ng-controller="MapCtrl">
+      <h1 class="page-header centered"> 
         Create Contiguous Floor Map 
+
 <!-- keep this element with this indentation -->
         <em class="fa fa-info-circle" 
 title="Make different floors 
 for non-contiguous
 sections">
       </em>
-      <a href="/upload"><button class="btn btn-warning">
-        <i class="fab fa-2x fa-phoenix-framework"></i>
-      </button></a>
       </h1>
 
       <!-- instructions ~ -->
+      <br>
+      <p>
+        <b>Instruction: </b> .
+      </p>
       <!-- fill this out -->
       
       <!-- dimensions table -->
-      <!-- 
       <div class="centered" style="margin: 20px 20px;">
         <div class="table-centered">
-          <div>Table dimensions (row, columns)</div>
+          <div> Dimensions (row, columns) </div>
           <div>&nbsp;</div>
           <input ng-model="y" ng-change="table = createMatrix(x, y)"
                  type="number" step="1" placeholder="Number of rows">
@@ -37,7 +44,7 @@ sections">
         </div>
         <div>
           <b>WARNING:</b> changing these won't preserve data.
-          Attempt to have the best layout possible before starting
+          Attempt to have the minimum dimentions needed  before starting.
         </div>
       </div>
 
@@ -45,13 +52,14 @@ sections">
         PEASE ENTER NUMBERS GREATER THAN ZERO!
         <br> Rows {{y}} , Columns {{x}}
       </div>
-      -->
-      
+     
       <br>
 
+      <!-- panoramic preview?  -->
+
       <!-- map construction area -->
-      <!-- <div ng-show="(x > 0 && y > 0)"> -->
-      <div>
+      <div ng-show="(x > 0 && y > 0)">
+      <!-- <div> -->
         <div class="table-centered">
           <div> Start Room Number: </div>
           &nbsp;
@@ -60,19 +68,15 @@ sections">
           </select>
         </div>
         <br>
+        <!-- nested loop to show table -->
         <div ng-repeat="x in table" class="row table-centered">
-          <!-- panoramic menu with preview?  -->
-
           <div ng-repeat="x in table[$index] track by $index">
 
-            <!-- conditional formatting of bold if start room? -->
-            
             <!-- only allow for unique selection. One number, one time -->
             <select ng-model="table[$parent.$index][$index]"
                     ng-options="x for x in filteredOptions = (picsOptions | notTakenInTable:this:$parent.$index:$index)"
                     class="dropdown"
             >
-                    <!-- ng-options="x for x in filteredOptions = (picsOptions | notTakenInTable:table:table[$parent.$index][$index])" -->
               <option value="" ng-if="filteredOptions.length > 0"> Picture: </option>
             </select>
           </div>
@@ -91,7 +95,13 @@ sections">
       </div>
 
       <br> <br>
+
+      <!-- 
+      {{$root.pics}}
       {{table}}
+      {{loading}}
+       -->
+
       <br> <br>
 
       <div class="right">

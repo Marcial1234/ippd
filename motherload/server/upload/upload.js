@@ -25,17 +25,23 @@ preProcessFiles = (req, res) => {
 
   if (!req.files)
     res.json({err: "no files"});
+  else if (!req.body.floor)
+    res.json({err: "'floor' hash intended as directory not passed"});
   else {
-    if (req.body.floor) {
-      floor = req.body.floor
-      PANO_DIRECTORY += [floor, "\\"].join("")
+    floor = req.body.floor
+    PANO_DIRECTORY += [floor, "\\"].join("")
+    let files = Object.values(req.files)
 
-      if (!fs.existsSync(PANO_DIRECTORY)) {
-        fs.mkdirSync(PANO_DIRECTORY);
-      }
+    // let names = [], 
+    // for (let f in files) {
+    //   name.push(f.name)
+    // }
+
+    if (!fs.existsSync(PANO_DIRECTORY)) {
+      fs.mkdirSync(PANO_DIRECTORY);
     }
-
-    uploadFiles(Object.values(req.files), res)
+    
+    uploadFiles(files, res)
   }
 }
 

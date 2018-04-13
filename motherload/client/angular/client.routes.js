@@ -2,11 +2,16 @@
 let config = ['$routeProvider', '$locationProvider',
   ($routeProvider, $locationProvider) => {
     $routeProvider
+      // base/'abstract'
       .when("/", {
         templateUrl: "partials/home.html",
       })
 
       // Pages
+      .when("/searchNotes", {
+        templateUrl: "partials/searchNotes.html",
+      })
+
       .when("/FloorMap", {
         templateUrl: "partials/FloorMap.html",
       })
@@ -16,32 +21,16 @@ let config = ['$routeProvider', '$locationProvider',
       })
 
       .when("/upload", {
-        templateUrl: "partials/ImageUploadStart.html",
+        templateUrl: "partials/upload.html",
+      })
+
+      .when("/viewFloors", {
+        templateUrl: "partials/viewFloors.html",
       })
 
       .when("/us", {
         templateUrl: "partials/us.html",
       })
-
-      // .when("/ImageUploadEdits", {
-      //   controller: "PageCtrl",
-      //   templateUrl: "partials/ImageUploadEdits.html",
-      // })
-
-      // .when("/VRStart", {
-      //   controller: "PageCtrl",
-      //   templateUrl: "partials/VRStart.html",
-      // })
-
-      // .when("/VRView", {
-      //   controller: "PageCtrl",
-      //   templateUrl: "partials/VRView.html",
-      // })
-
-      // .when("/LocationCreation", {
-      //   controller: "PageCtrl",
-      //   templateUrl: "partials/LocationCreation.html",
-      // })
 
       // defaults
       .when("/404", {
@@ -51,15 +40,14 @@ let config = ['$routeProvider', '$locationProvider',
       .otherwise( {
         redirectTo: '/404',
       })
-      ;
 
     // gets rid of '#' in the routes ~
     $locationProvider.html5Mode({
       enabled: true,
       requireBase: false
-    });
-}];
+    })
+}]
 
 angular
   .module('app.routes', ['ngRoute'])
-  .config(config);
+  .config(config)

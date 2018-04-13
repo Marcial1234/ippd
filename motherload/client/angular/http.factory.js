@@ -1,61 +1,60 @@
 angular
   .module("app")
-  .factory("Factory", ["$http", "$window",
-    function(http, window) {
+  .factory("Factory", ["$http", "$location",
+    function(http, location) {
 
-      let serverMethods = {
+      return {
+
         // Picture Upload
-        postPics: (formdata, size) => {
+        postPics: async (formdata, size) => {
           // THIS IS WHAT WORKED
-          let request = {
-            method: 'POST',
-            url: '/upload',
-            data: formdata,
-            timeout: size * 300000,
-            headers: {
-              'Content-Type': undefined
-            }
-          }
-
-          console.log("sending ~")
-          return http(request)
+          // let request = {
+          //   method: 'POST',
+          //   url: '/upload',
+          //   data: formdata,
+          //   timeout: size * 300000,
+          //   headers: {
+          //     'Content-Type': undefined
+          //   }
+          // }
+          // console.log("sending ~")
+          // return http(request)
+          return await new Promise((res) => res(formdata.map(x => "static_assets/" + x)))
         },
 
         // Basic CRUD
         getFloors: () => {
-          return http.get("/api/getAllFloors");
+          return http.get("/api/getAllFloors")
         },
 
         getBuildings: () => {
-          return http.get("/api/getAllBuildings");
+          return http.get("/api/getAllBuildings")
         },
 
         createFloor: (obj) => {
-          return http.post("/api/floor/", obj);
+          return http.post("/api/floor/", obj)
         },
 
         createBuilding: (obj) => {
-          return http.post("/api/building/", obj);
+          return http.post("/api/building/", obj)
         },
 
         deleteFloor: (id) => {
-          return http.delete("/api/floor/" + id);
+          return http.delete("/api/floor/" + id)
         },
 
         deleteBuilding: (id) => {
-          return http.delete("/api/building/" + id);
+          return http.delete("/api/building/" + id)
         },
 
         changePanoURL: (obj) => {
           // values inside are in the abc order needed
           // obj.pnewURL
-          let customParams = Object.values(obj);
-          return http.delete("/api/updatePanoramic/" + customParams);
+          let customParams = Object.values(obj).join("/")
+          return http.delete("/api/updatePanoramic/" + customParams)
         },
 
-      };
-
-      return serverMethods;
+      }
     }
   ])
-  ;
+  

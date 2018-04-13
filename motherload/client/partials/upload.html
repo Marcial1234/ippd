@@ -2,31 +2,40 @@
 <div class="container">
   <div class="row">
     <ol class="breadcrumb">
-      <li> <a href="../">Home</a> </li>
-      <li class="active"> Image Portal </li>
+      <li> <a href="/">Home</a> </li>
+      <li class="active"> New Floor </li>
     </ol>
   </div>
   <div class="row">
     <div class="col-lg-12">
-      <h1 class="page-header">Image Portal</h1>
+      <h1 class="page-header centered">New Floor Image Upload</h1>
     </div>
-    <div class="col-lg-12">
-      <!--  (up to 1000, or 1GB) -->
-      <!-- <h5>Select image(s) to upload:</h5> -->
 
-      <!-- custom directive -->
-      <input type="file" id="up" multiple accept="image/*" severful="$root.data" names="$root.names">
+    <div class="col-lg-12">
+      <p> 
+        Upload unstiched panoramic 360° from Gear 360 Camera. You will have the opportinity to add panoramic-ready pictures after this.
+        <br>
+        <br>
+        Please expect a maximum processing time of 30 seconds per picture. On the meantime, you'll build the floorplan layout on the next page.
+      </p>
+
       <br>
 
+      <!-- custom directive to process files -->
+      <input type="file" id="up" multiple accept="image/*" severful="$root.data" names="$root.names">
+
       <div class="" ng-show="names.length > 1">
-        Files:
-        <div ng-repeat="n in names">{{n}}</div>
+        <br>
+        Files: <div ng-repeat="n in names">{{n}}</div> <br>
         <br>
       </div>
 
-      <input class="btn btn-primary" ng-click="dale()" value="Upload All Images">
+      <div class="right">
+      <input class="btn btn-primary" ng-click="sendImagesToServer()" value="Upload All Images">
+      </div>
 
       <!-- working on it ~ -->
+      <!-- probably won't be a thing -->
       <table class="table" ng-show="uploader.queue">
         <thead>
           <tr>

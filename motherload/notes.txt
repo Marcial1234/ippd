@@ -1,51 +1,36 @@
-Idea for Map View => done
-  last resort ~ send picture to frontend?
-  just have 'boxes' with number input fields/dropdowns
-  Have a defined start point and end point (cotiguous space)
-  === end of frontend ~
-  n^2 lazy parsing, find out how many used, push as you see ~
-  auto assign rotations based relative coors ~
-  record index of start ~
-    [step].join(""):
-      "01" => right 90
-      "10" => left -90
-      "-10" => forward 0
-      "0-1" => backward -178?
-      
-  TODO Later:
-  delete pics not used
-  * view from button-to-top as front/back *
-    - need a huge ass visual indicator
-        - ARROWS!
+For floor edits:
+  remember the 'sparce matrix', x & y
+  ==> ADD TO DB MODEL
 
-Idea for image uploading:
-  Move to server on bldg => floor hash based folder structure
-  Stitch
-  get index: url mapping, with some time of DB/endpoint parsing? via a DB boolean
-  create room objects from that
-  add them to floor.photos
+main page
+  => add bldgs 
+    => bootstrap forms
+  => view floors
+    list
+      + edit (later)
+      => add floors
+        name?
 
-  return promise to frontend once done ~
-  or one by one??
+add params (bldg id) extraction to frontend ~ messy but lolz
+  - Map View
+  - Floor View
 
-Go to stuart ~
+Map View => done
+* view from button-to-top as front/back *
+  - need a huge ass visual indicator
+      - ARROWS!
 
-Other TODOs:
-  Move to remote image sources/uris => kevin
+GO/CALL STUART !
 
-  Picture uploading and mapping !!
-
-  ===
-
+Other:
   Bldg and note search view
 
   "/preview" endpoint to server ~ _tab pano
     refactor current app to now show menu overlay ~
     just need a barebone view
 
-  no name/text navs? 
-    null => "go" tooltip
-    default to "next"? or hide it altogether?
-
   Create a '404' eq for react vr if nothing is passed ~ 
     Basic/Template view, with either our/verizon's logo and some 'not supposed to be here'/'wrong page' message
+
+Not doing:
+  remote sources of panoramics. figure that out yourself
