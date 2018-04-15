@@ -59,11 +59,11 @@ function init(bundle, parent, options) {
 
   // Grabbing url query to search for a specific building
   //  => url?key=values
-  let bldg = getQueryStringValue("building");
-  console.log("GQS", getQueryStringValue("building"));
+  let bldg = getQueryStringValue("bldg");
+  // console.log("GQS", getQueryStringValue("bldg"));
 
-  if (!bldg) bldg = "5abed5d1571e152138346d24";
-  let floor = "5ac6d11c0aa88b2dec945e0e";
+  // if (!bldg) bldg = "5abed5d1571e152138346d24";
+  let floor = "5ac6d11c0aa88b2dec945e20";
   // let room = getQueryStringValue("room");
   // if (!room) bldg = "0";
 
