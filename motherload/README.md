@@ -6,7 +6,8 @@
 ## Installation
 - Clone/Download
 - Browse to 'motherload'
-- run `npm run first install` - this may take several minutes
+- run `npm install` - this may take several minutes
+- run `npm run first-install` - this may take several minutes
 - run `npm start`. It'll open on [localhost port 5001](http://localhost:5001). You can browse to generic VR on [localhost:5001/vr](http://localhost:5001/vr).
   + **NOT RESPONSIBLE FOR ERRORS IF THIS PORT DOESN'T WORK**
   + Check cross-origin issues...
