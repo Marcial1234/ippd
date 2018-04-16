@@ -198,7 +198,7 @@ class VRLayout extends React.Component{
             // console.log("LOADED:", nextLocationId);
             changeLocationId(nextLocationId)
           }}
-          source={ loc.preview == "" ? asset(data.uri) : {uri: loc.preview}}
+          source={ loc.preview == "" ? asset(data.uri) : asset(loc.preview)}
         />
 
       {this.props.photo.preview == "" && <CylindricalPanel
