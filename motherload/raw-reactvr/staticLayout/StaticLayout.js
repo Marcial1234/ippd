@@ -72,7 +72,14 @@ export default class StaticLayout extends React.Component {
   }
 
   componentDidMount() {
-    setTimeout(function() {this.openOverlay(-1, "Select")}.bind(this), 500);
+
+        setTimeout(function() {
+          if (this.props.photo.preview == "") {
+                this.openOverlay(-1, "Select")
+          }
+
+        }.bind(this), 500);
+
   }
 
   componentDidUpdate(prevProps) {
@@ -83,7 +90,9 @@ export default class StaticLayout extends React.Component {
       })
       NativeModules.DomOverlayModule.closeOverlay3();
       NativeModules.DomOverlayModule.closeOverlay2();
-      this.openOverlay(-1, "Select");
+      if (this.props.photo.preview == ""){
+            this.openOverlay(-1, "Select");
+      }
 
       if (this.state.overlayOpen1) {
         NativeModules.DomOverlayModule.closeOverlay1();
@@ -599,7 +608,7 @@ export default class StaticLayout extends React.Component {
     /* Overlay Menu */
     return (
       <View >
-        {this.props.photo.preview != "true" && <View>
+        {this.props.photo.preview == "" && <View>
           <View style={styles.menu}>
             <VrButton style={styles.menuButton} onClick={this.goHome}>
               <Text style={styles.menuText}>Home</Text>

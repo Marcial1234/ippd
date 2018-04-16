@@ -84,7 +84,14 @@ class VRLayout extends React.Component{
         .then(response => response.json())
         .then(responseData => {
           console.log("Building:", responseData);
-          let floor = responseData.floors[loc.floor].hash;
+          let floor;
+
+          if(typeof responseData.floors[loc.floor] === 'undefined' || loc.floor === ""){
+            floor = responseData.floors[0].hash;
+          }
+          else{
+            floor = responseData.floors[loc.floor].hash;
+          }
 
           let floorPath = ["api", "floor", floor].join("/");
 
@@ -114,7 +121,7 @@ class VRLayout extends React.Component{
       let {nextLocationId} = nextProps.photo;
       let room;
 
-      if(typeof roomData[nextLocationId] === 'undefined'){
+      if(typeof roomData[nextLocationId] === 'undefined' || loc.room === ""){
         room = roomData[0];
       }
       else{
@@ -162,7 +169,7 @@ class VRLayout extends React.Component{
 
     let rot = this.props.photo.rotation;
     let trans = this.props.photo.translation;
-
+    console.log("Preview:", this.props.photo.preview)
     // map short names to functions that will be used.
     let {updatePhoto, changeLocationId, changeNextLocationId, changeZoom} = this.props;
     //console.log("Props in render: ", this.props);
@@ -191,10 +198,10 @@ class VRLayout extends React.Component{
             // console.log("LOADED:", nextLocationId);
             changeLocationId(nextLocationId)
           }}
-          source={asset(data.uri)}
+          source={ loc.preview == "" ? asset(data.uri) : {uri: loc.preview}}
         />
 
-      {this.props.photo.preview != "true" && <CylindricalPanel
+      {this.props.photo.preview == "" && <CylindricalPanel
           layer={{
             width: MAX_TEXTURE_WIDTH,
             height: MAX_TEXTURE_HEIGHT,
