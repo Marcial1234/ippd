@@ -12,11 +12,11 @@ gulp.task('browser-sync', ['nodemon'], function() {
     bs.init(null, {
         port: "5001",
         proxy: "http://localhost:5000",
-        files: [
-            "client/**/*.*", 
-            "!client/**/*.jpg", 
-            "!client/**/*.JPG",
-        ],
+        // files: [
+        //     "client/**/*.*", 
+        //     "!./client/**/*.jpg", 
+        //     "!./client/**/*.JPG",
+        // ],
         reloadOnRestart: true,
         browser: "chrome",
     });

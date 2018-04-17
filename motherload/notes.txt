@@ -1,15 +1,10 @@
 For floor edits:
   remember the 'sparce matrix', x & y
   ==> ADD TO DB MODEL
+// + edit (later) ~ scrap!
 
 main page
-  => add bldgs 
-    => bootstrap forms
-  => view floors
-    list
-      + edit (later)
-      => add floors
-        name?
+  => picture mappings ~
 
 add params (bldg id) extraction to frontend ~ messy but lolz
   - Map View

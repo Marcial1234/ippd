@@ -27,7 +27,9 @@ sections">
       <!-- instructions ~ -->
       <br>
       <p>
-        <b>Instruction: </b> .
+        <b>Instruction: </b> 
+
+        .
       </p>
       <!-- fill this out -->
       
@@ -36,10 +38,10 @@ sections">
         <div class="table-centered">
           <div> Dimensions (row, columns) </div>
           <div>&nbsp;</div>
-          <input ng-model="y" ng-change="table = createMatrix(x, y)"
+          <input ng-model="y" ng-change="table = createMatrix(x, y); setTableStyling(y)"
                  type="number" step="1" placeholder="Number of rows">
           <div>&nbsp;</div>
-          <input ng-model="x" ng-change="table = createMatrix(x, y)"
+          <input ng-model="x" ng-change="table = createMatrix(x, y);"
                  type="number" step="1" placeholder="Number of columns">
         </div>
         <div>
@@ -61,6 +63,10 @@ sections">
       <div ng-show="(x > 0 && y > 0)">
       <!-- <div> -->
         <div class="table-centered">
+          <div> Floor Name: </div>
+          &nbsp;
+          <input type="text" ng-model="floorName" placeholder="Name (required)">
+          &nbsp;
           <div> Start Room Number: </div>
           &nbsp;
           <select ng-model="startRoom" ng-options="x for x in picsOptions">
@@ -69,9 +75,8 @@ sections">
         </div>
         <br>
         <!-- nested loop to show table -->
-        <div ng-repeat="x in table" class="row table-centered">
-          <div ng-repeat="x in table[$index] track by $index">
-
+        <div ng-repeat="x in table" class="row table-{{tableStyle}}">
+          <div ng-repeat="x in table[$index] track by $index" >
             <!-- only allow for unique selection. One number, one time -->
             <select ng-model="table[$parent.$index][$index]"
                     ng-options="x for x in filteredOptions = (picsOptions | notTakenInTable:this:$parent.$index:$index)"
@@ -90,8 +95,8 @@ sections">
         <p>Shift Map <em class="fa fa-info-circle" title="Data WILL be preserved"></em></p>
         <button class="btn btn-info" ng-click="shiftUp()">Up</button>
         <button class="btn btn-info" ng-click="shiftDown()">Down</button>
-        <button class="btn btn-info" ng-click="shiftRight()">Right</button>
         <button class="btn btn-info" ng-click="shiftLeft()">Left</button>
+        <button class="btn btn-info" ng-click="shiftRight()">Right</button>
       </div>
 
       <br> <br>
@@ -104,7 +109,7 @@ sections">
 
       <br> <br>
 
-      <div class="right">
+      <div class="right" ng-show="floorName">
         <button ng-click="buildFloor()" class="btn btn-success">
           Create Virtual Floor
         </button>

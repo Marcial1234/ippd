@@ -19,7 +19,6 @@ var BuildingSchema = new mongoose.Schema({
   name:        {type: String, required: true},
   city:        {type: String, required: true},
   state:       {type: String, required: true},
-  num_floors:  {type: Number, required: true},
   
   // will be auto-populated
   long_state:  String,

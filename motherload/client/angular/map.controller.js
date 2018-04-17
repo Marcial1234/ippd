@@ -4,11 +4,7 @@ angular
   .controller('MapCtrl', ["$rootScope", "$scope", "$location", "$interval", "Factory",
     function (rootScope, scope, location, interval, Factory, ) {
 
-      if (!rootScope.currentBuildingId) {
-        alert("Not building refence found. Please browse to this page in a valid sequence")
-        location.path("/")
-        scope.$apply()
-      }
+      // starter code below these 2 f(x)s
 
       // Dynamically create a 2D array
       scope.createMatrix = (x, y) => {
@@ -19,32 +15,50 @@ angular
       const checkFilesDones = () => {
         if (rootScope.pics && scope.loading) {
           scope.loading = false
-          console.log(rootScope.pics)
+          console.log(rootScope.pics.data)
 
           rootScope.names.forEach((item, index) => {
-            scope.picsOptions.push(index)
+            // scope.picsOptions.push(index)
             scope.picsToUrls[index] = item
           })
 
-          interval.cancel(waitForFiles)
-          delete waitForFiles
+          interval.cancel(scope.waitForFiles)
+          delete scope.waitForFiles
         }
         else if (!scope.loading)
-          delete waitForFiles
+          delete scope.waitForFiles
         else
           console.log("Got nonin")
       }
 
-      // Initial variables of the contiguous 'room'
-      scope.startRoom, scope.x = 5, scope.y = 5 // dimensions
-      scope.table = scope.createMatrix(scope.x, scope.y)
+      // starter code
+      // if (false) {
+      if (!rootScope.currentBldgId) {
+        alert("No building refence found. Please browse to this page in a valid sequence")
+        console.log(rootScope.currentBldgId)
+        location.path("/")
+      }
+      // we good, then ~
+      else {
+        // Initial variables of the contiguous 'room'
+        scope.x = 5, scope.y = 5 // dimensions
+        scope.tableStyle = "centered", scope.startRoom, 
+        scope.table = scope.createMatrix(scope.x, scope.y)
 
-      // wait for picture data from parent controller
-      let waitForFiles = interval(checkFilesDones, 5000)
-      scope.loading = true
+        scope.picsOptions = rootScope.names.map((x,i) => i)
+        // scope.picsOptions = [0,1,2,3]
 
-      // mapping to picture data TBUsed later
-      scope.picsToUrls, scope.picsOptions
+        // wait for picture data from parent controller
+        scope.waitForFiles = interval(checkFilesDones, 5000)
+        scope.loading = true
+
+        // mapping to picture data TBUsed later
+        scope.picsToUrls = {}
+      }
+
+      scope.setTableStyling = (size) => {
+        scope.tableStyle =  size < 11 ? "centered " : "left"
+      }
 
       // scope.getDefaultDropdownText = (counter) => {
       //   return counter > 0 ? "Picture: " : "Done!"
@@ -58,8 +72,6 @@ angular
       // provide a way to preserve data and increment the table ~
       // table offset f(x)nality
       const shift = (increment_x, increment_y) => {
-        // console.log(increment_x, increment_y)
-
         let tempTable = scope.createMatrix(scope.x, scope.y)
         let shifted_x, shifted_y
 
@@ -68,8 +80,6 @@ angular
             shifted_x = i + increment_x
             shifted_y = j + increment_y
 
-            // make callback variable?? hmm
-            // within bounds...
             if (isWithinBounds(shifted_x, shifted_y))
               tempTable[i][j] = scope.table[shifted_x][shifted_y]
             else {
@@ -190,21 +200,29 @@ angular
       // build order: navs => photos => floor
       // but called in reverse ofc
       scope.buildFloor = () => {
-        if (!scope.startRoom) {
+        if (scope.startRoom == null) {
           alert("Select a start room before continuing")
           return
         }
 
         preProcess()
         const data = {
+          name: scope.floorName,
           photos: buildPhotoObj(),
-          parent: rootScope.currentBuildingId,
+          parent: rootScope.currentBldgId,
           firstPhotoId: scope.photoToIndex[scope.startRoom],
         }
+
         console.log(JSON.stringify(data))
         scope.vid = JSON.stringify(data)
+
         // make a post ~ done
-        // Factory.createFloor(data)
+        Factory.createFloor(data)
+        .then((res) => {
+          console.log(res.data)
+          rootScope.bldgFloors.push(res.data)
+          location.path("/viewFloors")
+        })
       }
       // === END ===
 		}

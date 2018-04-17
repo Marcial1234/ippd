@@ -7,32 +7,38 @@
       </ol>
     </div>
   </div>
-  <div class="row centered">
-    <div class="centered" style="">
-    <!-- tba -->
-    <!-- <div class="col-md-6"> -->
-      
-      <form>
-        <!-- Change to dynamic forms that rerfence information stored, created in LocationCreation-->
-        <div class="row">
-          <input type="text" placeholder="Central Office Name" required>
+  <div class="row">
+    <div class="col-lg-12 left" ng-app="app">
+      <form style="padding: 25%;">
+        <div class="form-group">
+          <label>Name</label>
+          <input ng-model="tempBldg.name" type="text" class="form-control" 
+                 placeholder="Central Office Name" required>
         </div>
-
-        <div class="row">
-          <input type="text" placeholder="City" required>
+        <div class="form-group">
+          <label>Address</label>
+          <div class="table-left">
+            <input ng-model="tempBldg.city"
+                   type="text" class="form-control" placeholder="City" required>
+            <select ng-model="tempBldg.state" class="form-control" required 
+            ng-options="name for (name, value) in states"
+              >
+              <option value="" disabled> Choose State </option>
+            </select>
+          </div>
         </div>
-
-        <div class="row">
-          <select type="text" name="State" required style="">
-            <option value=""> State </option>
-          </select>
+        <!-- {{tempBldg.state}} -->
+        <!-- ugly ng-show because you can't use "object" in ng statements -->
+        <div class="form-group centered" ng-show="tempBldg.name && tempBldg.city && tempBldg.state">
+          <!-- Initiate your VR experience! -->
+          <a ng-click="newBuilding(tempBldg)">
+            <button class="btn btn-success">
+              New building it is!
+            </button>
+          </a>
         </div>
+      </form>
 
-        <!-- ng-click="submit()" -->
-        <input class="btn btn-success" type="submit"
-               value="Initiate your VR experience!" >
-        </input>
-        </form>      
     </div>
   </div>
 </div>

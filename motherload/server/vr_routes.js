@@ -5,6 +5,11 @@ var router = express.Router();
 var floors = require("./db/floors.crud.js") ;
 var buildings = require("./db/buildings.crud.js") ;
 
+router.route("/getStates")
+      .get((req, res) => {
+        res.json(require("./db/state_abbv_mapping"))
+      });
+
 // Dummy:
 // router.route("/path")
 //       .get(pano.read)
@@ -20,9 +25,11 @@ router.route("/getAllBuildings")
 
 // ~ General 'search'
 // what can u edit from buildings? floors? address? idk...
+router.route("/building")
+      .post(buildings.create)
+
 router.route("/building/:bldg")
       .get(buildings.read)
-      .post(buildings.create)
       // .put(buildings.update)
       .delete(buildings.delete)
       ;
@@ -31,12 +38,13 @@ router.route("/building/:bldg")
 router.route("/getAllFloors")
       .get(floors.getAll);
 
+router.route("/floor")
+      .post(floors.create)
+      
 router.route("/floor/:floor")
       .get(floors.read)
-      // ...
-      // .post(floors.create)
       .put(floors.update)
-      .delete(floors.read)
+      .delete(floors.delete)
       ;
 
 // Floor++, need to pass relative index within photos (pindex) and/or notes/navs (nindex)

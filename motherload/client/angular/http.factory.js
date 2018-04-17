@@ -8,18 +8,22 @@ angular
         // Picture Upload
         postPics: async (formdata, size) => {
           // THIS IS WHAT WORKED
-          // let request = {
-          //   method: 'POST',
-          //   url: '/upload',
-          //   data: formdata,
-          //   timeout: size * 300000,
-          //   headers: {
-          //     'Content-Type': undefined
-          //   }
-          // }
+          let request = {
+            method: 'POST',
+            url: '/upload',
+            data: formdata,
+            timeout: size * 300000,
+            headers: {
+              'Content-Type': undefined
+            }
+          }
           // console.log("sending ~")
-          // return http(request)
-          return await new Promise((res) => res(formdata.map(x => "static_assets/" + x)))
+          return http(request)
+          // return await new Promise((res) => res(formdata.map(x => x)))
+        },
+
+        getStates: () => {
+          return http.get("/api/getStates")
         },
 
         // Basic CRUD
@@ -31,12 +35,17 @@ angular
           return http.get("/api/getAllBuildings")
         },
 
+        getBldgFloors: (id) => {
+          return http.get("/api/building/" + id)
+        },
+
         createFloor: (obj) => {
-          return http.post("/api/floor/", obj)
+          return http.post("/api/floor", obj)
         },
 
         createBuilding: (obj) => {
-          return http.post("/api/building/", obj)
+          // console.log(obj)
+          return http.post("/api/building", obj)
         },
 
         deleteFloor: (id) => {

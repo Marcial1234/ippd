@@ -1,31 +1,27 @@
 // Later use ~
 angular
   .module('app')
-  .controller('FormCtrl', ["$scope", "$location", "Factory",
-    function (scope, location, Factory, ) {
+  .controller('FormCtrl', ["$rootScope", "$scope", "$location", "Factory",
+    function (rootScope, scope, location, Factory, ) {
 
       // used variables
-      scope.allFloors = [];
-      scope.allBuildings = [];
+      rootScope.allFloors = [];
+      rootScope.allBuildings = [];
 
-      scope.dummyFloors = [
-        {name: "Top Secret FBI Floor"},
-        {name: "Spring 2018 UF Finals"},
-        {name: "Next year's ad campain materials"},
-      ];
-
-      Factory.getBuildings().then(
+      Factory.getBuildings()
+      .then(
         (res) => {
-          scope.allBuildings = res.data;
+          rootScope.allBuildings = res.data;
         }
       );
 
-      Factory.getFloors().then(
+      Factory.getFloors()
+      .then(
         (res) => {
-          scope.allFloors = res.data;
+          rootScope.allFloors = res.data;
         }
       );
-
+      
       const getDisclaimer = (type, name) => {
         let disclaimer = [" Deleting this", type, "('", 
                           name, "')",
@@ -41,25 +37,10 @@ angular
         if (confirm(getDisclaimer("building", name))) {
           Factory.deleteBuilding(id)
           .then((res) => {
-            if (res._id) {
+            console.log(res.data)
+            if (res.data._id) {
               scope.allBuildings.some((item, index, blds) => {
-                if (item._id == res._id) {
-                  blds.splice(index, 1);
-                  return true;
-                }
-              })
-            }
-          })
-        }
-      }
-
-      scope.delFloor = (id, name) => {
-        if (confirm(getDisclaimer("floor", name))) {
-          Factory.deleteFloor(id)
-          .then((res) => {
-            if (res._id) {
-              scope.allFloors.some((item, index, blds) => {
-                if (item._id == res._id) {
+                if (item._id == res.data._id) {
                   blds.splice(index, 1);
                   return true;
                 }
