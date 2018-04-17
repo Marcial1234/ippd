@@ -72,6 +72,7 @@ FloorSchema.post("save", (doc) => {
 
 });
 
+
 // Create model from schema
 var Floor = mongoose.model("Floors", FloorSchema);
 // THIS CLEANS/FIXES SOME DB PROBLEMS

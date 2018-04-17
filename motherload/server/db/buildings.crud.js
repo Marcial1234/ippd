@@ -2,6 +2,7 @@ var mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
 // var exec = require('child_process').exec;
 
+var Floor = require('./floors.model.js');
 var Building = require('./buildings.model.js');
 
 //----------------------------------------------------------------------
@@ -12,14 +13,17 @@ module.exports = {
   // this should work ~
   create: (req, res) => {
     var newBuilding = new Building(req.body);
-    // console.log(newBuilding);
+    // band-aid fix ~
+    console.log(newBuilding);
     
     newBuilding.save((err, realNewBuilding) => {
       if (err) {
         console.log(err);
         res.status(400).send(err);
-      } 
-      else res.json(realNewBuilding);
+      }
+      else {
+        res.json(realNewBuilding);
+      }
     });
   },
 
@@ -37,14 +41,18 @@ module.exports = {
       if (err) res.status(404).send(err);
       // if (err) res.sendstatus(404);
       else {
-        for (var i = 0; i < bldg.floors.length; i++) {
-          Floor.findByIdAndRemove(bldg.floors[i].hash, (err) => {
-            if (err) console.log(err);
-            else console.log(" :( ~ bai bai");
-          });
-
-          if (i == bldg.floors.length - 0) res.json(req.building);
+        if (bldg.floors.length) {
+          // this should be on the model .. but oh well
+          for (var i = 0; i < bldg.floors.length; i++) {
+            Floor.findByIdAndRemove(bldg.floors[i].hash, (err) => {
+              if (err) console.log(err);
+              else console.log(" :( ~ bai bai");
+            });
+            
+            if (i == bldg.floors.length - 1) res.json(req.building);
+          }
         }
+        else res.json(req.building);
       }
     });
   },

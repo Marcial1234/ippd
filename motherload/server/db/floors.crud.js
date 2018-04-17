@@ -3,24 +3,24 @@ mongoose.Promise = global.Promise;
 // var exec = require('child_process').exec;
 
 var Floor = require('./floors.model.js');
+var Building = require('./buildings.model.js');
 
 //---------------------------------------------
 // CRUD f(x)ality for each floor within a Floor
 //---------------------------------------------
 module.exports = {
 
-  // TBA
-  // create: (req, res) => {
-  //   var newFloor = new Floor(req.body);
-  //   console.log(newFloor);
+  create: (req, res) => {
+    var newFloor = new Floor(req.body);
+    console.log(newFloor);
 
-  //   newFloor.save((err, realNewFloor) => {
-  //     if (err) {
-  //       console.log(err);
-  //       res.status(400).send(err);
-  //     } else res.json(realNewFloor);
-  //   });
-  // },
+    newFloor.save((err, realNewFloor) => {
+      if (err) {
+        console.log(err);
+        res.status(400).send(err);
+      } else res.json(realNewFloor);
+    });
+  },
 
   // normal get
   read: (req, res) => {
@@ -42,11 +42,39 @@ module.exports = {
     });
   },
 
+  // figure this out later !~
   delete: (req, res) => {
-    Floor.findByIdAndRemove(req.floor._id, (err) => {
+    Building.find({_id: req.floor.parent}, (err, bldgs) => {
       if (err) res.status(404).send(err);
-      else res.json(req.floor);
-    });
+      else {
+        let bldg = bldgs[0]
+        let bldgID = req.floor._id + ""
+        // console.log(bldgs[0].floors.length)
+
+        // find the index of this floor ... delete
+        // assuming first index always
+        bldg.floors.some((item, index, obj) => {
+          let floorID = item.hash + ""
+
+          if (bldgID == floorID) {
+            obj.splice(index, 1)
+            bldg.floors = obj
+
+            Building.findByIdAndUpdate(bldg._id, bldg, {new: true}, 
+            (err, newo) => {
+              console.log(err, newo, bldgID, bldg)
+              res.json(req.floor)
+            })
+          }
+        })
+      }
+    })
+    // Floor.findByIdAndRemove(req.floor._id, (err) => {
+    //   if (err) res.status(404).send(err);
+    //   else {
+    //     // delete from building...
+    //   }
+    // });
   },
 
   getAll: (req, res) => {

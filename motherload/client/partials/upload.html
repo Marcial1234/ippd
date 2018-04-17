@@ -7,16 +7,20 @@
     </ol>
   </div>
   <div class="row">
+    <div ng-app="app" ng-controller="FloorsCtrl"></div>
     <div class="col-lg-12">
       <h1 class="page-header centered">New Floor Image Upload</h1>
     </div>
 
     <div class="col-lg-12">
       <p> 
-        Upload unstiched panoramic 360° from Gear 360 Camera. You will have the opportinity to add panoramic-ready pictures after this.
+        Upload un/stiched panoramic 360° from Gear 360 Camera.
         <br>
         <br>
-        Please expect a maximum processing time of 30 seconds per picture. On the meantime, you'll build the floorplan layout on the next page.
+        If you already have panoramic-ready pictures feel free to opt-out of auto-conversion.
+        <br>
+        <br>
+        Expect a maximum processing time of 30 seconds per picture if you're auto-converting now.
       </p>
 
       <br>
@@ -30,59 +34,19 @@
         <br>
       </div>
 
-      <div class="right">
-      <input class="btn btn-primary" ng-click="sendImagesToServer()" value="Upload All Images">
+      <div class="right" ng-show="$root.data">
+        <div>
+          <label>
+          Converting to Panoramic? {{$root.stitch}}
+          <input type="checkbox" ng-model="$root.stich" >
+          </label>
+        </div>
+        <input class="btn btn-primary" ng-click="sendImagesToServer()" 
+        value="Upload Image(s)">
       </div>
 
-      <!-- working on it ~ -->
-      <!-- probably won't be a thing -->
-      <table class="table" ng-show="uploader.queue">
-        <thead>
-          <tr>
-            <th width="50%">Name</th>
-            <th ng-show="uploader.isHTML5">Size</th>
-            <th ng-show="uploader.isHTML5">Progress</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr ng-repeat="item in uploader.queue">
-            <td>
-              <strong>{{ item.file.name }}</strong>
-              <!-- Image preview -->
-              <!--auto height-->
-              <!--<div ng-thumb="{ file: item.file, width: 100 }"></div>-->
-              <!--auto width-->
-              <div ng-show="uploader.isHTML5" ng-thumb="{ file: item._file, height: 100 }"></div>
-              <!--fixed width and height -->
-              <!--<div ng-thumb="{ file: item.file, width: 100, height: 100 }"></div>-->
-            </td>
-            <td ng-show="uploader.isHTML5" nowrap>{{ item.file.size/1024/1024|number:2 }} MB</td>
-            <td ng-show="uploader.isHTML5">
-              <div class="progress" style="margin-bottom: 0;">
-                <div class="progress-bar" role="progressbar" ng-style="{ 'width': item.progress + '%' }"></div>
-              </div>
-            </td>
-            <td class="text-center">
-              <span ng-show="item.isSuccess"><i class="glyphicon glyphicon-ok"></i></span>
-              <span ng-show="item.isCancel"><i class="glyphicon glyphicon-ban-circle"></i></span>
-              <span ng-show="item.isError"><i class="glyphicon glyphicon-remove"></i></span>
-            </td>
-            <td nowrap>
-              <button type="button" class="btn btn-success btn-xs" ng-click="item.upload()" ng-disabled="item.isReady || item.isUploading || item.isSuccess">
-                <span class="glyphicon glyphicon-upload"></span> Upload
-              </button>
-              <button type="button" class="btn btn-warning btn-xs" ng-click="item.cancel()" ng-disabled="!item.isUploading">
-                <span class="glyphicon glyphicon-ban-circle"></span> Cancel
-              </button>
-              <button type="button" class="btn btn-danger btn-xs" ng-click="item.remove()">
-                <span class="glyphicon glyphicon-trash"></span> Remove
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <!-- have an option for 'stitch' or not -->
+
     </div>
   </div>
 </div>
