@@ -9,7 +9,7 @@ angular
       rootScope.states = {}
       rootScope.search = ""
       rootScope.stitch = false
-      rootScope.bldgFloors = []
+      // rootScope.bldgFloors = []
       rootScope.currentBldgId = ""
       rootScope.currentFloorId = ""
       rootScope.tba = () => alert("functionality TBDone")
@@ -53,9 +53,9 @@ angular
         formdata.append("floor", rootScope.currentFloorId)
 
         Factory.postPics(scope.data, scope.names.length)
-        .then( async (res) => {
+        .then((res) => {
           // asynchorously return file paths and let angular know a change happened
-          await timeout(3000)
+          // await timeout(3000)
           rootScope.pics = res
           rootScope.$apply()
         })

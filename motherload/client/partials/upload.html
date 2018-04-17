@@ -21,6 +21,9 @@
         <br>
         <br>
         Expect a maximum processing time of 30 seconds per picture if you're auto-converting now.
+        <br>
+        <br>
+        <b>Remember</b> the order on which you submited them, as it'll be used for the next step.
       </p>
 
       <br>
@@ -35,12 +38,14 @@
       </div>
 
       <div class="right" ng-show="$root.data">
+        <!-- 
         <div>
           <label>
-          Converting to Panoramic? {{$root.stitch}}
-          <input type="checkbox" ng-model="$root.stich" >
+          Converting to Panoramic?
+          <input type="checkbox" ng-model="$root.stitch" >
           </label>
         </div>
+         -->
         <input class="btn btn-primary" ng-click="sendImagesToServer()" 
         value="Upload Image(s)">
       </div>

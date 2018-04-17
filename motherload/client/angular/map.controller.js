@@ -12,18 +12,22 @@ angular
       }
       
       // 'service' that waits for file data to be done ~ killed after
-      const checkFilesDones = () => {
+      const checkFilesDones = async () => {
         if (rootScope.pics && scope.loading) {
           scope.loading = false
+          let pics = rootScope.pics.data.panoPaths
           console.log(rootScope.pics.data)
 
-          rootScope.names.forEach((item, index) => {
+          await pics.forEach((item, index) => {
             // scope.picsOptions.push(index)
             scope.picsToUrls[index] = item
-          })
 
-          interval.cancel(scope.waitForFiles)
-          delete scope.waitForFiles
+            if (index == pics.length) {
+              interval.cancel(scope.waitForFiles)
+              delete scope.waitForFiles
+              console.log(scope.picsToUrls)
+            }
+          })
         }
         else if (!scope.loading)
           delete scope.waitForFiles

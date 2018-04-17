@@ -24,12 +24,18 @@ sections">
       </em>
       </h1>
 
-      <!-- instructions ~ -->
       <br>
       <p>
         <b>Instruction: </b> 
-
-        .
+        Remember the order of the submitted pictures. The order of which you selected them will be represented in the selection boxes below, starting with the 1st as '0'.
+        <br>
+        A right or left in the grid below is a right of left in the VR
+        <br>
+        Going up the grid: Room is in front
+        <br>
+        Going down the grid: Room is in the back
+        <br>
+        Use all the options until there's no more selections available. When everything's been selected, you can create the new floor once the images have been processed.
       </p>
       <!-- fill this out -->
       
@@ -109,13 +115,17 @@ sections">
 
       <br> <br>
 
-      <div class="right" ng-show="floorName">
+      <div class="right" ng-show="floorName && !picsToUrls[0]">
+        <a class="btn btn-default">Pictures Still Uploading/Converting</a>
+      </div>
+
+      <div class="right" ng-show="picsToUrls[0]">
         <button ng-click="buildFloor()" class="btn btn-success">
           Create Virtual Floor
         </button>
       </div>
 
-      <div ng-if="vid">{{vid}}</div>
+      <!-- <div ng-if="vid">{{vid}}</div> -->
     </div>
   </div>
 </div>

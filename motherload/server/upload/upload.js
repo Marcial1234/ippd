@@ -61,12 +61,13 @@ validate = (panoPaths, invalidPanos) => {
 const timeout = ms => new Promise(res => setTimeout(res, ms))
 
 getPanoPath = (imgPath) => {
-  if (weAreStitching) {
-    nameWithouthExtension = imgPath.split(".")[0]
-    return [nameWithouthExtension + PANO_EXTENTION].join("/")
-    // return [floor, nameWithouthExtension + PANO_EXTENTION].join("/")
-  }
-  else return imgPath
+  // if (weAreStitching == true) {
+  //   nameWithouthExtension = imgPath.split(".")[0]
+  //   return [nameWithouthExtension + PANO_EXTENTION].join("/")
+  //   // return [floor, nameWithouthExtension + PANO_EXTENTION].join("/")
+  // }
+  // else 
+  return imgPath
 }
 
 // .mv comes from ?? fileUpload?
@@ -142,19 +143,20 @@ uploadFiles = async (images, res, extraParams) => {
   // copy/move images to server ~ get pano paths
   panoPaths = images.map(uploadToServer)
   console.log(panoPaths)
-  Promise.all(panoPaths).then(async (paths) => {
+  Promise.all(panoPaths).then((paths) => {
     console.log("startDinggggg", weAreStitching)
 
     // hmm
-    if (!weAreStitching) {
-      console.log("??")
-      await stich()
+    // if (weAreStitching == true) {
+    //   console.log("??", weAreStitching)
+    //   stich().then(
+    //     res.json({panoPaths: paths})
+    //   )
+    // }
+      console.log("!!", weAreStitching)
       res.json({panoPaths: paths})
-    }
-    else {
-      console.log("!!")
-      res.json({panoPaths: paths})
-    }
+    // else {
+    // }
   })
 
   // push to cloud
