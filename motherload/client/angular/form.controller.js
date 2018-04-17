@@ -1,28 +1,24 @@
 // Later use ~
 angular
   .module('app')
-  .controller('FormCtrl', ["$scope", "$location", "Factory",
-    function (scope, location, Factory, ) {
+  .controller('FormCtrl', ["$rootScope", "$scope", "$location", "Factory",
+    function (rootScope, scope, location, Factory, ) {
 
       // used variables
-      scope.allFloors = [];
-      scope.allBuildings = [];
+      rootScope.allFloors = [];
+      rootScope.allBuildings = [];
 
-      scope.dummyFloors = [
-        {name: "Top Secret FBI Floor"},
-        {name: "Spring 2018 UF Finals"},
-        {name: "Next year's ad campain materials"},
-      ];
-
-      Factory.getBuildings().then(
+      Factory.getBuildings()
+      .then(
         (res) => {
-          scope.allBuildings = res.data;
+          rootScope.allBuildings = res.data;
         }
       );
 
-      Factory.getFloors().then(
+      Factory.getFloors()
+      .then(
         (res) => {
-          scope.allFloors = res.data;
+          rootScope.allFloors = res.data;
         }
       );
 
@@ -41,8 +37,9 @@ angular
         if (confirm(getDisclaimer("building", name))) {
           Factory.deleteBuilding(id)
           .then((res) => {
+            
             if (res._id) {
-              scope.allBuildings.some((item, index, blds) => {
+              rootScope.allBuildings.some((item, index, blds) => {
                 if (item._id == res._id) {
                   blds.splice(index, 1);
                   return true;
@@ -58,7 +55,7 @@ angular
           Factory.deleteFloor(id)
           .then((res) => {
             if (res._id) {
-              scope.allFloors.some((item, index, blds) => {
+              rootScope.allFloors.some((item, index, blds) => {
                 if (item._id == res._id) {
                   blds.splice(index, 1);
                   return true;

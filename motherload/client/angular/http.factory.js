@@ -22,6 +22,10 @@ angular
           return await new Promise((res) => res(formdata.map(x => "static_assets/" + x)))
         },
 
+        getStates: () => {
+          return http.get("/api/getStates")
+        },
+
         // Basic CRUD
         getFloors: () => {
           return http.get("/api/getAllFloors")
@@ -31,12 +35,17 @@ angular
           return http.get("/api/getAllBuildings")
         },
 
+        getBldgFloors: (id) => {
+          return http.get("/api/building/" + id)
+        },
+
         createFloor: (obj) => {
-          return http.post("/api/floor/", obj)
+          return http.post("/api/floor", obj)
         },
 
         createBuilding: (obj) => {
-          return http.post("/api/building/", obj)
+          // console.log(obj)
+          return http.post("/api/building", obj)
         },
 
         deleteFloor: (id) => {

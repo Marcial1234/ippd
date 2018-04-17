@@ -12,14 +12,19 @@ module.exports = {
   // this should work ~
   create: (req, res) => {
     var newBuilding = new Building(req.body);
-    // console.log(newBuilding);
+    // band-aid fix ~
+    // newBuilding.num_floors = 999;
+    console.log(newBuilding);
+    // res.json({here: "oink"});
     
     newBuilding.save((err, realNewBuilding) => {
       if (err) {
         console.log(err);
         res.status(400).send(err);
-      } 
-      else res.json(realNewBuilding);
+      }
+      else {
+        res.json(realNewBuilding);
+      }
     });
   },
 

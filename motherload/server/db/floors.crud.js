@@ -9,18 +9,17 @@ var Floor = require('./floors.model.js');
 //---------------------------------------------
 module.exports = {
 
-  // TBA
-  // create: (req, res) => {
-  //   var newFloor = new Floor(req.body);
-  //   console.log(newFloor);
+  create: (req, res) => {
+    var newFloor = new Floor(req.body);
+    console.log(newFloor);
 
-  //   newFloor.save((err, realNewFloor) => {
-  //     if (err) {
-  //       console.log(err);
-  //       res.status(400).send(err);
-  //     } else res.json(realNewFloor);
-  //   });
-  // },
+    newFloor.save((err, realNewFloor) => {
+      if (err) {
+        console.log(err);
+        res.status(400).send(err);
+      } else res.json(realNewFloor);
+    });
+  },
 
   // normal get
   read: (req, res) => {

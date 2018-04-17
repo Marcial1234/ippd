@@ -36,10 +36,10 @@ sections">
         <div class="table-centered">
           <div> Dimensions (row, columns) </div>
           <div>&nbsp;</div>
-          <input ng-model="y" ng-change="table = createMatrix(x, y)"
+          <input ng-model="y" ng-change="table = createMatrix(x, y); setTableStyling(y)"
                  type="number" step="1" placeholder="Number of rows">
           <div>&nbsp;</div>
-          <input ng-model="x" ng-change="table = createMatrix(x, y)"
+          <input ng-model="x" ng-change="table = createMatrix(x, y);"
                  type="number" step="1" placeholder="Number of columns">
         </div>
         <div>
@@ -69,9 +69,8 @@ sections">
         </div>
         <br>
         <!-- nested loop to show table -->
-        <div ng-repeat="x in table" class="row table-centered">
-          <div ng-repeat="x in table[$index] track by $index">
-
+        <div ng-repeat="x in table" class="row table-{{tableStyle}}">
+          <div ng-repeat="x in table[$index] track by $index" >
             <!-- only allow for unique selection. One number, one time -->
             <select ng-model="table[$parent.$index][$index]"
                     ng-options="x for x in filteredOptions = (picsOptions | notTakenInTable:this:$parent.$index:$index)"

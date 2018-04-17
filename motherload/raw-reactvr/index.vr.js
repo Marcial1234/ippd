@@ -86,10 +86,10 @@ class VRLayout extends React.Component{
           console.log("Building:", responseData);
           let floor;
 
-          if(typeof responseData.floors[loc.floor] === 'undefined' || loc.floor === ""){
+          if (typeof responseData.floors[loc.floor] === 'undefined' || loc.floor === "") {
             floor = responseData.floors[0].hash;
           }
-          else{
+          else {
             floor = responseData.floors[loc.floor].hash;
           }
 
@@ -98,6 +98,7 @@ class VRLayout extends React.Component{
           fetch(this.formatSearchQuery(floorPath))
             .then(response => response.json())
             .then(responseData => {
+              
               // console.log("Floor:", responseData)
               this.init(responseData);
             })
@@ -110,21 +111,25 @@ class VRLayout extends React.Component{
   }
 
   componentWillUpdate(nextProps, nextState) {
-     // console.log("Component Will Update!:", nextProps.photo.nextLocationId, this.props.photo.nextLocationId);
     if ( (nextProps.photo.nextLocationId == null)
       || (nextProps.photo.locationId !== nextProps.photo.nextLocationId )
       || this.props.location.currentFloor != nextProps.location.currentFloor) {
       // let {currentFloor} = nextProps.location;
       // console.log("Trying to update");
+
       console.log(nextProps);
       let roomData = nextProps.location.rooms;
       let {nextLocationId} = nextProps.photo;
       let room;
 
-      if(typeof roomData[nextLocationId] === 'undefined' || loc.room === ""){
-        room = roomData[0];
+      if (typeof roomData[nextLocationId] === 'undefined' || loc.room === "") {
+        // if the 'firstPhotoId' room exists, show it, else choose the first room as default
+        if (roomData.firstPhotoId)
+          room = roomData[roomData.firstPhotoId]
+        else
+          room = roomData[0]
       }
-      else{
+      else {
         room = roomData[nextLocationId];
       }
         this.props.updatePhoto({
@@ -169,7 +174,7 @@ class VRLayout extends React.Component{
 
     let rot = this.props.photo.rotation;
     let trans = this.props.photo.translation;
-    console.log("Preview:", this.props.photo.preview)
+    // console.log("Preview:", this.props.photo.preview)
     // map short names to functions that will be used.
     let {updatePhoto, changeLocationId, changeNextLocationId, changeZoom} = this.props;
     //console.log("Props in render: ", this.props);
@@ -179,8 +184,10 @@ class VRLayout extends React.Component{
     const notes = (data && data.notes) || null;
     const rotation = (data && data.rotationOffset) || null;
     // {rotateY: - ((rot == 0) ? 0: rot)},
+
 // source={asset(data.uri)}
 // source={{uri: 'http://res.cloudinary.com/serverful/image/upload/v1521187672/1521187637743.jpg'}}
+
     return (
       <View onInput={this.handleInput}
         style={{

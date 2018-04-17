@@ -1,32 +1,32 @@
-var fs = require('fs');
-var exec = require('child_process').exec;
-var cloudinary = require('cloudinary');
-var dirname, floor;
+var fs = require('fs')
+var exec = require('child_process').exec
+var cloudinary = require('cloudinary')
+var dirname, floorm, weAreStitching = false
 
-const FILE_EXTENTION = ".jpg";
-const PANO_EXTENTION = "_pano.jpg";
-const WIN_SCRIPT_NAME = "win-gear360pano.cmd";
+const FILE_EXTENTION = ".jpg"
+const PANO_EXTENTION = "_pano.jpg"
+const WIN_SCRIPT_NAME = "win-gear360pano.cmd"
 
 // these are relative to base folder "..\\server"
-const STICHING_SCRIPT_PATH = "\\client\\gear360pano\\";
+const STICHING_SCRIPT_PATH = "\\client\\gear360pano\\"
 let PANO_DIRECTORY = "client\\static_assets\\"
 
 cloudinary.config({
   api_key: process.env.API_KEY,
   api_secret: process.env.API_SECRET,
   cloud_name: 'serverful',
-});
+})
 
 preProcessFiles = (req, res) => {
 
-  console.log(req.body);
-  console.log(req.files);
-  console.log(req.timeout);
+  console.log(req.body)
+  console.log(req.files)
+  console.log(req.timeout)
 
   if (!req.files)
-    res.json({err: "no files"});
+    res.json({err: "no files"})
   else if (!req.body.floor)
-    res.json({err: "'floor' hash intended as directory not passed"});
+    res.json({err: "'floor' hash intended as directory not passed"})
   else {
     floor = req.body.floor
     PANO_DIRECTORY += [floor, "\\"].join("")
@@ -38,7 +38,7 @@ preProcessFiles = (req, res) => {
     // }
 
     if (!fs.existsSync(PANO_DIRECTORY)) {
-      fs.mkdirSync(PANO_DIRECTORY);
+      fs.mkdirSync(PANO_DIRECTORY)
     }
     
     uploadFiles(files, res)
@@ -59,8 +59,12 @@ validate = (panoPaths, invalidPanos) => {
 const timeout = ms => new Promise(res => setTimeout(res, ms))
 
 getPanoPath = (imgPath) => {
-  nameWithouthExtension = imgPath.split(".")[0]
-  return [floor, nameWithouthExtension + PANO_EXTENTION].join("/")
+  if (weAreStitching) {
+    nameWithouthExtension = imgPath.split(".")[0]
+    return [nameWithouthExtension + PANO_EXTENTION].join("/")
+    // return [floor, nameWithouthExtension + PANO_EXTENTION].join("/")
+  }
+  else return imgPath
 }
 
 // .mv comes from ?? fileUpload?
@@ -86,18 +90,18 @@ uploadToServer = async (image) => {
 */
 
 windowsStitchcommand = () => {
-  let upload_dir = dirname + PANO_DIRECTORY;
+  let upload_dir = dirname + PANO_DIRECTORY
   console.log(upload_dir)
 
-  let script_path = dirname + STICHING_SCRIPT_PATH;
-  let abs_script_path = script_path + WIN_SCRIPT_NAME;
+  let script_path = dirname + STICHING_SCRIPT_PATH
+  let abs_script_path = script_path + WIN_SCRIPT_NAME
   
   let cmd = [
     abs_script_path, 
     upload_dir + "*.JPG", 
     "/o", 
     upload_dir,
-  ].join(" ");
+  ].join(" ")
 
   return cmd
 }
@@ -115,8 +119,8 @@ stich = async () => {
       console.log("GOING OUT");
 
       if (error !== null) {
-        console.log(stderr);
-        // console.log('exec error:', error);
+        console.log(stderr)
+        // console.log('exec error:', error)
       }
 
       resolve(error)
@@ -126,12 +130,12 @@ stich = async () => {
 
 uploadFiles = async (images, res, extraParams) => {
 
-  let size = images.length;
+  let size = images.length
   let panoPaths, failedStitching, cloudPaths, invalidPanos = []
 
   // we're on the server folder, and want the base project path
   // GLOBAL FOR THIS FILE
-  dirname = __dirname + "/../../";
+  dirname = __dirname + "/../../"
 
   // copy/move images to server ~ get pano paths
   panoPaths = images.map(uploadToServer)
@@ -156,12 +160,12 @@ pushToCloud = (imagePanoPath) => {
       // public_id: (Date.now() ** 1.5),
       resource_type: "image",
     }, (error, result) => {
-      console.log(error);
-      console.log(result);
+      console.log(error)
+      console.log(result)
       resolve(result)
-    });
+    })
   })  
 }
 
 // do this the ES6 way later...
-module.exports = preProcessFiles;
+module.exports = preProcessFiles

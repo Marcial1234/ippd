@@ -44,14 +44,14 @@ module.exports.upload_base_tooltips = function() {
     name :  "Library",
     city :  "Tucson",
     state:  "AZ",
-    num_floors:  1,
+    // num_floors:  1,
   })
 
   var b = new Building({
     name :  "IPPD",
     city :  "Gainesville",
     state:  "FL",
-    num_floors:  1,
+    // num_floors:  1,
   })
   // console.log(a, b);
   a.save();
