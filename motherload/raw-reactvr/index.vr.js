@@ -20,8 +20,8 @@ import LoadingSpinner from './components/LoadingSpinner';
 import DisplayTooltips from './components/DisplayTooltips';
 
 let loc;
-const MAX_TEXTURE_HEIGHT = 720;
-const MAX_TEXTURE_WIDTH = 4096;
+const MAX_TEXTURE_HEIGHT = 1000;
+const MAX_TEXTURE_WIDTH = 3000;
 const PPM = 1 / (2 * Math.PI * 3) * MAX_TEXTURE_WIDTH;
 const degreesToPixels = degrees => -(degrees / 360) * MAX_TEXTURE_WIDTH;
 const RCTDeviceEventEmitter = require('RCTDeviceEventEmitter');
@@ -85,7 +85,7 @@ class VRLayout extends React.Component{
         .then(responseData => {
           console.log("Building:", responseData);
           let floor;
-
+          console.log("Hello!", responseData.floors);
           if (typeof responseData.floors[loc.floor] === 'undefined' || loc.floor === "") {
             floor = responseData.floors[0].hash;
           }
@@ -98,8 +98,15 @@ class VRLayout extends React.Component{
           fetch(this.formatSearchQuery(floorPath))
             .then(response => response.json())
             .then(responseData => {
-              
-              // console.log("Floor:", responseData)
+
+              console.log("RD: ", responseData);
+              if (loc.room === "") {
+                // if the 'firstPhotoId' room exists, show it, else choose the first room as default
+                if (responseData.firstPhotoId)
+                  loc.room = responseData.firstPhotoId;
+                else
+                  loc.room = 0;
+              }
               this.init(responseData);
             })
             .done();
@@ -146,7 +153,6 @@ class VRLayout extends React.Component{
   }
 
   init(roomConfig) {
-    fullJSON = roomConfig;
     let buildingPath = ["api", "building", roomConfig.parent].join("/");
     // console.log("#Init", roomConfig);
 
@@ -158,7 +164,6 @@ class VRLayout extends React.Component{
           floors: building.floors,
           rooms: roomConfig.photos,
         });
-        this.props.changeNextLocationId(loc.room);
       })
       .done();
   }

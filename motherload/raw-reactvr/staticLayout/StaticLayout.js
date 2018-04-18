@@ -427,6 +427,7 @@ export default class StaticLayout extends React.Component {
     let {currentFloor} = this.props.location;
     let {locationId, data} = this.props.photo;
     console.log(obj.floor, obj.room);
+    console.log(currentFloor, locationId);
 
     if (obj.floor == currentFloor && obj.room == locationId) {
       console.log("Already here.");
