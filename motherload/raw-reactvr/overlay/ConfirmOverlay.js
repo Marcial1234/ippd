@@ -1,7 +1,7 @@
 import React from 'react';
 
 //This is standard react.
-export default class ConfirmationOverlay extends React.Component{
+export default class ConfirmOverlay extends React.Component{
 
   constructor() {
     super();

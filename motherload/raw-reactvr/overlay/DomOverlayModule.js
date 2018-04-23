@@ -2,9 +2,9 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {Module} from 'react-vr-web';
 
-import TextboxOverlay from './TextboxOverlay';
+import NoteOverlay from './NoteOverlay';
 import SelectorOverlay from './SelectorOverlay';
-import ConfirmationOverlay from './ConfirmationOverlay';
+import ConfirmOverlay from './ConfirmOverlay';
 
 export default class DomOverlayModule extends Module {
   constructor(overlayContainer1, overlayContainer2, overlayContainer3) {
@@ -33,7 +33,7 @@ export default class DomOverlayModule extends Module {
       'overlayOpen1'
     ]);
     ReactDOM.render(
-      <TextboxOverlay text={text} title={title} type={type} gNotes={gNotes}
+      <NoteOverlay text={text} title={title} type={type} gNotes={gNotes}
         onClose={this.closeOverlay1} submit={this.submit} submitGNotes={this.submitGNotes}/>,
       this._overlayContainer1
     );
@@ -50,7 +50,7 @@ export default class DomOverlayModule extends Module {
   }
   openOverlay3(index) {
     ReactDOM.render(
-      <ConfirmationOverlay index={index} submit={this.submitConfirmation}/>,
+      <ConfirmOverlay index={index} submit={this.submitConfirmation}/>,
        this._overlayContainer3
     );
   }

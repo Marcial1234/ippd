@@ -74,7 +74,7 @@ export default class StaticLayout extends React.Component {
   componentDidMount() {
 
         setTimeout(function() {
-          if (this.props.photo.preview == "") {
+          if (this.props.location.preview == "") {
                 this.openOverlay(-1, "Select")
           }
 
@@ -83,14 +83,14 @@ export default class StaticLayout extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.photo.locationId !== this.props.photo.locationId) {
+    if (prevProps.location.locationId !== this.props.location.locationId) {
       this.setState({
         navID: -1,
         noteID: -1,
       })
       NativeModules.DomOverlayModule.closeOverlay3();
       NativeModules.DomOverlayModule.closeOverlay2();
-      if (this.props.photo.preview == ""){
+      if (this.props.location.preview == ""){
             this.openOverlay(-1, "Select");
       }
 
@@ -102,12 +102,11 @@ export default class StaticLayout extends React.Component {
       if (this.state.displayNotes) {
         this.refreshTooltips();
       }
-      let {data} = this.props.photo;
+      let {data} = this.props.location;
       let notes = data.notes;
       for (let i = 0; i < notes.length; i++){
         notes[i].selected = false;
       }
-      // this.props.photo.updateData(data);
     }
   }
 
@@ -125,14 +124,14 @@ export default class StaticLayout extends React.Component {
   }
 
   createNote() {
-    let {data} = this.props.photo;
+    let {data} = this.props.location;
     let notes = data.notes;
     let ID = notes.length;
     // ???
     NativeModules.ClientModule.getRotation();
     setTimeout(function() {
       let rot = (this.state.cameraRot._y*57)%360;
-      rot += this.props.photo.rotation;
+      rot += this.props.location.rotation;
       if (rot > 180){
         let diff = (rot - 180);
         rot*=-1;
@@ -164,7 +163,7 @@ export default class StaticLayout extends React.Component {
   }
 
   moveNote(direction) {
-    let {data} = this.props.photo;
+    let {data} = this.props.location;
     let notes = data.notes;
     let navs = data.navs;
 
@@ -239,7 +238,7 @@ export default class StaticLayout extends React.Component {
   }
 
   editNote(index) {
-    let {data} = this.props.photo;
+    let {data} = this.props.location;
     let notes = data.notes;
     this.selectTooltip(index, "note");
 
@@ -252,7 +251,7 @@ export default class StaticLayout extends React.Component {
   }
 
   deleteNote(index) {
-    let {data} = this.props.photo;
+    let {data} = this.props.location;
     let notes = data.notes;
 
     NativeModules.DomOverlayModule.openOverlay3(index);
@@ -274,7 +273,7 @@ export default class StaticLayout extends React.Component {
   }
 
   updateText(obj) {
-    let {data} = this.props.photo;
+    let {data} = this.props.location;
     let notes = data.notes;
     let note = notes[this.state.noteID];
 
@@ -302,7 +301,7 @@ export default class StaticLayout extends React.Component {
   }
 
   selectTooltip(index, type) {
-    let {data} = this.props.photo;
+    let {data} = this.props.location;
     let notes = data.notes;
     let navs = data.navs;
     // console.log("Data", data, "Index:", index);
@@ -324,10 +323,7 @@ export default class StaticLayout extends React.Component {
 
       setTimeout(function() {
         let rot = (this.state.cameraRot._y*57)%360;
-        let obj = {
-          rotation: notes[index].rotationY - rot,
-          translation: 0, //notes[index].translateX
-        };
+        let obj = notes[index].rotationY - rot;
         this.props.focusNote(obj);
       }.bind(this), 25);
     }
@@ -344,10 +340,7 @@ export default class StaticLayout extends React.Component {
 
       setTimeout(function() {
         let rot = (this.state.cameraRot._y*57)%360;
-        let obj = {
-          rotation: navs[index].rotationY - rot,
-          translation: 0, //notes[index].translateX
-        };
+        let obj = notes[index].rotationY - rot;
         this.props.focusNote(obj);
       }.bind(this), 25);
 
@@ -401,10 +394,9 @@ export default class StaticLayout extends React.Component {
   }
 
   openOverlay(index, type) {
-    let {locationId, data} = this.props.photo;
+    let {locationId, data, currentFloor, floors, rooms} = this.props.location;
     let notes = (data && data.notes) || null;
     let gNotes = (data && data.gNotes) || null;
-    let {currentFloor, floors, rooms} = this.props.location;
 
     let FL = JSON.parse(JSON.stringify(floors));
     let RMS = JSON.parse(JSON.stringify(rooms));
@@ -424,8 +416,7 @@ export default class StaticLayout extends React.Component {
   }
 
   selectFloorRoom(obj) {
-    let {currentFloor} = this.props.location;
-    let {locationId, data} = this.props.photo;
+    let {locationId, data, currentFloor} = this.props.location;
     console.log(obj.floor, obj.room);
     console.log(currentFloor, locationId);
 
@@ -434,7 +425,7 @@ export default class StaticLayout extends React.Component {
     }
     else if (obj.floor == currentFloor) {
       let roomData = this.props.location.rooms[obj.room];
-      this.props.updatePhoto({
+      this.props.updatelocation({
         zoomZ: 0,
         data: roomData,
         locationId: null,
@@ -455,7 +446,7 @@ export default class StaticLayout extends React.Component {
             obj.room = rdp[0];
           }
 
-          this.props.updatePhoto({
+          this.props.updatelocation({
             zoomZ: 0,
             data: roomData[obj.room],
             locationId: null,
@@ -475,7 +466,7 @@ export default class StaticLayout extends React.Component {
 
   goHome() {
     // console.log("Props:", this.props);
-    let {data} = this.props.photo;
+    let {data} = this.props.location;
     let fLocs = Object.keys(this.props.location.floors);
     let rLocs = Object.keys(this.props.location.rooms);
 
@@ -487,21 +478,10 @@ export default class StaticLayout extends React.Component {
     this.setState({displayNotes: false})
     NativeModules.DomOverlayModule.closeOverlay1();
 
-    // NativeModules.ClientModule.getRotation();
-    // setTimeout(function() {
-    //   let rot = (this.state.cameraRot._y*57)%360;
-    //   let obj = {
-    //     rotation: -rot,
-    //     translation: 0,
-    //   };
-    //   this.props.focusNote(obj);
-    // }.bind(this), 25);
-    // NativeModules.DomOverlayModule.closeOverlay2();
   }
 
   save(type, obj, index = -1) {
-    let {currentFloor, floors} = this.props.location;
-    let {locationId} = this.props.photo;
+    let {locationId, currentFloor, floors} = this.props.location;
 
     // "/gNotes/:floor/:pindex/:note"
     if (type == "gNotes") {
@@ -568,12 +548,11 @@ export default class StaticLayout extends React.Component {
   }
 
   setRotation(){
-    let {data} = this.props.photo;
+    let {data} = this.props.location;
     NativeModules.ClientModule.getRotation();
 
     setTimeout(function() {
       let rot = (this.state.cameraRot._y*57)%360;
-      // rot += this.props.photo.rotation;
       data.rotationOffset = rot;
       console.log(rot);
       this.props.updateData(data);
@@ -590,7 +569,7 @@ export default class StaticLayout extends React.Component {
   }
 
   render() {
-    let {data} = this.props.photo;
+    let {data} = this.props.location;
     let notes = (data && data.notes) || null;
     let navs = (data && data.navs) || null;
     var lvls = [];
@@ -609,7 +588,7 @@ export default class StaticLayout extends React.Component {
     /* Overlay Menu */
     return (
       <View >
-        {this.props.photo.preview == "" && <View>
+        {this.props.location.preview == "" && <View>
           <View style={styles.menu}>
             <VrButton style={styles.menuButton} onClick={this.goHome}>
               <Text style={styles.menuText}>Home</Text>

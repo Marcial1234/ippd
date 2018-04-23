@@ -4,14 +4,11 @@ import { connect, Provider } from "react-redux";
 import { AppRegistry, asset, Pano, Text, View, NativeModules} from 'react-vr';
 import CylindricalPanel from 'CylindricalPanel';
 
-import * as mode from "./actions/modeActions";
-import * as photo from "./actions/photoActions";
 import * as location from "./actions/locationActions";
 
 import store from "./static_assets/store";
 import styles from "./static_assets/styles";
 
-import TextboxVr from './staticLayout/TextboxVr';
 import StaticLayout from './staticLayout/StaticLayout';
 
 import NavButton from './components/NavButton';
@@ -30,21 +27,15 @@ class VRLayout extends React.Component{
 
   constructor() {
     super();
-    // RCTDeviceEventEmitter.addListener('getJson', obj => {
-    //   jsonPath = obj;
-    // });
-    // NativeModules.ClientModule.getJson();
+
+    //adds listener waiting for call from client.js
     RCTDeviceEventEmitter.addListener('getLocation', obj => {
       loc = obj;
     });
+    //call function in client js, handled by above listener
     NativeModules.ClientModule.getLocation();
-
-    this.handleMove = this.handleMove.bind(this);
-    this.handleInput = this.handleInput.bind(this);
   }
 
-  // TODO: can we just use the 'formatSearchQuery' in StaticLayout?
-  // Returns the correct url for DB queries for BOTH dev and production
   formatSearchQuery(query) {
     let url;
     if (window.process.env.NODE_ENV === "production") {
@@ -59,33 +50,21 @@ class VRLayout extends React.Component{
     return [url, query].join("/");
   }
 
-  handleMove(e) {
-    console.log(e);
-  }
-
-  // "handleInput" can listen for mouse clicks or key presses and perform actions accordingly
-  // Use "onInput" inside a View. Ex: <View onInput={handleInput} style={styles.rootView}>
-  handleInput(e) {
-    let event = e.nativeEvent.inputEvent;
-  }
-
   componentDidMount() {
 
     // Gets the JSON data, and later initiallize component
-    // This "fetch" works as a GET request
+    // This fetch works as a GET request
 
+    //set timeout to delay long enough for RCTDeviceEventEmitter to send and receive
     setTimeout(function() {
-
-      console.log(loc);
 
       let buildingPath = ["api", "building", loc.bldg].join("/");
 
       fetch(this.formatSearchQuery(buildingPath))
         .then(response => response.json())
         .then(responseData => {
-          console.log("Building:", responseData);
           let floor;
-          console.log("Hello!", responseData.floors);
+          //if no floor is passed, or floor passed doesn't exist, default to first floor
           if (typeof responseData.floors[loc.floor] === 'undefined' || loc.floor === "") {
             floor = responseData.floors[0].hash;
           }
@@ -98,8 +77,6 @@ class VRLayout extends React.Component{
           fetch(this.formatSearchQuery(floorPath))
             .then(response => response.json())
             .then(responseData => {
-
-              console.log("RD: ", responseData);
               if (loc.room === "") {
                 // if the 'firstPhotoId' room exists, show it, else choose the first room as default
                 if (responseData.firstPhotoId)
@@ -113,20 +90,16 @@ class VRLayout extends React.Component{
         })
         .done();
     }.bind(this), 50);
-
-    //asset(this.props.jsonPath).uri
   }
 
   componentWillUpdate(nextProps, nextState) {
-    if ( (nextProps.photo.nextLocationId == null)
-      || (nextProps.photo.locationId !== nextProps.photo.nextLocationId )
+    //update location if it's on first run or room or floor has changed
+    if ( (nextProps.location.nextLocationId == null)
+      || (nextProps.location.locationId !== nextProps.location.nextLocationId )
       || this.props.location.currentFloor != nextProps.location.currentFloor) {
-      // let {currentFloor} = nextProps.location;
-      // console.log("Trying to update");
 
-      console.log(nextProps);
       let roomData = nextProps.location.rooms;
-      let {nextLocationId} = nextProps.photo;
+      let {nextLocationId} = nextProps.location;
       let room;
 
       if (typeof roomData[nextLocationId] === 'undefined' || loc.room === "") {
@@ -139,14 +112,10 @@ class VRLayout extends React.Component{
       else {
         room = roomData[nextLocationId];
       }
-        this.props.updatePhoto({
-          zoomZ: 0,
+        this.props.updatelocation({
           data: room,
           locationId: nextLocationId,
           nextLocationId: nextLocationId ? nextLocationId : 0,
-          rotation: 0,
-          // rotation: roomData.firstPhotoRotation +
-          // (roomData.photos[roomData.firstPhotoId].rotationOffset || 0),
         });
         this.props.setPreview(loc.preview);
     }
@@ -154,7 +123,6 @@ class VRLayout extends React.Component{
 
   init(roomConfig) {
     let buildingPath = ["api", "building", roomConfig.parent].join("/");
-    // console.log("#Init", roomConfig);
 
     fetch(this.formatSearchQuery(buildingPath))
       .then(response => response.json())
@@ -170,34 +138,26 @@ class VRLayout extends React.Component{
 
   render() {
     // map short names to state values that will be used.
-    let {locationId, nextLocationId, data} = this.props.photo;
+    let {locationId, nextLocationId, data} = this.props.location;
 
+    //only continue if data is loaded
     if (!data) {
       return null;
     }
-    // console.log("Data", data);
 
-    let rot = this.props.photo.rotation;
-    let trans = this.props.photo.translation;
-    // console.log("Preview:", this.props.photo.preview)
+    let rot = this.props.location.rotation;
     // map short names to functions that will be used.
-    let {updatePhoto, changeLocationId, changeNextLocationId, changeZoom} = this.props;
-    //console.log("Props in render: ", this.props);
+    let {updatelocation, changeLocationId, changeNextLocationId, changeZoom} = this.props;
 
     const isLoading = nextLocationId !== locationId;
     const navs = (data && data.navs) || null;
     const notes = (data && data.notes) || null;
     const rotation = (data && data.rotationOffset) || null;
-    // {rotateY: - ((rot == 0) ? 0: rot)},
-
-// source={asset(data.uri)}
-// source={{uri: 'http://res.cloudinary.com/serverful/image/upload/v1521187672/1521187637743.jpg'}}
 
     return (
-      <View onInput={this.handleInput}
+      <View
         style={{
           transform: [
-            {rotateX: + trans},
             {rotateY: - rot},
           ]
         }}
@@ -207,13 +167,12 @@ class VRLayout extends React.Component{
             tintColor: isLoading ? 'grey' : 'white',
           }}
           onLoad={() => {
-            // console.log("LOADED:", nextLocationId);
             changeLocationId(nextLocationId)
           }}
           source={ loc.preview == "" ? asset(data.uri) : asset(loc.preview)}
         />
 
-      {this.props.photo.preview == "" && <CylindricalPanel
+      {this.props.location.preview == "" && <CylindricalPanel
           layer={{
             width: MAX_TEXTURE_WIDTH,
             height: MAX_TEXTURE_HEIGHT,
@@ -257,34 +216,21 @@ class VRLayout extends React.Component{
 // Start of "Redux"
 // in "mapStateToProps", map names to use values returned from reducer
 const mapStateToProps = state => ({
-  name: state.user.name,
-  text: state.mode.text,
-  input: state.mode.input,
-  VRTextBox: state.mode.VRTextBox,
-  StaticTextBox: state.mode.StaticTextBox,
-  // photo props
-  photo: state.photo,
+    // location props
   location: state.location,
 });
 
 //in "mapDispatchToProps", map names to use functions returned from action
-//"mode" and "photo" are imported at the top of this file.
+//"location" is imported at the top of this file.
 const mapDispatchToProps = dispatch => ({
-  // show: () => dispatch(mode.createActiveMode()),
-  // hide: () => dispatch(mode.viewActiveMode()),
-  // textOn: () => dispatch(mode.textInputMode()),
-  // textInput: (text) => dispatch(mode.textInput(text)),
-  focusNote: (obj) => dispatch(photo.focusNote(obj)),
-  changeZoom: (zoom) => dispatch(photo.changeZoom(zoom)),
-  updateData: (data) => dispatch(photo.updateData(data)),
-  updateNotes: (notes) => dispatch(photo.updateNotes(notes)),
-  updateGNotes: (notes) => dispatch(photo.updateGNotes(notes)),
-  updatePhoto: (nextPhoto) => dispatch(photo.updatePhoto(nextPhoto)),
-  changeLocationId: (locationId) => dispatch(photo.changeLocationId(locationId)),
-  changeNextLocationId: (locationId) => dispatch(photo.changeNextLocationId(locationId)),
-  setPreview: (preview) => dispatch(photo.setPreview(preview)),
-
-  // any difference between these 2 groups?
+  focusNote: (obj) => dispatch(location.focusNote(obj)),
+  updateData: (data) => dispatch(location.updateData(data)),
+  updateNotes: (notes) => dispatch(location.updateNotes(notes)),
+  updateGNotes: (notes) => dispatch(location.updateGNotes(notes)),
+  updatelocation: (nextlocation) => dispatch(location.updatelocation(nextlocation)),
+  changeLocationId: (locationId) => dispatch(location.changeLocationId(locationId)),
+  changeNextLocationId: (locationId) => dispatch(location.changeNextLocationId(locationId)),
+  setPreview: (preview) => dispatch(location.setPreview(preview)),
   initFloors: (obj) => dispatch(location.initFloors(obj)),
   selectFloor: (floor) => dispatch(location.selectFloor(floor)),
 });

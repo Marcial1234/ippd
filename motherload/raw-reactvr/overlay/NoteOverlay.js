@@ -1,7 +1,7 @@
 import React from 'react';
 
 //This is standard react.
-export default class TextboxOverlay extends React.Component{
+export default class NoteOverlay extends React.Component{
 
   constructor(props) {
     super(props);

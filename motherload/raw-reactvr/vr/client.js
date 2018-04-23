@@ -1,12 +1,8 @@
-// Auto-generated content.
-// This file contains the boilerplate to set up your React app.
-// If you want to modify your application, start in "index.vr.js"
-
-// Auto-generated content.
 import {VRInstance, Module} from 'react-vr-web';
 import './process'; //necessary from DOMOverlay instructions
 import DomOverlayModule from '../overlay/DomOverlayModule';
 
+//ClientModule is used to give other files access to functions and variables in client.js
 class ClientModule extends Module {
   constructor() {
     super('ClientModule');
@@ -38,14 +34,14 @@ class ClientModule extends Module {
 
 }
 
-// Gets the url?key=values
+// Gets the url?key=values. Searches for 'key' in URL and returns value from "key=value"
 function getQueryStringValue (key) {
   return decodeURIComponent(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + encodeURIComponent(key).replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));
 }
 
 function init(bundle, parent, options) {
 
-  // Grabbing url query to search for a specific building
+  // Get values from URL
   //  => url?key=values
   let location = {
     bldg: getQueryStringValue("bldg"),
@@ -53,55 +49,43 @@ function init(bundle, parent, options) {
     room: getQueryStringValue("room"),
     preview: getQueryStringValue("preview"),
   }
-  console.log("GQS", location.bldg, location.floor, location.room, location.preview);
 
-  if (!location.bldg){
-    location.bldg = "5ac6d11c0aa88b2dec945e0c"
-  }
-
-  // create div from overlay
+    // create div for overlays
   const domOverlayContainer1 = document.createElement('div');
   const domOverlayContainer2 = document.createElement('div');
   const domOverlayContainer3 = document.createElement('div');
-  domOverlayContainer1.id = 'dom-overlay1';
-  domOverlayContainer2.id = 'dom-overlay2';
-  domOverlayContainer3.id = 'dom-overlay3';
+  domOverlayContainer1.id = 'note-overlay';
+  domOverlayContainer2.id = 'selector-overlay';
+  domOverlayContainer3.id = 'confirmation-overlay';
 
-  //create instance of module
+  //create instance of module, pass the containers
   const domOverlayModule = new DomOverlayModule(domOverlayContainer1, domOverlayContainer2, domOverlayContainer3);
   const clientModule = new ClientModule();
 
   const vr = new VRInstance(bundle, 'VRLayout', parent, {
-    // Add custom options here, still some work to be done...
-    // when it renders it for a 2nd time it goes away...
     ...options,
 
     hideFullscreen: true, //hides the button
-    //register dom overlay
+    //register domOverlay and client for use outside of client.js
     nativeModules: [domOverlayModule, clientModule],
   });
 
-  clientModule._setRNContext(vr.rootView.context);
-  clientModule._setLocation(location);
+
 
   vr.player._wrapper.appendChild(domOverlayContainer1);
   vr.player._wrapper.appendChild(domOverlayContainer2);
   vr.player._wrapper.appendChild(domOverlayContainer3);
 
-  // Any custom behavior you want to perform on each frame goes here
-  // vr.render = () => {};
-
-  // Begin the animation loop
   // Adds a camera and attaches the "Menu" component to it
   // This is for Stationary ReactVR
   vr.scene.add(vr.camera());
-  // console.log(vr.rootView.context);
   vr.mountComponent('StaticLayout', {},  vr.camera());
 
   vr.start();
-  //"vr.rootView.context" is the context for the VR portion of the app
-  //This is how the overlay(React) can connect with ReactVR
+  //sets the context as the VR context, so they'll both reference the same
   domOverlayModule._setRNContext(vr.rootView.context);
+  clientModule._setRNContext(vr.rootView.context);
+  clientModule._setLocation(location);
 
   // zoom code
   window.playerCamera = vr.player._camera;
@@ -119,7 +103,7 @@ window.ReactVR = { init };
 function onVRMessage(e) {
   var type = e.data.type;
 
-  // watching out for javascript string comparizons...
+  // watching out for javascript string comparisons...
   if (type == 'sceneChanged' && window.playerCamera.zoom != 1) {
     window.playerCamera.zoom = 1;
     window.playerCamera.updateProjectionMatrix();
@@ -148,7 +132,7 @@ function onRendererDoubleClick() {
 }
 
 function onRendererMouseWheel() {
-  // Fliped the '<' for non-reverse scroll, dont like reverse scroll
+  // Fliped the '<' for non-reverse scroll
   if (event.deltaY < 0) {
     if (window.playerCamera.zoom > 1) {
       window.playerCamera.zoom -= 0.1;
