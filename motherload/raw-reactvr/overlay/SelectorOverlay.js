@@ -75,6 +75,9 @@ export default class SelectorOverlay extends React.Component{
       floor: this.state.floor,
       room: this.state.room
     }
+
+    console.log("THE OBJ", obj)
+
     this.props.submit(obj);
     //
     // this.setState({updated: true});
@@ -93,7 +96,7 @@ export default class SelectorOverlay extends React.Component{
     this.setState({
       rooms: Object.keys(this.props.rooms),
       lRooms: Object.keys(this.props.rooms),
-      floors: Object.keys(this.props.floors),
+      floors: floorNames,
       lFloors: floorNames,
     })
   }
@@ -102,6 +105,7 @@ export default class SelectorOverlay extends React.Component{
     if(!this.state.rooms){
       return null;
     }
+    // console.log(this.state.rooms, this.state.lRooms, this.state.floors, this.state.lFloors)
 
     return (
       <div className="select-container">

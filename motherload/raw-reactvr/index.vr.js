@@ -98,24 +98,29 @@ class VRLayout extends React.Component{
       || (nextProps.location.locationId !== nextProps.location.nextLocationId )
       || this.props.location.currentFloor != nextProps.location.currentFloor) {
 
-      let roomData = nextProps.location.rooms;
+      let rooms = nextProps.location.rooms;
+
       let {nextLocationId} = nextProps.location;
       let room;
 
-      if (typeof roomData[nextLocationId] === 'undefined' || loc.room === "") {
+      if (typeof rooms[loc.room] === 'undefined' || loc.room === "") {
         // if the 'firstPhotoId' room exists, show it, else choose the first room as default
-        if (roomData.firstPhotoId)
-          room = roomData[roomData.firstPhotoId]
+        if (rooms.firstPhotoId){
+          room = rooms.firstPhotoId
+        }
         else
-          room = roomData[0]
+          room = 0;
+      }
+      else if (nextLocationId){
+        room = nextLocationId;
       }
       else {
-        room = roomData[nextLocationId];
+        room = loc.room
       }
         this.props.updatelocation({
-          data: room,
-          locationId: nextLocationId,
-          nextLocationId: nextLocationId ? nextLocationId : 0,
+          data: rooms[room],
+          locationId: room,
+          nextLocationId: room ? room : 0,
         });
         this.props.setPreview(loc.preview);
     }
@@ -132,6 +137,7 @@ class VRLayout extends React.Component{
           floors: building.floors,
           rooms: roomConfig.photos,
         });
+        this.props.selectFloor(loc.floor);
       })
       .done();
   }
@@ -233,6 +239,7 @@ const mapDispatchToProps = dispatch => ({
   setPreview: (preview) => dispatch(location.setPreview(preview)),
   initFloors: (obj) => dispatch(location.initFloors(obj)),
   selectFloor: (floor) => dispatch(location.selectFloor(floor)),
+  setRooms: (rooms) => dispatch(location.setRooms(rooms)),
 });
 
 //This sends the variables and functions to be referenced as "this.props"

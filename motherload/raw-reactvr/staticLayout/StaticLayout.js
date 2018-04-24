@@ -105,7 +105,7 @@ export default class StaticLayout extends React.Component {
       let {data} = this.props.location;
       let notes = data.notes;
       for (let i = 0; i < notes.length; i++){
-        notes[i].selected = false;
+          notes[i].selected = false;
       }
     }
   }
@@ -398,8 +398,11 @@ export default class StaticLayout extends React.Component {
     let notes = (data && data.notes) || null;
     let gNotes = (data && data.gNotes) || null;
 
-    let FL = JSON.parse(JSON.stringify(floors));
+    let FLS = JSON.parse(JSON.stringify(floors));
     let RMS = JSON.parse(JSON.stringify(rooms));
+
+    let floor = floors[currentFloor].name;
+    console.log("The Floor:", floor);
 
     if (type == "Text") {
       NativeModules.DomOverlayModule.closeOverlay1();
@@ -411,47 +414,52 @@ export default class StaticLayout extends React.Component {
     }
     if (type == "Select") {
       NativeModules.DomOverlayModule.closeOverlay2();
-      NativeModules.DomOverlayModule.openOverlay2(locationId.toString(), currentFloor, FL, RMS);
+      NativeModules.DomOverlayModule.openOverlay2(locationId.toString(), floor, FLS, RMS);
     }
   }
 
   selectFloorRoom(obj) {
-    let {locationId, data, currentFloor} = this.props.location;
-    console.log(obj.floor, obj.room);
-    console.log(currentFloor, locationId);
+    let {locationId, data, currentFloor, floors, rooms} = this.props.location;
+    let test = floors.find(o => o.name === obj.floor);
+    let floor = floors.indexOf(test);
+    console.log(test);
+    console.log(floor);
+    console.log(currentFloor);
 
     if (obj.floor == currentFloor && obj.room == locationId) {
       console.log("Already here.");
     }
-    else if (obj.floor == currentFloor) {
-      let roomData = this.props.location.rooms[obj.room];
+    else if (floor == currentFloor || floor == -1) {
+      let roomData = rooms[obj.room];
       this.props.updatelocation({
-        zoomZ: 0,
         data: roomData,
         locationId: null,
         nextLocationId: obj.room,
-        rotation: 0
       });
     }
     else {
-      let jsonPath = ["api", "floor", this.props.location.floors[obj.floor].hash].join("/");
+      let jsonPath = ["api", "floor", floors[floor].hash].join("/");
       fetch(this.formatSearchQuery(jsonPath))
         .then(response => response.json())
         .then(responseData => {
-          this.props.selectFloor(obj.floor);
           let roomData = responseData.photos;
+
+          this.props.selectFloor(floor);
+          this.props.setRooms(roomData);
+          console.log(responseData);
+
           let rdp = Object.keys(roomData);
 
           if (!rdp.includes(obj.room)) {
             obj.room = rdp[0];
           }
 
+          console.log("ROOM", obj.room)
+
           this.props.updatelocation({
-            zoomZ: 0,
             data: roomData[obj.room],
-            locationId: null,
+            locationId: obj.room,
             nextLocationId: obj.room,
-            rotation: 0
           });
 
           let locs = Object.keys(roomData);
@@ -490,14 +498,13 @@ export default class StaticLayout extends React.Component {
         .then(response => response.json())
         .then(responseData => {
           this.props.updateData(responseData.photos[locationId]);
-          // console.log("RD:", responseData);
+          console.log("RD:", responseData);
         })
         .done();
     }
     // "/notes/:floor/:pindex/:nindex"
     else if (type == "notes") {
       let jsonPath = ["api", type, floors[currentFloor].hash, locationId, index].join("/");
-      // console.log("Received Index:", index);
       // Always send POSTs, donno why puts aren't working, but ¯\_(ツ)_/¯
       fetch(this.formatSearchQuery(jsonPath), {
           body: JSON.stringify(obj),
@@ -526,7 +533,7 @@ export default class StaticLayout extends React.Component {
           .then(response => response.json())
           .then(responseData => {
             this.props.updateData(responseData.photos[locationId]);
-            // console.log("RD:", responseData);
+            console.log("RD:", responseData);
           })
           .done();
     }
@@ -539,8 +546,7 @@ export default class StaticLayout extends React.Component {
       .then(response => response.json())
       .then(responseData => {
         this.props.updateData(responseData.photos[locationId]);
-            this.refreshTooltips();
-        // console.log("RD:", responseData);
+        this.refreshTooltips();
       })
       .done();
     }
@@ -598,30 +604,6 @@ export default class StaticLayout extends React.Component {
             <VrButton style={styles.menuButton} onClick={ () => this.openOverlay(-1, "General")}>
                    <Text style={styles.menuText}>Room Notes</Text>
             </VrButton>
-
-
-
-    {/*
-            <VrButton style={styles.menuButton} onClick={this.test}>
-                   <Text style={styles.menuText}>Log It</Text>
-            </VrButton>
-            <VrButton style={styles.menuButton} onClick={this.setRotation}>
-                   <Text style={styles.menuText}>Set Rotation</Text>
-            </VrButton>
-            <VrButton style={styles.menuButton} onClick={this.save}>
-                   <Text style={styles.menuText}>Save</Text>
-            </VrButton>
-            <VrButton style={styles.menuButton} onClick={this.test}>
-                   <Text style={styles.menuText}>Log It</Text>
-            </VrButton>
-            <VrButton style={styles.menuButton} onClick={this.editNote}>
-              <Text style={styles.menuText}>Edit Note</Text>
-            </VrButton>
-            <VrButton style={styles.menuButton} onClick={this.changeVal}>
-              <Text style={styles.menuText}>Change Val</Text>
-            </VrButton>
-    */}
-
             <VrButton style={styles.menuButton} onClick={this.toggleNavs}>
               <Text style={styles.menuText}>Toggle Navs</Text>
             </VrButton>

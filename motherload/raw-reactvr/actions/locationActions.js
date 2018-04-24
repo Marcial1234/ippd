@@ -76,3 +76,10 @@ export function selectFloor(floor){
     payload: floor,
   }
 }
+
+export function setRooms(rooms){
+  return{
+    type: "Set Rooms",
+    payload: rooms,
+  }
+}

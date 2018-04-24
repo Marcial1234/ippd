@@ -16,8 +16,7 @@ export default function location(state=defaultState, action){
       case "Update":{
         return{...state, data : action.payload.data,
                          locationId : action.payload.locationId,
-                         nextLocationId : action.payload.nextLocationId,
-                         notes: action.payload.notes}
+                         nextLocationId : action.payload.nextLocationId}
       }
       case "Change Location":{
         return{...state, locationId : action.payload}
@@ -48,6 +47,9 @@ export default function location(state=defaultState, action){
       }
       case "Select Floor":{
         return{...state, currentFloor : action.payload}
+      }
+      case "Set Rooms":{
+        return{...state, rooms : action.payload}
       }
       default :{
         return{...state}
