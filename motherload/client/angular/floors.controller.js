@@ -44,6 +44,7 @@ angular
             }
           })
         }
+        
       }
 
       scope.editFloor = (id) => {

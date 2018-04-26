@@ -1,7 +1,7 @@
-var fs = require('fs')
-var exec = require('child_process').exec
-var cloudinary = require('cloudinary')
-var dirname, floorm, weAreStitching = false
+let fs = require('fs')
+let exec = require('child_process').exec
+let cloudinary = require('cloudinary')
+let dirname, floorm, weAreStitching = false
 
 const FILE_EXTENTION = ".jpg"
 const PANO_EXTENTION = "_pano.jpg"
@@ -61,7 +61,7 @@ validate = (panoPaths, invalidPanos) => {
 const timeout = ms => new Promise(res => setTimeout(res, ms))
 
 getPanoPath = (imgPath) => {
-  // if (weAreStitching == true) {
+  // if (weAreStitching) {
   //   nameWithouthExtension = imgPath.split(".")[0]
   //   return [nameWithouthExtension + PANO_EXTENTION].join("/")
   //   // return [floor, nameWithouthExtension + PANO_EXTENTION].join("/")
@@ -70,18 +70,15 @@ getPanoPath = (imgPath) => {
   return imgPath
 }
 
-// .mv comes from ?? fileUpload?
 uploadToServer = async (image) => {
-  let basePath = PANO_DIRECTORY + image.name
-  let path = basePath + FILE_EXTENTION
-
-  let panoPath = basePath + PANO_EXTENTION
+  let path = PANO_DIRECTORY + image.name
   await image.mv(path, (err) => {if (err) console.log(err)})
+  // .mv comes from express-fileUpload?
   console.log("Uploaded ", image.name, "as", path)
   return getPanoPath(image.name)
 } 
 
-// TBA LINUX SCRIPT
+// LINUX SCRIPT
 // YOU CAN USE '-P' for PARALLEL PROCESSING IN LINUX! SHOULD BE FASTERR
 // let upload_dir = dirname + '/public/upload/';
 // let cmd = dirname + '/public/gear360pano/gear360pano.sh -n ' + 
@@ -113,8 +110,6 @@ windowsStitchcommand = () => {
 stich = async () => {
   return new Promise((resolve, reject) => {
     cmd = windowsStitchcommand()
-    // console.log(cmd)
-    // console.log(__dirname)
 
     // converting the files on the background
     let stitch = exec(cmd, (error, stdout, stderr) => {
@@ -173,7 +168,8 @@ pushToCloud = (imagePanoPath) => {
       overwrite: true,
       // public_id: (Date.now() ** 1.5),
       resource_type: "image",
-    }, (error, result) => {
+    }, 
+    (error, result) => {
       console.log(error)
       console.log(result)
       resolve(result)
@@ -181,5 +177,4 @@ pushToCloud = (imagePanoPath) => {
   })  
 }
 
-// do this the ES6 way later...
 module.exports = preProcessFiles
