@@ -99,7 +99,7 @@ class VRLayout extends React.Component{
       || this.props.location.currentFloor != nextProps.location.currentFloor) {
 
       let rooms = nextProps.location.rooms;
-
+      console.log("nextProps", nextProps);
       let {nextLocationId} = nextProps.location;
       let room;
 
@@ -133,6 +133,7 @@ class VRLayout extends React.Component{
       .then(response => response.json())
       .then(responseData => {
         let building = responseData;
+        console.log("HERE WE GO", responseData);
         this.props.initFloors({
           floors: building.floors,
           rooms: roomConfig.photos,

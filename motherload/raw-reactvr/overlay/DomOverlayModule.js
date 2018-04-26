@@ -16,39 +16,39 @@ export default class DomOverlayModule extends Module {
     this._overlayContainer1 = overlayContainer1;
     this._overlayContainer2 = overlayContainer2;
     this._overlayContainer3 = overlayContainer3;
-    this.closeOverlay1 = this.closeOverlay1.bind(this);
-    this.closeOverlay2 = this.closeOverlay2.bind(this);
-    this.closeOverlay3 = this.closeOverlay3.bind(this);
-    this.openOverlay1 = this.openOverlay1.bind(this);
-    this.openOverlay2 = this.openOverlay2.bind(this);
-    this.openOverlay3 = this.openOverlay3.bind(this);
+    this.closeNotes = this.closeNotes.bind(this);
+    this.closeSelector = this.closeSelector.bind(this);
+    this.closeConfirm = this.closeConfirm.bind(this);
+    this.openNotes = this.openNotes.bind(this);
+    this.openSelector = this.openSelector.bind(this);
+    this.openConfirm = this.openConfirm.bind(this);
     this.submitSelection = this.submitSelection.bind(this);
     this.submitGNotes = this.submitGNotes.bind(this);
     this.submitConfirmation = this.submitConfirmation.bind(this);
   }
 
   //This method call opens up the overlay for display.
-  openOverlay1(text, title, type, gNotes) {
+  openNotes(text, title, type, gNotes) {
     this.rnContext.callFunction('RCTDeviceEventEmitter', 'emit', [
-      'overlayOpen1'
+      'openNotes'
     ]);
     ReactDOM.render(
       <NoteOverlay text={text} title={title} type={type} gNotes={gNotes}
-        onClose={this.closeOverlay1} submit={this.submit} submitGNotes={this.submitGNotes}/>,
+        onClose={this.closeNotes} submit={this.submit} submitGNotes={this.submitGNotes}/>,
       this._overlayContainer1
     );
   }
-  openOverlay2(room, floor, floors, rooms) {
+  openSelector(room, floor, floors, rooms) {
     this.rnContext.callFunction('RCTDeviceEventEmitter', 'emit', [
-      'overlayOpen2'
+      'openSelector'
     ]);
     ReactDOM.render(
       <SelectorOverlay room={room} rooms={rooms} floor={floor} floors={floors}
-         onClose={this.closeOverlay2} submit={this.submitSelection}/>,
+         onClose={this.closeConfirm} submit={this.submitSelection}/>,
        this._overlayContainer2
     );
   }
-  openOverlay3(index) {
+  openConfirm(index) {
     ReactDOM.render(
       <ConfirmOverlay index={index} submit={this.submitConfirmation}/>,
        this._overlayContainer3
@@ -56,21 +56,21 @@ export default class DomOverlayModule extends Module {
   }
 
 
-  closeOverlay1() {
+  closeNotes() {
     this.rnContext.callFunction('RCTDeviceEventEmitter', 'emit', [
-      'overlayClose1'
+      'closeNotes'
     ]);
     ReactDOM.unmountComponentAtNode(this._overlayContainer1);
   }
 
-  closeOverlay2() {
+  closeSelector() {
     this.rnContext.callFunction('RCTDeviceEventEmitter', 'emit', [
-      'overlayClose2'
+      'closeSelector'
     ]);
     ReactDOM.unmountComponentAtNode(this._overlayContainer2);
   }
 
-  closeOverlay3() {
+  closeConfirm() {
     ReactDOM.unmountComponentAtNode(this._overlayContainer3);
   }
 
@@ -81,7 +81,7 @@ export default class DomOverlayModule extends Module {
     //The first part of the callFunction is 'RCTDeviceEventEmitter', 'emit'
     //This will always stay as is
     //'textUpdated' is the name of the listener created in StaticLayout
-    //'text' is value we are returning from here.
+    //'text' is value returned here
     submit(obj){
       this.rnContext.callFunction('RCTDeviceEventEmitter', 'emit', [
         'updateText', obj,

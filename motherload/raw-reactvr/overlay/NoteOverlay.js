@@ -1,6 +1,5 @@
 import React from 'react';
 
-//This is standard react.
 export default class NoteOverlay extends React.Component{
 
   constructor(props) {
@@ -18,7 +17,6 @@ export default class NoteOverlay extends React.Component{
     this.handleTextChange = this.handleTextChange.bind(this);
     this.handleTitleChange = this.handleTitleChange.bind(this);
     this.handleGNotesChange = this.handleGNotesChange.bind(this);
-    this.test = this.test.bind(this);
   }
 
   handleTextChange(event) {
@@ -52,18 +50,6 @@ export default class NoteOverlay extends React.Component{
     setTimeout(function() {this.setState({updatedG: false});}.bind(this), 1000);
   }
 
-  test(){
-    // let element = this.props.doc.body.children[2].children[0].children[2].children[0];
-    // element.style.transform = "";
-    // console.log(element.style.transform);
-    // let elem = this.props.doc.querySelector("body div div div");
-    // // elem.click();
-    // elem.ref= "compass";
-    // console.log(elem.ref);
-    // console.log(ReactDOM.findDOMNode("compass"));
-    // this.props.testIt();
-    console.log(static_assets);
-  }
 
   render(){
       return (
@@ -105,7 +91,3 @@ export default class NoteOverlay extends React.Component{
       )
   }
 }
-//              <button onClick={this.testIt}>Test It</button>
-
-// <input type="text" ref="query" value={this.state.building}
-//      onChange={ (e) => {this.handleBuildingChange(e, "refresh"); this.updateSearch(e, "B")}} style={{width: 70}}/>

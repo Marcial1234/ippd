@@ -10,24 +10,24 @@ export default class StaticLayout extends React.Component {
     this.state ={
       navID: -1,
       noteID: -1,
-      adjustRate: 6,
+      moveRate: 6,
       cameraRot: null,
       noteOrNav: "note",
       displayNavs: false,
-      overlayOpen1: false,
-      overlayOpen2: false,
-      displayNotes: false,
+      NotesOpen: false,
+      SelectorOpen: false,
+      noteListOpen: false,
     }
 
-    this.test = this.test.bind(this);
     this.save = this.save.bind(this);
     this.goHome = this.goHome.bind(this);
     this.editNote = this.editNote.bind(this);
     this.moveNote = this.moveNote.bind(this);
+    this.moveNav = this.moveNav.bind(this);
     this.updateText = this.updateText.bind(this);
     this.deleteNote = this.deleteNote.bind(this);
     this.createNote = this.createNote.bind(this);
-    this.adjustRate = this.adjustRate.bind(this);
+    this.adjustMoveRate = this.adjustMoveRate.bind(this);
     this.changeRate = this.changeRate.bind(this);
     this.toggleNavs = this.toggleNavs.bind(this);
     this.openOverlay = this.openOverlay.bind(this);
@@ -41,71 +41,77 @@ export default class StaticLayout extends React.Component {
   }
 
   componentWillMount() {
-    // will respond to the call for 'updateText', obj is the value received
+    // will respond to the corresponding calls in DomOverlayModule
     RCTDeviceEventEmitter.addListener('updateText', obj => {
       this.updateText(obj);
     });
     RCTDeviceEventEmitter.addListener('updateGNotes', obj => {
       this.save("gNotes", obj);
     });
-    RCTDeviceEventEmitter.addListener('overlayClose1', () => {
-      this.setState({overlayOpen1: false,})
+    RCTDeviceEventEmitter.addListener('closeNotes', () => {
+      this.setState({NotesOpen: false,})
     });
-    RCTDeviceEventEmitter.addListener('overlayClose2', () => {
-      this.setState({overlayOpen2: false,})
+    RCTDeviceEventEmitter.addListener('closeSelector', () => {
+      this.setState({SelectorOpen: false,})
     });
-    RCTDeviceEventEmitter.addListener('overlayOpen1', () => {
-      this.setState({overlayOpen1: true,})
+    RCTDeviceEventEmitter.addListener('openNotes', () => {
+      this.setState({NotesOpen: true,})
     });
-    RCTDeviceEventEmitter.addListener('overlayOpen2', () => {
-      this.setState({overlayOpen2: true,})
+    RCTDeviceEventEmitter.addListener('openSelector', () => {
+      this.setState({SelectorOpen: true,})
     });
     RCTDeviceEventEmitter.addListener('selectFloorRoom', obj => {
       this.selectFloorRoom(obj);
     });
-    RCTDeviceEventEmitter.addListener('cameraRot', obj => {
-      this.setState({cameraRot: obj});
-    });
     RCTDeviceEventEmitter.addListener('deleteConfirm', obj => {
       this.deleteConfirmation(obj);
+    });
+
+    //responds to function in ClientModule
+    RCTDeviceEventEmitter.addListener('cameraRot', obj => {
+      this.setState({cameraRot: obj});
     });
   }
 
   componentDidMount() {
-
+      //initial delay gives props time to load.
         setTimeout(function() {
           if (this.props.location.preview == "") {
                 this.openOverlay(-1, "Select")
           }
 
+          //clear any lingering selections
+          let {data} = this.props.location;
+          let notes = data.notes;
+          for (let i = 0; i < notes.length; i++){
+              notes[i].selected = false;
+          }
         }.bind(this), 500);
 
   }
 
   componentDidUpdate(prevProps) {
+    //check if moving to new location
     if (prevProps.location.locationId !== this.props.location.locationId) {
+      //reset states so no notes or navs are selected on location change
       this.setState({
         navID: -1,
         noteID: -1,
       })
-      NativeModules.DomOverlayModule.closeOverlay3();
-      NativeModules.DomOverlayModule.closeOverlay2();
+
+      NativeModules.DomOverlayModule.closeConfirm();
+      NativeModules.DomOverlayModule.closeSelector();
       if (this.props.location.preview == ""){
             this.openOverlay(-1, "Select");
       }
 
-      if (this.state.overlayOpen1) {
-        NativeModules.DomOverlayModule.closeOverlay1();
+      if (this.state.NotesOpen) {
+        NativeModules.DomOverlayModule.closeNotes();
         this.openOverlay(-1, "General");
       }
 
-      if (this.state.displayNotes) {
+      if (this.state.noteListOpen) {
         this.refreshTooltips();
-      }
-      let {data} = this.props.location;
-      let notes = data.notes;
-      for (let i = 0; i < notes.length; i++){
-          notes[i].selected = false;
       }
     }
   }
@@ -126,10 +132,15 @@ export default class StaticLayout extends React.Component {
   createNote() {
     let {data} = this.props.location;
     let notes = data.notes;
+
+    //set ID of new note to be 1 past the last index
     let ID = notes.length;
-    // ???
+
+    //get current facing direction
     NativeModules.ClientModule.getRotation();
+    //use delay to let props process
     setTimeout(function() {
+      //get facing direction then ensure it is between -180 and 180 to fit in CylindricalPanel
       let rot = (this.state.cameraRot._y*57)%360;
       rot += this.props.location.rotation;
       if (rot > 180){
@@ -143,15 +154,16 @@ export default class StaticLayout extends React.Component {
         rot = 180 + diff;
       }
 
+      //create New Note object.
+
       let newNote = {
         Type: "textblock",
-        text: "It's Full!",
+        text: "This is default text, waiting to be changed.",
         title: "New Note",
         width: 1.3,
         height: 1.5,
         selected: false,
         rotationY: rot,
-        // rotationY: (ID>0) ? notes[ID-1].rotationY -20 : 160,
         translateX: 0,
       }
       this.save("notes", newNote, ID);
@@ -165,76 +177,84 @@ export default class StaticLayout extends React.Component {
   moveNote(direction) {
     let {data} = this.props.location;
     let notes = data.notes;
-    let navs = data.navs;
 
     let NoteID = this.state.noteID;
-    let NavID = this.state.navID;
-    let adj = this.state.adjustRate;
+    let moveRate = this.state.moveRate;
 
-    // point of this?
-    if (NoteID >= notes.length) {
-      this.setState({noteID: 0});
-      NoteID = 0;
-    }
-
-    if (NavID >= navs.length) {
-      this.setState({noteID: 0});
-      NavID = 0;
-    }
-
-    // need to figure out what to do at 180 degrees
-    //  => make it 178 ~
-    if (this.state.noteOrNav == "note") {
-      switch(direction) {
+    switch(direction) {
         case "right":
-          if (notes[NoteID].rotationY - adj > -180) {
-            notes[NoteID].rotationY -=adj;
+          if (notes[NoteID].rotationY - moveRate > -180) {
+            notes[NoteID].rotationY -=moveRate;
           }
           else {
             notes[NoteID].rotationY *=-1;
           }
           break;
         case "left":
-          if (notes[NoteID].rotationY + adj < 180) {
-            notes[NoteID].rotationY +=adj;
+          if (notes[NoteID].rotationY + moveRate < 180) {
+            notes[NoteID].rotationY +=moveRate;
           }
           else {
             notes[NoteID].rotationY *=-1;
           }
           break;
         case "up":
-          notes[NoteID].translateX -=adj;
+          notes[NoteID].translateX -=moveRate;
           break;
         case "down":
-          notes[NoteID].translateX +=adj;
+          notes[NoteID].translateX +=moveRate;
           break;
       }
-      this.save("notes", notes[NoteID], NoteID);
-      data.notes = notes;
-    }
 
-    if (this.state.noteOrNav == "nav") {
+      //CylindricalPanel won't display at ~180 or ~-180
+      if(notes[NoteID].rotationY > 177 && notes[NoteID].rotationY < 180)
+        notes[NoteID].rotationY = 177;
+      if(notes[NoteID].rotationY >= 180 && notes[NoteID].rotationY < 183)
+          notes[NoteID].rotationY = 183;
+      if(notes[NoteID].rotationY < -177 && notes[NoteID].rotationY > -180)
+        notes[NoteID].rotationY = -177;
+      if(notes[NoteID].rotationY <= -180 && notes[NoteID].rotationY > -183)
+          navs[NoteID].rotationY = -183;
+      this.save("notes", notes[NoteID], NoteID);
+
+  }
+
+  moveNav(direction) {
+    let {data} = this.props.location;
+    let navs = data.navs;
+
+    let NavID = this.state.navID;
+    let moveRate = this.state.moveRate;
+
       switch(direction) {
         case "right":
-          if (navs[NavID].rotationY - adj > -180) {
-            navs[NavID].rotationY -=adj;
+          if (navs[NavID].rotationY - moveRate > -180) {
+            navs[NavID].rotationY -=moveRate;
           }
           else {
             navs[NavID].rotationY *=-1;
           }
           break;
         case "left":
-          if (navs[NavID].rotationY + adj < 180) {
-            navs[NavID].rotationY +=adj;
+          if (navs[NavID].rotationY + moveRate < 180) {
+            navs[NavID].rotationY +=moveRate;
           }
           else {
             navs[NavID].rotationY *=-1;
           }
           break;
       }
+      //CylindricalPanel won't display at ~180 or ~-180
+      if(navs[NavID].rotationY > 177 && navs[NavID].rotationY < 180)
+        navs[NavID].rotationY = 177;
+      if(navs[NavID].rotationY >= 180 && navs[NavID].rotationY < 183)
+          navs[NavID].rotationY = 183;
+      if(navs[NavID].rotationY < -177 && navs[NavID].rotationY > -180)
+        navs[NavID].rotationY = -177;
+      if(navs[NavID].rotationY <= -180 && navs[NavID].rotationY > -183)
+          navs[NavID].rotationY = -183;
       this.save("navs", navs[NavID].rotationY, NavID);
-      // data.navs = navs;
-    }
+
   }
 
   editNote(index) {
@@ -254,22 +274,21 @@ export default class StaticLayout extends React.Component {
     let {data} = this.props.location;
     let notes = data.notes;
 
-    NativeModules.DomOverlayModule.openOverlay3(index);
+    NativeModules.DomOverlayModule.openConfirm(index);
   }
 
   deleteConfirmation(obj){
     if(obj.confirm == "Yes"){
-      if (obj.index == this.state.noteID && this.overlayOpen1) {
-        NativeModules.DomOverlayModule.closeOverlay1();
+      console.log(obj.index, this.state.noteID, this.state.NotesOpen);
+      //if deleting selected note & overlay is open close note overlay and open reopen overlay with just "general notes"
+      if (obj.index == this.state.noteID && this.state.NotesOpen) {
+        NativeModules.DomOverlayModule.closeNotes();
         this.openOverlay(-1, "General");
-      }
-      else if (obj.index == this.state.noteID) {
-        NativeModules.DomOverlayModule.closeOverlay1();
       }
 
       this.save("delete", "", obj.index);
     }
-    NativeModules.DomOverlayModule.closeOverlay3();
+    NativeModules.DomOverlayModule.closeConfirm();
   }
 
   updateText(obj) {
@@ -288,7 +307,7 @@ export default class StaticLayout extends React.Component {
     this.setState({
       noteOrNav: "note",
       displayNavs: false,
-      displayNotes: !this.state.displayNotes,
+      noteListOpen: !this.state.noteListOpen,
     })
   }
 
@@ -296,7 +315,7 @@ export default class StaticLayout extends React.Component {
     this.setState({
       noteOrNav: "nav",
       displayNavs: !this.state.displayNavs,
-      displayNates: false,
+      noteListOpen: false,
     })
   }
 
@@ -304,12 +323,11 @@ export default class StaticLayout extends React.Component {
     let {data} = this.props.location;
     let notes = data.notes;
     let navs = data.navs;
-    // console.log("Data", data, "Index:", index);
 
     if (type == "note") {
       this.setState({noteID: index, noteOrNav: "note"});
 
-      if (this.state.overlayOpen1) {
+      if (this.state.NotesOpen) {
          this.openOverlay(index, "Text");
       }
 
@@ -340,33 +358,27 @@ export default class StaticLayout extends React.Component {
 
       setTimeout(function() {
         let rot = (this.state.cameraRot._y*57)%360;
-        let obj = notes[index].rotationY - rot;
+        let obj = navs[index].rotationY - rot;
         this.props.focusNote(obj);
       }.bind(this), 25);
 
-      if (this.state.overlayOpen1) {
+      if (this.state.NotesOpen) {
         this.openOverlay(-1, "General");
       }
 
     }
   }
 
-  adjustRate(direction) {
+  adjustMoveRate(direction) {
     switch (direction) {
       case "up":
-        if (this.state.adjustRate < 20) {
-          this.setState({adjustRate : this.state.adjustRate + 2 })
-        }
-        else {
-            console.log("Adjust Rate Maxed");
+        if (this.state.moveRate < 20) {
+          this.setState({moveRate : this.state.moveRate + 2 })
         }
         break;
       case "down":
-        if (this.state.adjustRate > 2) {
-          this.setState({adjustRate : this.state.adjustRate - 2 })
-        }
-        else {
-            console.log("Adjust Rate Minimized");
+        if (this.state.moveRate > 2) {
+          this.setState({moveRate : this.state.moveRate - 2 })
         }
       break;
 
@@ -375,12 +387,12 @@ export default class StaticLayout extends React.Component {
 
   // What is rate? I figured out, but explain it somewhere ~ if not, maybe 'increment?'
   changeRate(magnitude) {
-    this.setState({adjustRate : magnitude })
+    this.setState({moveRate : magnitude })
   }
 
   floorSelection() {
-    if (this.state.overlayOpen2) {
-      NativeModules.DomOverlayModule.closeOverlay2();
+    if (this.state.SelectorOpen) {
+      NativeModules.DomOverlayModule.closeSelector();
     }
     else {
       this.openOverlay(-1, "Select");
@@ -389,6 +401,7 @@ export default class StaticLayout extends React.Component {
   }
 
   refreshTooltips() {
+    //use timeout so commands don't execute at exactly the same time.
     setTimeout(function() {this.toggleNotes()}.bind(this), 125);
     setTimeout(function() {this.toggleNotes()}.bind(this), 125);
   }
@@ -398,6 +411,7 @@ export default class StaticLayout extends React.Component {
     let notes = (data && data.notes) || null;
     let gNotes = (data && data.gNotes) || null;
 
+    //convert to strings so they can be passed correctly.
     let FLS = JSON.parse(JSON.stringify(floors));
     let RMS = JSON.parse(JSON.stringify(rooms));
 
@@ -405,30 +419,31 @@ export default class StaticLayout extends React.Component {
     console.log("The Floor:", floor);
 
     if (type == "Text") {
-      NativeModules.DomOverlayModule.closeOverlay1();
-      NativeModules.DomOverlayModule.openOverlay1(notes[index].text, notes[index].title, "Both", gNotes);
+      NativeModules.DomOverlayModule.closeNotes();
+      NativeModules.DomOverlayModule.openNotes(notes[index].text, notes[index].title, "Both", gNotes);
     }
     if (type == "General") {
-      NativeModules.DomOverlayModule.closeOverlay1();
-      NativeModules.DomOverlayModule.openOverlay1("", "", "General", gNotes);
+      NativeModules.DomOverlayModule.closeNotes();
+      NativeModules.DomOverlayModule.openNotes("", "", "General", gNotes);
     }
     if (type == "Select") {
-      NativeModules.DomOverlayModule.closeOverlay2();
-      NativeModules.DomOverlayModule.openOverlay2(locationId.toString(), floor, FLS, RMS);
+      NativeModules.DomOverlayModule.closeSelector();
+      NativeModules.DomOverlayModule.openSelector(locationId.toString(), floor, FLS, RMS);
     }
   }
 
   selectFloorRoom(obj) {
     let {locationId, data, currentFloor, floors, rooms} = this.props.location;
+
+    //obj contains the floor name. make floor = the index of the floor name
     let test = floors.find(o => o.name === obj.floor);
     let floor = floors.indexOf(test);
-    console.log(test);
-    console.log(floor);
-    console.log(currentFloor);
 
+    //same floor, same location ID = already here
     if (obj.floor == currentFloor && obj.room == locationId) {
       console.log("Already here.");
     }
+    //same floor or trying to navigate to floor that doesn't exist
     else if (floor == currentFloor || floor == -1) {
       let roomData = rooms[obj.room];
       this.props.updatelocation({
@@ -437,6 +452,8 @@ export default class StaticLayout extends React.Component {
         nextLocationId: obj.room,
       });
     }
+    //new floor, new room.
+    //retrieve new floor data from databsse
     else {
       let jsonPath = ["api", "floor", floors[floor].hash].join("/");
       fetch(this.formatSearchQuery(jsonPath))
@@ -446,35 +463,27 @@ export default class StaticLayout extends React.Component {
 
           this.props.selectFloor(floor);
           this.props.setRooms(roomData);
-          console.log(responseData);
 
           let rdp = Object.keys(roomData);
-
+          //if trying to navigate to room that doesn't exist, default to room #1
           if (!rdp.includes(obj.room)) {
             obj.room = rdp[0];
           }
-
-          console.log("ROOM", obj.room)
 
           this.props.updatelocation({
             data: roomData[obj.room],
             locationId: obj.room,
             nextLocationId: obj.room,
           });
-
-          let locs = Object.keys(roomData);
-          // console.log();
-          setTimeout(function() {this.props.changeNextLocationId(locs[0])}.bind(this), 25);
-          setTimeout(function() {this.props.changeNextLocationId(locs[1])}.bind(this), 25);
-          setTimeout(function() {this.props.changeNextLocationId(obj.room)}.bind(this), 25);
         })
         .done();
     }
   }
 
   goHome() {
-    // console.log("Props:", this.props);
+    // Go to first photo
     let {data} = this.props.location;
+    console.log(this.props);
     let fLocs = Object.keys(this.props.location.floors);
     let rLocs = Object.keys(this.props.location.rooms);
 
@@ -482,10 +491,8 @@ export default class StaticLayout extends React.Component {
     floor = fLocs[0];
 
     this.selectFloorRoom({floor, room});
-    //this.props.changeNextLocationId(locs[0]);
-    this.setState({displayNotes: false})
-    NativeModules.DomOverlayModule.closeOverlay1();
-
+    this.setState({noteListOpen: false})
+    NativeModules.DomOverlayModule.closeNotes();
   }
 
   save(type, obj, index = -1) {
@@ -498,14 +505,13 @@ export default class StaticLayout extends React.Component {
         .then(response => response.json())
         .then(responseData => {
           this.props.updateData(responseData.photos[locationId]);
-          console.log("RD:", responseData);
+
         })
         .done();
     }
-    // "/notes/:floor/:pindex/:nindex"
+    // "/notes/:floor/:pindex/:nindex" -> method: post
     else if (type == "notes") {
       let jsonPath = ["api", type, floors[currentFloor].hash, locationId, index].join("/");
-      // Always send POSTs, donno why puts aren't working, but ¯\_(ツ)_/¯
       fetch(this.formatSearchQuery(jsonPath), {
           body: JSON.stringify(obj),
           headers: { "Content-Type": "application/json" },
@@ -514,9 +520,9 @@ export default class StaticLayout extends React.Component {
       .then(response => response.json())
       .then(responseData => {
         this.props.updateData(responseData.photos[locationId]);
-        console.log("RD:", responseData);
+
         this.selectTooltip(index, "note");
-        if (this.state.displayNotes) {
+        if (this.state.noteListOpen) {
           this.refreshTooltips();
         }
         else {
@@ -533,11 +539,11 @@ export default class StaticLayout extends React.Component {
           .then(response => response.json())
           .then(responseData => {
             this.props.updateData(responseData.photos[locationId]);
-            console.log("RD:", responseData);
+            // this.selectTooltip(index, "nav");
           })
           .done();
     }
-
+    //"/notes/:floor/:pindex/:nindex" -> method:delete
     else if (type == "delete") {
       let jsonPath = ["api", "notes", floors[currentFloor].hash, locationId, index].join("/");
       fetch(this.formatSearchQuery(jsonPath), {
@@ -550,40 +556,35 @@ export default class StaticLayout extends React.Component {
       })
       .done();
     }
-
   }
 
   setRotation(){
     let {data} = this.props.location;
     NativeModules.ClientModule.getRotation();
-
+    //Client Module returns Camera Rotation to the listener
+    //use timeout to give time for state to update
     setTimeout(function() {
+      //multiply rotation from ClientModule.getRotation by 57 to approximately convert radians to degrees
+      //%360 to make the value always fall between 0-360. Otherwise the number can be infinitely high.
+      //0-360 fits within the bounds
       let rot = (this.state.cameraRot._y*57)%360;
       data.rotationOffset = rot;
-      console.log(rot);
+
       this.props.updateData(data);
     }.bind(this), 25);
-  }
-
-  test(){
-    console.log("cameraRot:", (this.state.cameraRot._y*57)%360);
-    // NativeModules.ClientModule.getRotation();
-    // setTimeout(function() {
-    //   let rot = (this.state.cameraRot._y*57)%360;
-    //   console.log(rot);
-    // }.bind(this), 25);
   }
 
   render() {
     let {data} = this.props.location;
     let notes = (data && data.notes) || null;
     let navs = (data && data.navs) || null;
-    var lvls = [];
-
+    var adjustRateArray = [];
+    //range of values for adjust rate.
     for (let i = 2; i <= 20; i+=2) {
-      lvls.push(i);
+      adjustRateArray.push(i);
     }
 
+    //if notes or navs don't exist, create empty array for them so code doesn't break;
     if (!notes) {
       notes = [];
     }
@@ -616,12 +617,12 @@ export default class StaticLayout extends React.Component {
 
           </View>
 
-          {!this.state.overlayOpen2 &&
+          {!this.state.SelectorOpen &&
           <VrButton style={styles.selection} onClick={this.floorSelection}>
             <Image style={styles.selectionImage} source={asset('expand_arrow.png')}></Image>
           </VrButton>}
 
-          {(this.state.displayNotes && notes.length == 0) && <View style={styles.noteList}>
+          {(this.state.noteListOpen && notes.length == 0) && <View style={styles.noteList}>
           <VrButton>
             <Text style={styles.tooltipListItem}>
             No Notes For This Room
@@ -642,7 +643,7 @@ export default class StaticLayout extends React.Component {
             })}
           </View>}
 
-          {(this.state.displayNotes && notes.length > 0) && <View style={styles.noteList}>
+          {(this.state.noteListOpen && notes.length > 0) && <View style={styles.noteList}>
             {notes.map((note, index) => {
               if (note)
               return(
@@ -665,56 +666,55 @@ export default class StaticLayout extends React.Component {
           </View>}
 
           {/* Side "Moving" Menus */}
-          {((this.state.displayNotes && notes.length > 0) || (this.state.displayNavs && navs.length > 0)) && <View style={styles.pBButton}>
-          <VrButton style={this.state.noteOrNav == "nav" ? styles.pBLeftNav : styles.pBLeft} onClick={() => this.moveNote("left")}>
+          {(this.state.displayNavs && navs.length > 0 && this.state.noteOrNav == "nav") && <View style={styles.pBButton}>
+          <VrButton style={styles.pBLeftNav} onClick={() => this.moveNav("left")}>
             <Text style={styles.menuText}>Left</Text>
           </VrButton>
-          <VrButton style={this.state.noteOrNav == "nav" ? styles.pBRightNav : styles.pBRight} onClick={() => this.moveNote("right")}>
+          <VrButton style={styles.pBRightNav} onClick={() => this.moveNav("right")}>
             <Text style={styles.menuText}>Right</Text>
           </VrButton>
+        </View>}
 
-          {this.state.noteOrNav == "note" && <VrButton style={styles.pBUp} onClick={() => this.moveNote("up")}>
+          {(this.state.noteListOpen && notes.length > 0 && this.state.noteOrNav == "note") && <View style={styles.pBButton}>
+          <VrButton style={styles.pBLeft} onClick={() => this.moveNote("left")}>
+            <Text style={styles.menuText}>Left</Text>
+          </VrButton>
+          <VrButton style={styles.pBRight} onClick={() => this.moveNote("right")}>
+            <Text style={styles.menuText}>Right</Text>
+          </VrButton>
+          {<VrButton style={styles.pBUp} onClick={() => this.moveNote("up")}>
             <Text style={styles.menuText}>Up</Text>
           </VrButton>
           }
-          {this.state.noteOrNav == "note" && <VrButton style={styles.pBDown} onClick={() => this.moveNote("down")}>
+          {<VrButton style={styles.pBDown} onClick={() => this.moveNote("down")}>
             <Text style={styles.menuText}>Down</Text>
           </VrButton>
           }
-          <VrButton style={styles.pBPlus} onClick={() => this.adjustRate("up")}>
+        </View>}
+
+          {(this.state.noteListOpen || this.state.displayNavs) && <View>
+
+          <VrButton style={styles.pBPlus} onClick={() => this.adjustMoveRate("up")}>
             <Text style={styles.menuText}>+</Text>
           </VrButton>
           <VrButton style={styles.pBRate}>
-            <Text style={styles.menuText}>{this.state.adjustRate}</Text>
+            <Text style={styles.menuText}>{this.state.moveRate}</Text>
           </VrButton>
-          <VrButton style={styles.pBMinus} onClick={() => this.adjustRate("down")}>
+          <VrButton style={styles.pBMinus} onClick={() => this.adjustMoveRate("down")}>
             <Text style={styles.menuText}>-</Text>
           </VrButton>
           <View style={styles.pBRateBar}>
-            {lvls.map((mag, index) => {
+            {adjustRateArray.map((mag, index) => {
               return(
-                <VrButton style={(this.state.adjustRate == mag) ? styles.pBRateBarButtonSelected : styles.pBRateBarButton}
+                <VrButton style={(this.state.moveRate == mag) ? styles.pBRateBarButtonSelected : styles.pBRateBarButton}
                     key={index} onClick={() => this.changeRate(mag)}>
                       <Text style={styles.barText}>{mag}</Text>
                 </VrButton>
               );
             })}
           </View>
+        </View>}
           </View>}
-        </View>}
-        {/* The line below Displays the View only if "this.props.textInputActive" is true
-          Using the && is a short way of doing it instead of
-           this.props.textInputActive ? <View> : null */}
-
-        {/*
-          {this.props.StaticTextBox && <View style={styles.staticTBView}>
-          <Text style={styles.staticTBText}>
-            {this.props.input}
-          </Text>
-        </View>}
-        */}
-
-
       </View>
     );
   }
