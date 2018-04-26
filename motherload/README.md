@@ -53,7 +53,16 @@
   - Have a designer/UI person on your team :relaxed: :grin:
 
 ### VR
-<!-- more here -->
+  -**Set Image Rotation**
+    + Add ability to use camera rotation to set each image's default rotation, and use this in addition to the already existing rotation used for focusing on a note.
+  -**Consistent Note Display**
+    + At some points, the note text can be cut off. Other times after editing text, the formatting can be off. This may be able to be fixed by adding custom ReactVR code.
+  -**Improved Notes List**
+    + Add ability to scroll through list of notes on page. Possibly moving it from React VR to React for cleaner functionality on a 2D plane.
+  -**Customize Zoom**
+    + Allow custom zoom bar like Google Maps. Prevent zoom from zooming in on the static elements
+  -**Add Responsiveness**
+    + Make all ReactVR and React elements responsive for use on any size screen, portrait or landscape.
 
 ## Still TBD
 - Finish Frontend Deletes of floors in Buildings
