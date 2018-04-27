@@ -1,8 +1,5 @@
 import React from 'react';
-// import Select from 'react-select';
-// import 'react-select/dist/react-select.css';
 
-//This is standard react.
 export default class SelectorOverlay extends React.Component{
 
   constructor(props) {
@@ -76,12 +73,7 @@ export default class SelectorOverlay extends React.Component{
       room: this.state.room
     }
 
-    console.log("THE OBJ", obj)
-
     this.props.submit(obj);
-    //
-    // this.setState({updated: true});
-    // setTimeout(function() {this.setState({updated: false});}.bind(this), 1000);
   }
 
   updateSelections() {
@@ -105,7 +97,6 @@ export default class SelectorOverlay extends React.Component{
     if(!this.state.rooms){
       return null;
     }
-    // console.log(this.state.rooms, this.state.lRooms, this.state.floors, this.state.lFloors)
 
     return (
       <div className="select-container">
