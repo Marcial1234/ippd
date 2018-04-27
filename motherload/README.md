@@ -41,6 +41,12 @@
 
 ## Future Suggetions
 
+### Server
+  - Upload of pictures to a cloud service. Had issues with Async JS.
+    + Will need to change change the VR's source mechanisms from 'asset()' to pure links
+  - Have optional panoramic conversion/stiching, or separate the stitching process altogether and just make a Python script for it.
+  - Convert panoramic conversion command to Linux. [Docs](https://github.com/ultramango/gear360pano).
+
 ### Frontend
   - **Floor editing**
     + Save the array/matrix used to generate the the navigation buttons angles and its dimenetions (x, y), repopulate the picture side menu, and allow for the same process as initial floor creation f(x)nality.
